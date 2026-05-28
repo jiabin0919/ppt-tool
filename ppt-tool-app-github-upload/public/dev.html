@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PPT Tool · 开发预览</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <strong>PPT Tool</strong>
+      <span class="version">v0.1.0 · 开发预览</span>
+    </div>
+    <div class="status-row">
+      <span id="health-status" class="badge">API: 检查中...</span>
+      <span id="dna-status" class="badge">DNA: 加载中...</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>步骤 1 · API 连通性</h2>
+      <p class="hint">检查 Netlify Functions 是否可达,看哪些模型 API key 已配置。</p>
+      <button id="check-health">检查 /api/health</button>
+      <pre id="health-output" class="output"></pre>
+    </section>
+
+    <section class="card">
+      <h2>步骤 2 · DNA 注册表</h2>
+      <p class="hint">加载 7 套 DNA 的 manifest + skeleton, 应该看到全部 7 套出现。</p>
+      <div id="dna-grid" class="dna-grid">
+        <!-- DNA 卡片由 JS 渲染 -->
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>步骤 3 · 试调一次 LLM</h2>
+      <p class="hint">选模型, 输入测试 prompt, 验证端到端连通。</p>
+      <div class="form-row">
+        <label>模型:</label>
+        <select id="llm-model">
+          <option value="deepseek">DeepSeek V3</option>
+          <option value="doubao">豆包 Pro</option>
+          <option value="kimi">Kimi</option>
+          <option value="qwen">通义千问 Plus</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>团队密码:</label>
+        <input id="team-password" type="password" placeholder="部署时设置的 TEAM_PASSWORD">
+      </div>
+      <div class="form-row">
+        <label>提示词:</label>
+        <textarea id="llm-prompt" rows="3" placeholder="例如:用一句话介绍 manifest-driven 架构">用一句话介绍 manifest-driven 架构</textarea>
+      </div>
+      <button id="call-llm">调用 /api/llm-proxy</button>
+      <pre id="llm-output" class="output"></pre>
+    </section>
+  </main>
+
+  <script src="/lib/manifest-loader.js"></script>
+  <script src="/lib/renderer.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

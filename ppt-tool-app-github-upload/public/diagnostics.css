@@ -1,0 +1,144 @@
+/* diagnostics.css · 诊断面板样式 */
+
+.diagnostics-panel {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.dp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.dp-header h3 {
+  margin: 0;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #737373;
+}
+
+.dp-summary {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.dp-count {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dp-count.error {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.dp-count.warning {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.dp-count.info {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.dp-count.ok {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.dp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.dp-issue {
+  padding: 8px 10px;
+  background: #FAFAFA;
+  border: 1px solid #E5E5E5;
+  border-left-width: 3px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dp-issue:hover {
+  background: #F4F4F5;
+}
+
+.dp-issue.error {
+  border-left-color: #DC2626;
+}
+
+.dp-issue.warning {
+  border-left-color: #F59E0B;
+}
+
+.dp-issue.info {
+  border-left-color: #3B82F6;
+}
+
+.dp-issue-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+
+.dp-issue-page {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  padding: 1px 5px;
+  background: #1A1A1A;
+  color: #FFF;
+  border-radius: 3px;
+}
+
+.dp-issue-type {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  color: #525252;
+}
+
+.dp-issue-slot {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  color: #737373;
+  margin-left: auto;
+}
+
+.dp-issue-message {
+  color: #1A1A1A;
+  line-height: 1.4;
+}
+
+.dp-issue-preview {
+  margin-top: 4px;
+  font-size: 10px;
+  color: #737373;
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dp-empty {
+  text-align: center;
+  padding: 20px 0;
+  color: #16A34A;
+  font-size: 12px;
+}

@@ -1,0 +1,223 @@
+/* PPT Tool · 开发预览样式 */
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: #FAFAFA;
+  color: #1A1A1A;
+  line-height: 1.6;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: #FFF;
+  border-bottom: 1px solid #E5E5E5;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand strong {
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.brand .version {
+  margin-left: 8px;
+  font-size: 12px;
+  color: #888;
+  font-family: ui-monospace, monospace;
+}
+
+.status-row {
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  background: #F4F4F5;
+  border-radius: 999px;
+  color: #525252;
+  font-family: ui-monospace, monospace;
+}
+
+.badge.ok {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.badge.err {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  gap: 24px;
+}
+
+.card {
+  background: #FFF;
+  border: 1px solid #E5E5E5;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.card h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.card .hint {
+  margin: 0 0 16px;
+  color: #737373;
+  font-size: 14px;
+}
+
+button {
+  background: #1A1A1A;
+  color: #FFF;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+button:hover {
+  background: #404040;
+}
+
+button:disabled {
+  background: #A3A3A3;
+  cursor: not-allowed;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.form-row label {
+  min-width: 80px;
+  font-size: 14px;
+  color: #525252;
+}
+
+.form-row select,
+.form-row input,
+.form-row textarea {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #D4D4D4;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.form-row textarea {
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.output {
+  margin: 12px 0 0;
+  padding: 12px;
+  background: #FAFAFA;
+  border: 1px solid #E5E5E5;
+  border-radius: 6px;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 12px;
+  color: #404040;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.output:empty {
+  display: none;
+}
+
+/* DNA Grid */
+.dna-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.dna-card {
+  border: 1px solid #E5E5E5;
+  border-radius: 10px;
+  padding: 16px;
+  background: #FAFAFA;
+}
+
+.dna-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.dna-card-name {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.dna-card-tagline {
+  font-size: 12px;
+  color: #737373;
+  margin: 4px 0 8px;
+}
+
+.dna-card-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #525252;
+  font-family: ui-monospace, monospace;
+  margin-bottom: 12px;
+}
+
+.dna-card-skins {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.skin-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #FFF;
+  border: 1px solid #E5E5E5;
+  border-radius: 999px;
+  font-size: 11px;
+  color: #404040;
+}
+
+.skin-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}

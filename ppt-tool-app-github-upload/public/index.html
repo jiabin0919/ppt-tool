@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PPT Tool · 一份报告变成精美 PPT</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/pipeline.css">
+  <link rel="stylesheet" href="/edit-panel.css">
+  <link rel="stylesheet" href="/fullscreen-preview.css">
+  <link rel="stylesheet" href="/diagnostics.css">
+  <link rel="stylesheet" href="/image-uploader.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <strong>PPT Tool</strong>
+      <span class="version">v0.1.0</span>
+    </div>
+    <nav class="stage-nav">
+      <div class="stage-dot" data-stage="input">
+        <span class="stage-num">1</span><span class="stage-label">输入报告</span>
+      </div>
+      <div class="stage-line"></div>
+      <div class="stage-dot" data-stage="outline">
+        <span class="stage-num">2</span><span class="stage-label">确认结构</span>
+      </div>
+      <div class="stage-line"></div>
+      <div class="stage-dot" data-stage="preview">
+        <span class="stage-num">3</span><span class="stage-label">预览编辑</span>
+      </div>
+    </nav>
+    <div class="topbar-actions">
+      <select id="model-selector" class="model-select" title="选择 LLM 模型">
+        <option value="deepseek">DeepSeek V3</option>
+        <option value="doubao">豆包 Pro</option>
+        <option value="kimi">Kimi</option>
+        <option value="qwen">通义千问 Plus</option>
+      </select>
+      <input id="password-input" type="password" class="password-input"
+             placeholder="团队密码" title="部署时设置的 TEAM_PASSWORD">
+      <button id="btn-new-work" class="ghost small" title="清空缓存,从头开始">＋新建</button>
+      <a href="/dev.html" class="dev-link" title="开发预览页">⚙</a>
+    </div>
+  </header>
+
+  <!-- 恢复 banner: 启动检测到有缓存时显示 -->
+  <div id="restore-banner" class="restore-banner" hidden>
+    <div class="rb-content">
+      <span class="rb-icon">⏮</span>
+      <div class="rb-text">
+        <strong>检测到未完成的工作</strong>
+        <span class="rb-meta" id="rb-meta">—</span>
+      </div>
+      <button id="btn-restore" class="primary small">恢复</button>
+      <button id="btn-discard" class="ghost small">丢弃</button>
+      <button class="rb-close" id="rb-close-btn" title="稍后再说">×</button>
+    </div>
+  </div>
+
+  <main class="stage stage-input" data-stage="input">
+    <div class="stage-content">
+      <div class="input-grid">
+        <div class="card">
+          <h2>报告原文</h2>
+          <p class="hint">把你想做成 PPT 的文章 / 报告 / 内部文档粘进来。1000-5000 字最佳。<br>
+          <strong>或上传附件</strong>(PDF / Word / PPT / Markdown / TXT),工具会自动提取文本。</p>
+          
+          <div class="attach-zone" id="attach-zone">
+            <div class="attach-drop" id="attach-drop">
+              <span class="attach-icon">📎</span>
+              <div class="attach-text">
+                <strong>拖文件到此</strong>,或 <span class="attach-link">点击选择</span>
+                <span class="attach-formats">PDF · Word · PPT · MD · TXT</span>
+              </div>
+              <input type="file" id="attach-input" class="iu-hidden-input" 
+                     accept=".pdf,.docx,.pptx,.md,.markdown,.txt" multiple>
+            </div>
+            <div class="attach-list" id="attach-list"></div>
+          </div>
+          
+          <textarea id="raw-report" rows="14" placeholder="粘贴报告原文,或上传附件后留空也可以…"></textarea>
+        </div>
+        <div class="card">
+          <h2>设置</h2>
+          <div class="form-row">
+            <label>受众</label>
+            <input id="setting-audience" type="text" placeholder="例如:管理层 / 投资人 / 客户">
+          </div>
+          <div class="form-row">
+            <label>页数</label>
+            <input id="setting-pages" type="text" placeholder="例如:12-16 页">
+          </div>
+          <div class="form-row">
+            <label>时长</label>
+            <input id="setting-duration" type="text" placeholder="例如:20-25 分钟">
+          </div>
+          <div class="form-row form-row-stack">
+            <label>特殊要求</label>
+            <textarea id="setting-special" rows="3"
+                      placeholder="例如:必须提某个数据 / 不能提竞争对手名字"></textarea>
+          </div>
+          <p class="hint hint-aside">留空时使用默认值(通用商业受众 / 12-16 页 / 20-25 分钟)。</p>
+        </div>
+      </div>
+
+      <div class="stage-footer">
+        <button id="btn-to-outline" class="primary">
+          生成内容规划 →
+        </button>
+        <p class="footer-hint">调用 content-planner skill,约 30-60 秒。</p>
+      </div>
+    </div>
+  </main>
+
+  <main class="stage stage-outline" data-stage="outline" hidden>
+    <div class="stage-content">
+      <div class="outline-summary card">
+        <h2>全局规划</h2>
+        <div class="summary-grid">
+          <div>
+            <strong>叙事框架</strong>
+            <p id="summary-framework">—</p>
+          </div>
+          <div>
+            <strong>核心论点</strong>
+            <p id="summary-thesis">—</p>
+          </div>
+          <div>
+            <strong>章节结构</strong>
+            <p id="summary-chapters">—</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="outline-pages card">
+        <h2>逐页规划</h2>
+        <p class="hint">这是 planner 输出的页面骨架。下个版本将支持拖拽 / 修改 / 删除。</p>
+        <div id="outline-list" class="outline-list"></div>
+      </div>
+
+      <div class="stage-footer">
+        <button class="ghost" data-back-to="input">← 返回修改报告</button>
+        <span class="footer-spacer"></span>
+        <div class="dna-picker">
+          <label>设计 DNA</label>
+          <select id="dna-selector"></select>
+        </div>
+        <button id="btn-to-preview" class="primary">
+          生成 PPT →
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <main class="stage stage-preview" data-stage="preview" hidden>
+    <div class="preview-layout">
+      <aside class="preview-thumbs">
+        <h3>页面列表</h3>
+        <div id="thumb-list" class="thumb-list"></div>
+        <div class="thumb-actions">
+          <button class="ghost small" data-back-to="outline">← 返回 outline</button>
+        </div>
+      </aside>
+
+      <section class="preview-stage">
+        <div class="preview-toolbar">
+          <span id="preview-title">第 1 页</span>
+          <span class="footer-spacer"></span>
+          <button id="btn-diagnose" class="ghost small" title="扫描质量问题">🔍 诊断</button>
+          <button id="btn-autofix" class="ghost small" title="一键安全修复" disabled>🛠 一键修复</button>
+          <button id="btn-fullscreen" class="ghost small" title="全屏播放 (← → 翻页)">⛶ 全屏</button>
+          <button id="btn-download" class="ghost small">↓ 下载 HTML</button>
+          <button id="btn-regenerate" class="ghost small">↻ 重新生成</button>
+        </div>
+        <div class="preview-iframe-wrap">
+          <div class="preview-iframe-frame">
+            <iframe id="preview-iframe" title="预览"></iframe>
+          </div>
+        </div>
+      </section>
+
+      <aside class="preview-edit">
+        <div id="diagnostics-panel" class="diagnostics-panel" hidden>
+          <div class="dp-header">
+            <h3>诊断报告</h3>
+            <button class="ghost small dp-close" type="button">关闭</button>
+          </div>
+          <div id="dp-summary" class="dp-summary"></div>
+          <div id="dp-list" class="dp-list"></div>
+        </div>
+        <h3 id="edit-panel-title">编辑当前页</h3>
+        <div id="edit-panel"></div>
+      </aside>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+  <div id="loading-overlay" class="loading-overlay" hidden>
+    <div class="loading-spinner"></div>
+    <div id="loading-message" class="loading-message">加载中…</div>
+  </div>
+
+  <script src="/lib/manifest-loader.js"></script>
+  <script src="/lib/renderer.js"></script>
+  <script src="/lib/llm-client.js"></script>
+  <script src="/lib/storage.js"></script>
+  <script src="/lib/image-uploader.js"></script>
+  <script src="/lib/doc-parser.js"></script>
+  <script src="/lib/edit-panel.js"></script>
+  <script src="/lib/fullscreen-preview.js"></script>
+  <script src="/lib/diagnostics.js"></script>
+  <script src="/lib/auto-fix.js"></script>
+  <script src="/pipeline.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "ppt-tool-app",
+  "version": "0.1.0",
+  "description": "Manifest-driven PPT auto-generation tool with 7 DNA libraries",
+  "private": true,
+  "scripts": {
+    "dev": "netlify dev",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {
+    "openai": "^4.71.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

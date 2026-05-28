@@ -1,0 +1,2081 @@
+{
+  "schema_version": "1.2",
+  "_usage": {
+    "本文档作用": "描述 Editorial DNA 的全部 42 个 variant。供 visual-planner skill 在为 PPT 每一页选 variant 时查询。",
+    "消费方": [
+      "visual-planner skill: 根据每页 page_role 和内容特征, 从 variants 数组挑一个最合适的 variant",
+      "css-renderer skill: 拿到 variant_id 后, 通过 _renderer.dom_selector 在 skeleton 找 DOM, 按 slots 填内容"
+    ],
+    "选 variant 的标准步骤": [
+      "1. 读 planning.md 这一页的 page_role(必须是 12 个标准值之一)",
+      "2. 在 variants 数组里筛选所有 page_role 匹配的 variant",
+      "3. 对比每个候选 variant 的 \"什么时候用\" 字段, 根据内容特征选最合适",
+      "4. 检查 \"数量约束\", 确保内容项数符合 variant 容量",
+      "5. 不符合, 查 \"什么时候不用\" 数组找 fallback variant"
+    ],
+    "输出格式": "选定 variant 后, 按 _yaml_example_text 格式输出 visual_plan.yaml",
+    "禁止行为": [
+      "不要编造 manifest 中不存在的 variant_id",
+      "不要编造 manifest 中不存在的 slot key",
+      "不要使用下划线前缀字段(_renderer, _warnings) 作为业务字段",
+      "如果所有 variant 都不合适, 在 yaml 的 review_comments 里如实说明, 不要硬塞"
+    ]
+  },
+  "_type_definitions": {
+    "纯文本": {
+      "格式": "字符串, 不含任何 HTML 标签",
+      "示例": "2025 中国新能源汽车年度观察",
+      "禁止": [
+        "<em>...</em>",
+        "<br>",
+        "**markdown**"
+      ]
+    },
+    "富文本": {
+      "格式": "字符串, 允许以下 HTML 标签",
+      "允许的标签": {
+        "<em>...</em>": "用主题 accent 色高亮关键词",
+        "<strong>...</strong>": "加粗强调",
+        "<br>": "换行(只在标题类 slot 用)",
+        "<span class='accent-word'>...</span>": "强调词(同 accent 色)",
+        "<span class='outline-word'>...</span>": "空心描边字(大字版用)",
+        "<span class='unit'>...</span>": "数字后小单位"
+      },
+      "示例": "渗透率<em>40.9%</em>的历史性拐点",
+      "禁止": [
+        "除上述外的 HTML 标签",
+        "嵌套 HTML",
+        "markdown 语法"
+      ]
+    },
+    "组合字段": {
+      "格式": "JSON 对象, 有多个固定子字段",
+      "示例": {
+        "label": "市场规模",
+        "value": "1285万辆"
+      },
+      "说明": "每个子字段在 variant 的 slots 定义里详细说明"
+    },
+    "同质列表": {
+      "格式": "JSON 数组, 每项是字符串",
+      "示例": [
+        "渗透率突破 40%",
+        "出口同比 +71%",
+        "动力电池 TOP3 中国占 2"
+      ],
+      "说明": "用于一组同类型简单项"
+    },
+    "重复列表": {
+      "格式": "JSON 对象数组, 每项是一个对象",
+      "示例": [
+        {
+          "item-label": "DRIVER 01",
+          "item-title": "渗透率拐点",
+          "item-desc": "..."
+        },
+        {
+          "item-label": "DRIVER 02",
+          "item-title": "自主份额",
+          "item-desc": "..."
+        }
+      ],
+      "说明": "用于一组异质项, 每项含多字段。featured 项用 _featured: true 标记"
+    },
+    "图片": {
+      "格式": "JSON 对象",
+      "示例": {
+        "url": "https://picsum.photos/seed/cars/1280/720",
+        "alt": "新能源车流",
+        "image_fit": "cover"
+      },
+      "image_fit 枚举值": {
+        "cover": "填满容器, 居中裁切, 不变形 - 适合摄影 / 风景",
+        "contain": "完整显示, 周围 padding - 适合产品图 / logo",
+        "scale-down": "不放大失真, 居中显示 - 适合截图 / 小尺寸"
+      },
+      "url 留空时": "用骨架默认渐变背景(各主题自适应)"
+    },
+    "图表": {
+      "格式": "JSON 对象",
+      "示例": {
+        "type": "line",
+        "x_labels": [
+          "Q1",
+          "Q2",
+          "Q3",
+          "Q4"
+        ],
+        "primary": {
+          "label": "销量(万辆)",
+          "data": [
+            25,
+            32,
+            42,
+            50
+          ]
+        }
+      },
+      "type 枚举值 (封闭)": [
+        "line",
+        "bar",
+        "bar-line-combo",
+        "doughnut",
+        "pie"
+      ],
+      "禁止": "不要用枚举外的类型, 渲染器没桥接会画空白"
+    }
+  },
+  "_fallback_rules": {
+    "内容项数超过最多": {
+      "处理": "拆成两页, 第二页用相同 variant",
+      "示例": "用户给 8 条要点, S-D 严格 4 个 → 拆 2 页 S-D 或改用 S-E"
+    },
+    "内容项数少于最少": {
+      "处理": "查 variant '什么时候不用' 数组, 跟随建议",
+      "示例": "2 条数据, S-A 需要 3 条 → S-A '什么时候不用' 指明退路"
+    },
+    "找不到匹配 page_role 的 variant": {
+      "处理": "退到 page_role=support, 在 review_comments 里说明",
+      "禁止": "不要编造 variant_id"
+    },
+    "用户内容跟所有 variant 都不匹配": {
+      "处理": "在 yaml 的 global.review_comments 里如实说明",
+      "禁止": "不要硬塞内容到不合适的 variant"
+    },
+    "字数超过 slot 最大字数": {
+      "处理": "精简内容到限制内",
+      "底线": "不能为了塞内容而违反字数限制"
+    }
+  },
+  "_yaml_example_text": "# Editorial DNA · visual_plan.yaml 示例\n\nglobal:\n  dna: \"editorial\"\n  total_pages: 20\n  review_comments: |\n    20 页, 17 个不同 variant\n    高潮: 2 个 climax (P2 CLX-A · 40.9%, P8 CLX-C · 双数字)\n    Gallery: 1 个 (P10 H3)\n\npages:\n  - slide: 1\n    variant_id: \"COV-A\"\n    page_role: \"cover\"\n    director_note: |\n      【情绪定调】权威庄重\n      【内容载体】全出血图 + 左下文字\n      【视觉主角】slot-title-zh 中文主标\n      【空间分配】骨架默认\n      【演讲配合】无动画\n    slots:\n      slot-eyebrow: \"[ ANNUAL OBSERVATION · 2025 ]\"\n      slot-title-en: \"THE YEAR OF<br>EXECUTION\"\n      slot-title-zh: \"2025 中国新能源汽车<em>年度观察</em>\"\n      slot-cover-meta:\n        - \"DATA-DRIVEN · APRIL 2026\"\n        - \"60 PAGES · 32 CHARTS\"\n        - \"BY ARCHIVE RESEARCH\"\n      img-full:\n        url: \"https://picsum.photos/seed/ev-highway/1280/720\"\n        alt: \"新能源汽车高速车流\"\n        image_fit: \"cover\"\n\n  - slide: 4\n    variant_id: \"S-A\"\n    page_role: \"support\"\n    director_note: |\n      【情绪定调】冷静客观\n      【内容载体】左折线图 + 右 3 条增长驱动力\n      【视觉主角】左侧折线图\n      【空间分配】7:3 强调图表\n      【演讲配合】图表先出, 三条要点依次淡入\n    slots:\n      slot-title-en: \"GROWTH<br>DRIVERS\"\n      slot-title-zh: \"核心增长驱动力分析\"\n      slot-chart:\n        type: \"line\"\n        x_labels: [\"Q1\", \"Q2\", \"Q3\", \"Q4\", \"Q5\", \"Q6\", \"Q7\"]\n        primary: {label: \"月度销量(万辆)\", data: [25, 32, 38, 42, 50, 58, 65]}\n        fill: true\n      slot-item-list:\n        - item-label: \"[ DRIVER 01 ]\"\n          item-title: \"渗透率突破拐点\"\n          item-desc: \"年渗透率从 28% 跃升至 40.9%。\"\n        - item-label: \"[ DRIVER 02 ]\"\n          item-title: \"自主品牌份额\"\n          item-desc: \"TOP5 自主份额达 67%。\"\n        - item-label: \"[ DRIVER 03 ]\"\n          item-title: \"出口成第二曲线\"\n          item-desc: \"2024 年出口 127 万辆, 同比 +71%。\"\n      slot-source: \"数据来源: 中汽协, 2026.03\"\n",
+  "dna": {
+    "id": "editorial",
+    "name": "Editorial",
+    "tagline": "杂志感叙事 / 编辑设计风(纽约客 / 华尔街日报系)",
+    "description": "杂志编辑感, 米色底 + 衬线字体 + Drop cap + 多栏分栏 + 精细排版规则。适合长篇叙事性内容、深度报道、文化评论、特稿、文学性研究报告。视觉签名: 大 Drop cap / 多栏文字布局 / 衬线 + 无衬线混排 / 古典字距 / kicker + headline + deck 三层标题结构。",
+    "适用场景": [
+      "长篇深度报道 / 特稿",
+      "文化评论 / 杂志风文章",
+      "文学性年报",
+      "编辑性研究汇报",
+      "电影 / 设计 / 文化机构 deck"
+    ],
+    "不适合": [
+      "SaaS 产品发布(用 Capsule)",
+      "咨询数据研报(用 Archive)",
+      "极简品牌册(用 Meridian)",
+      "设计工作室作品集(用 Studio)",
+      "生活方式叙事(用 Macaron)"
+    ],
+    "关键词": [
+      "杂志",
+      "编辑",
+      "衬线",
+      "叙事",
+      "特稿",
+      "editorial",
+      "纽约客",
+      "New Yorker"
+    ],
+    "_renderer": {
+      "skeleton_file": "skeleton_editorial.html",
+      "preview_image": "editorial_wall_v6.png"
+    },
+    "总 variant 数": 42,
+    "创建时间": "2026-05-12",
+    "版本": "1.0"
+  },
+  "skins": [
+    {
+      "id": "editorial-cream",
+      "name": "米色经典 · 杂志默认",
+      "is_default": true,
+      "色块预览": {
+        "底色": "#F5EFE3",
+        "正文色": "#1F1A12",
+        "品牌色": "#A0481D"
+      }
+    },
+    {
+      "id": "editorial-ivory",
+      "name": "象牙白 · 纽约客风",
+      "色块预览": {
+        "底色": "#FAF6EC",
+        "正文色": "#171511",
+        "品牌色": "#7C2D12"
+      }
+    },
+    {
+      "id": "editorial-noir",
+      "name": "深棕 · 戏剧反差",
+      "色块预览": {
+        "底色": "#1F1A12",
+        "正文色": "#F5EFE3",
+        "品牌色": "#F4B860"
+      }
+    }
+  ],
+  "variants": [
+    {
+      "id": "COV-A",
+      "page_role": "cover",
+      "描述": "图为主 + 左下叙事文字封面 · 全出血图片 + 左下角文字栈(eyebrow + title-en + title-zh + meta)",
+      "什么时候用": "叙事感强的封面, 用图片传达氛围, 文字作为引子在左下角",
+      "什么时候不用": [
+        "需要居中仪式感大字 → 用 COV-B",
+        "咨询研报风分栏 → 用 COV-C"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-cov-a-editorial"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-issue": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-issue)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-title-en": {
+          "类型": "富文本",
+          "描述": "英文主标, 可用 <br>",
+          "最大字数": 30,
+          "示例": "KEY<br>FINDINGS"
+        },
+        "slot-title-zh": {
+          "类型": "富文本",
+          "描述": "中文主标, 可用 <em>",
+          "最大字数": 30,
+          "示例": "核心<em>发现</em>"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "COV-B",
+      "page_role": "cover",
+      "描述": "居中大标题封面 · 全出血图 + 中心居中大字(eyebrow + title-en + 装饰线 + title-zh)",
+      "什么时候用": "仪式感强的封面, 发布会 / 重要报告",
+      "什么时候不用": [
+        "叙事感, 左下文字 → 用 COV-A",
+        "咨询分栏 → 用 COV-C"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-cov-b-editorial"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-issue": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-issue)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-publication": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-publication)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title-en": {
+          "类型": "富文本",
+          "描述": "英文主标, 可用 <br>",
+          "最大字数": 30,
+          "示例": "KEY<br>FINDINGS"
+        },
+        "slot-title-zh": {
+          "类型": "富文本",
+          "描述": "中文主标, 可用 <em>",
+          "最大字数": 30,
+          "示例": "核心<em>发现</em>"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "COV-C",
+      "page_role": "cover",
+      "描述": "咨询风分栏封面 · 左 60% 文字栈 + 右 40% 图片面板(MBB / 投行风)",
+      "什么时候用": "咨询研报 / 投行 deck 经典分栏, 严谨权威感",
+      "什么时候不用": [
+        "全图叙事 → 用 COV-A",
+        "中心大字 → 用 COV-B"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-cov-c-editorial",
+        "items_dom_selector": ".row",
+        "items_count": 4
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 7,
+        "默认": 4,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title-en": {
+          "类型": "富文本",
+          "描述": "英文主标, 可用 <br>",
+          "最大字数": 30,
+          "示例": "KEY<br>FINDINGS"
+        },
+        "slot-title-zh": {
+          "类型": "富文本",
+          "描述": "中文主标, 可用 <em>",
+          "最大字数": 30,
+          "示例": "核心<em>发现</em>"
+        },
+        "slot-pull-quote": {
+          "类型": "富文本",
+          "描述": "引语",
+          "最大字数": 80,
+          "示例": "<em>关键</em>就是<em>这里</em>"
+        }
+      },
+      "_warnings": {
+        "用了 transform_rotate": true,
+        "PowerPoint 导出安全": false,
+        "_action": "渲染器看到 PowerPoint 导出安全=false 时, 给用户弹窗警告该 variant 导出 PPTX 时可能失真"
+      }
+    },
+    {
+      "id": "CB-A",
+      "page_role": "chapter_break",
+      "描述": "全出血图章节扉页 + 居中文字 · 大图作背景, 中心 章节号 + 章节标题",
+      "什么时候用": "需要图片建立情绪的章节切换",
+      "什么时候不用": [
+        "全出血图 + 左下叙事文字 → 用 CB-B",
+        "无图纯文字 → 用 CB-C/D/E"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-cb-a-editorial"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-chapter-num": {
+          "类型": "富文本",
+          "描述": "大数字, 含 <span class=\"unit\">",
+          "最大字数": 12,
+          "示例": "40.9<span class=\"unit\">%</span>"
+        },
+        "slot-chapter-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-chapter-lede": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-chapter-lede)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CB-D",
+      "page_role": "chapter_break",
+      "描述": "全屏大字版章节扉页 · 单行冲击大字(可用 outline-word 空心描边)",
+      "什么时候用": "需要单行冲击, 强宣言感(如'拐点已至')",
+      "什么时候不用": [
+        "需要章节号 → 用 CB-A/B/C",
+        "侧栏数字 → 用 CB-E"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-cb-d-editorial"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-chapter-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-chapter-lede": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-chapter-lede)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CB-E",
+      "page_role": "chapter_break",
+      "描述": "左侧竖排章节号 + 右侧标题/核心问题 · 侧栏 num + 右侧 title + 大问题",
+      "什么时候用": "需要提出本章核心问题的扉页",
+      "什么时候不用": [
+        "全出血图 → 用 CB-A/B",
+        "水印数字 → 用 CB-C"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-cb-e-editorial"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-chapter-num": {
+          "类型": "富文本",
+          "描述": "大数字, 含 <span class=\"unit\">",
+          "最大字数": 12,
+          "示例": "40.9<span class=\"unit\">%</span>"
+        },
+        "slot-chapter-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "OUT-A",
+      "page_role": "outline",
+      "描述": "Numbered List 标准编号目录 · N 行 out-row(num + title + page),适合 5-9 章节",
+      "什么时候用": "标准章节编号列表, 简洁直接",
+      "什么时候不用": [
+        "需要给每章描述 → 用 OUT-B 双栏卡片",
+        "议题型横向铺陈 → 用 OUT-C"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-out-a-editorial",
+        "items_dom_selector": ".out-row",
+        "items_count": 5
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 5,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-chapter-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-chapter-desc": {
+          "类型": "富文本",
+          "描述": "描述文字",
+          "最大字数": 80,
+          "示例": "描述内容"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "OUT-B",
+      "page_role": "outline",
+      "描述": "Two-Column Visual 双栏目录卡片 · N 卡片(num + title + desc),适合需要描述的咨询风",
+      "什么时候用": "需要给读者每章背景介绍的咨询风目录",
+      "什么时候不用": [
+        "简洁编号 → 用 OUT-A",
+        "议题型横向铺陈 → 用 OUT-C"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-out-b-editorial",
+        "items_dom_selector": ".outb-card",
+        "items_count": 6
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 4,
+        "最多": 9,
+        "默认": 6,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-chapter-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CLX-A",
+      "page_role": "climax",
+      "描述": "孤立压倒性大数字 · 极大 tyrant-number(160px+)+ micro-caption + corner-label",
+      "什么时候用": "全篇最重要的一个数字(如 40.9% 渗透率), 极简留白",
+      "什么时候不用": [
+        "需要主+副结构 → 用 CLX-B",
+        "双数字对峙 → 用 CLX-C",
+        "前后对比 → 用 CLX-D",
+        "数字作背景 → 用 CLX-E"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-clx-a-editorial",
+        "items_dom_selector": ".item",
+        "items_count": 3
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 6,
+        "默认": 3,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-value": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-value)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-unit": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-unit)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-caption": {
+          "类型": "富文本",
+          "描述": "说明文字",
+          "最大字数": 60,
+          "示例": "图注说明"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CLX-Q",
+      "page_role": "climax",
+      "描述": "立场对照(我们 vs 竞品) · 双块 view, ours 紫色反白填充",
+      "什么时候用": "传达产品立场对比, 主流 vs 我们的不同",
+      "什么时候不用": [
+        "数字对比 → 用 CLX-D",
+        "feature 维度对比 → 用 CMP-D"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-clx-q-editorial"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-value": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-value)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-unit": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-unit)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-pull-quote": {
+          "类型": "富文本",
+          "描述": "引语",
+          "最大字数": 80,
+          "示例": "<em>关键</em>就是<em>这里</em>"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CLX-X",
+      "page_role": "climax",
+      "描述": "CLX-X 版式",
+      "什么时候用": "根据内容特征选择",
+      "什么时候不用": [],
+      "_renderer": {
+        "dom_selector": ".variant-clx-x-editorial",
+        "items_dom_selector": ".item",
+        "items_count": 3
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 6,
+        "默认": 3,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-claim": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-claim)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-value": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-value)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-unit": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-unit)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CLX-B",
+      "page_role": "climax",
+      "描述": "悬崖式大数字 + 情绪化短说明 · cliff-number(120px) + 长 cliff-caption + signal dot",
+      "什么时候用": "数字 + 一句情绪化解读, 比 CLX-A 更有叙事感",
+      "什么时候不用": [
+        "极简孤立大数字 → 用 CLX-A",
+        "双数字 → 用 CLX-C"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-clx-b-editorial"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-value": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-value)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-unit": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-unit)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-label": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-label)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-headline": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-headline)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-description": {
+          "类型": "富文本",
+          "描述": "描述文字",
+          "最大字数": 80,
+          "示例": "描述内容"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CLX-C",
+      "page_role": "climax",
+      "描述": "双数字对峙 · 左右各一个 star-number, 中央 diagonal-line 分隔",
+      "什么时候用": "两个对比维度的关键数字(如 中国 vs 全球, 我们 vs 同行)",
+      "什么时候不用": [
+        "孤立大数字 → 用 CLX-A",
+        "前后对比 → 用 CLX-D",
+        "数字作背景 → 用 CLX-E"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-clx-c-editorial"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-value": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-value)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-unit": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-unit)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-label": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-label)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-trend": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-trend)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CLX-D",
+      "page_role": "climax",
+      "描述": "前后时间对比 · 双块 cli-side(BEFORE + AFTER), 中央 → 箭头, AFTER 强调",
+      "什么时候用": "时间维度对比(2022 vs 2024, 改版前后)",
+      "什么时候不用": [
+        "孤立数字 → 用 CLX-A",
+        "双方对峙 → 用 CLX-C"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-clx-d-editorial",
+        "items_dom_selector": ".clxd-side",
+        "items_count": 2
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-value-before": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-value-before)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-unit": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-unit)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-label": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-label)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-value-after": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-value-after)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "S-A",
+      "page_role": "support",
+      "描述": "左图表 + 右 3 要点 · 左 60% chart canvas + 右 40% 3 个 item 列表",
+      "什么时候用": "1 个图表配 3 条解读, 最常用的 support 版式",
+      "什么时候不用": [
+        "图表是背景氛围 → 用 S-B",
+        "1 大结论 + 3 证据卡 → 用 S-C",
+        "4 等权要点 → 用 S-D",
+        "6 条密集要点 → 用 S-E",
+        "结论 + 6 发现 → 用 S-F",
+        "纯图表主角 → 用 S-G"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-s-a-editorial",
+        "items_dom_selector": ".bar",
+        "items_count": 4
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 4,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-page-num": {
+          "类型": "富文本",
+          "描述": "大数字, 含 <span class=\"unit\">",
+          "最大字数": 12,
+          "示例": "40.9<span class=\"unit\">%</span>"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-chart": {
+          "类型": "图表",
+          "描述": "图表数据",
+          "示例": {
+            "type": "line",
+            "x_labels": [
+              "Q1",
+              "Q2",
+              "Q3",
+              "Q4"
+            ],
+            "primary": {
+              "label": "X",
+              "data": [
+                1,
+                2,
+                3,
+                4
+              ]
+            }
+          }
+        },
+        "slot-chart-caption": {
+          "类型": "富文本",
+          "描述": "说明文字",
+          "最大字数": 60,
+          "示例": "图注说明"
+        },
+        "slot-points": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-points)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "S-B",
+      "page_role": "support",
+      "描述": "警示大数字 + 图表氛围 · 大 warning-number 主角 + 背景 chart, 强调风险 / 拐点",
+      "什么时候用": "1 个警示性数字 + 图表作氛围(如 '6% 滞销' + 同行下滑曲线)",
+      "什么时候不用": [
+        "图表是主角 → 用 S-G",
+        "图表 + 要点 → 用 S-A"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-s-b-editorial",
+        "items_dom_selector": ".col",
+        "items_count": 3
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 6,
+        "默认": 3,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-point-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-point-desc": {
+          "类型": "富文本",
+          "描述": "描述文字",
+          "最大字数": 80,
+          "示例": "描述内容"
+        },
+        "slot-point-data": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-point-data)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "S-C",
+      "page_role": "support",
+      "描述": "一句强结论 + 3 张证据卡 · 超大 hero-conclusion + 下方 3 张 evidence-item",
+      "什么时候用": "想先给观点再列证据(如'拐点已至 + 3 个证据')",
+      "什么时候不用": [
+        "图表 + 要点 → 用 S-A",
+        "4 等权要点 → 用 S-D"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-s-c-editorial",
+        "items_dom_selector": ".bar",
+        "items_count": 5
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 3,
+        "最多": 8,
+        "默认": 5,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "S-F",
+      "page_role": "support",
+      "描述": "顶部大结论 + 6 个支撑发现 · 顶部 conclusion 句 + 2×3 finding 网格",
+      "什么时候用": "1 个大结论 + 6 条支撑发现",
+      "什么时候不用": [
+        "纯 6 要点(无结论)→ 用 S-E",
+        "1 结论 + 3 证据 → 用 S-C"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-s-f-editorial",
+        "items_dom_selector": ".col",
+        "items_count": 3
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 6,
+        "默认": 3,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CMP-C",
+      "page_role": "comparison",
+      "描述": "前后对比 / 旧 vs 新 · 极简双列 + 中轴 axis 分隔, 强调演化",
+      "什么时候用": "2022 vs 2024 / 旧方案 vs 新方案 (有时间方向感)",
+      "什么时候不用": [
+        "3-4 并列 → 用 CMP-A",
+        "1 主 N 副 → 用 CMP-B",
+        "二选一 → 用 CMP-D"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-cmp-c-editorial",
+        "items_dom_selector": ".point",
+        "items_count": 6
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 6,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {},
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CMP-A",
+      "page_role": "comparison",
+      "描述": "3-4 对象对称对比 · 横排 bento-cell(tag + number + label),Bento 风格",
+      "什么时候用": "3-4 个对称对象的对比(竞品 / 维度并列)",
+      "什么时候不用": [
+        "2 对象非对称 → 用 CMP-B",
+        "前后对比 → 用 CMP-C",
+        "二选一 → 用 CMP-D",
+        "多维评分 → 用 CMP-E"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-cmp-a-editorial",
+        "items_dom_selector": ".item",
+        "items_count": 3
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 3,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-primary-name": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-primary-name)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-primary-desc": {
+          "类型": "富文本",
+          "描述": "描述文字",
+          "最大字数": 80,
+          "示例": "描述内容"
+        },
+        "slot-secondary-name": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-secondary-name)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-secondary-desc": {
+          "类型": "富文本",
+          "描述": "描述文字",
+          "最大字数": 80,
+          "示例": "描述内容"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CMP-D",
+      "page_role": "comparison",
+      "描述": "二选一决策 · 左右 50/50 decision-side, 各自 title + 6 side-point 列表",
+      "什么时候用": "二选一决策 / 黑白对比(老路 vs 新路)",
+      "什么时候不用": [
+        "多对象对比 → 用 CMP-A",
+        "前后对比 → 用 CMP-C",
+        "多维评分 → 用 CMP-E"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-cmp-d-editorial",
+        "items_dom_selector": ".cell",
+        "items_count": 25
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 23,
+        "最多": 28,
+        "默认": 25,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "INS-A",
+      "page_role": "insight",
+      "描述": "纯粹灵魂金句 · 居中大字 quote + attr, 极致留白",
+      "什么时候用": "一行金句(报告主张句, 不带引号), 情绪锚点",
+      "什么时候不用": [
+        "带引号的名人引用 → 用 INS-B",
+        "金句 + 补充 → 用 INS-C",
+        "数据金句 → 用 INS-D"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-ins-a-editorial"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-quote": {
+          "类型": "富文本",
+          "描述": "引语",
+          "最大字数": 80,
+          "示例": "<em>关键</em>就是<em>这里</em>"
+        },
+        "slot-attribution": {
+          "类型": "富文本",
+          "描述": "署名",
+          "最大字数": 40,
+          "示例": "— <strong>NAME</strong> · ROLE"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "INS-B",
+      "page_role": "insight",
+      "描述": "名人引用 · 大字 quote + 引号装饰 ins-quotemark + 署名",
+      "什么时候用": "名人 / 权威 / 受访者的引用(带引号修饰)",
+      "什么时候不用": [
+        "自主张观点 → 用 INS-A",
+        "金句 + 补充 → 用 INS-C"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-ins-b-editorial"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-quote": {
+          "类型": "富文本",
+          "描述": "引语",
+          "最大字数": 80,
+          "示例": "<em>关键</em>就是<em>这里</em>"
+        },
+        "slot-author-name": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-author-name)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-author-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "INS-C",
+      "page_role": "insight",
+      "描述": "金句 + 补充说明 · 3 行竖向递进 line(line-1 大字 + line-2 中字 + line-3 小字)",
+      "什么时候用": "需要展开论点(主张 + 论据 + 结论)",
+      "什么时候不用": [
+        "单句金句 → 用 INS-A",
+        "带引号 → 用 INS-B"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-ins-c-editorial"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-quote": {
+          "类型": "富文本",
+          "描述": "引语",
+          "最大字数": 80,
+          "示例": "<em>关键</em>就是<em>这里</em>"
+        },
+        "slot-attribution": {
+          "类型": "富文本",
+          "描述": "署名",
+          "最大字数": 40,
+          "示例": "— <strong>NAME</strong> · ROLE"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "INS-D",
+      "page_role": "insight",
+      "描述": "数据金句 · 中心大数字 + 上下文 label + context + source",
+      "什么时候用": "1 个核心数字配一句解读(数据驱动的洞察)",
+      "什么时候不用": [
+        "纯金句 → 用 INS-A/B/C",
+        "孤立大数字(climax)→ 用 CLX-A"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-ins-d-editorial",
+        "items_dom_selector": ".insd-col",
+        "items_count": 2
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-quote": {
+          "类型": "富文本",
+          "描述": "引语",
+          "最大字数": 80,
+          "示例": "<em>关键</em>就是<em>这里</em>"
+        },
+        "slot-attribution": {
+          "类型": "富文本",
+          "描述": "署名",
+          "最大字数": 40,
+          "示例": "— <strong>NAME</strong> · ROLE"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "H1",
+      "page_role": "gallery",
+      "描述": "1 张全屏图 + 标题/标签 caption · img-full + h1-tag + h1-title",
+      "什么时候用": "需要展示一张主图(场景 / 产品 / 数据 viz), 全屏氛围",
+      "什么时候不用": [
+        "2 张图 → 用 H2",
+        "3 张 → 用 H3",
+        "4 张 → 用 H4",
+        "5 张 → 用 H5",
+        "图 + 多条文字 → 用 GC-A/B"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-h1-editorial"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-caption": {
+          "类型": "富文本",
+          "描述": "说明文字",
+          "最大字数": 60,
+          "示例": "图注说明"
+        },
+        "slot-meta": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-meta)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      },
+      "图片占位": [
+        {
+          "yaml key": "h1-image",
+          "数量": 1,
+          "默认 image_fit": "cover",
+          "描述": "图片占位"
+        }
+      ]
+    },
+    {
+      "id": "H2",
+      "page_role": "gallery",
+      "描述": "2 张并排图 · img-cell × 2 + 各自 caption(title + sub)",
+      "什么时候用": "对比 2 个对象(竞品 / 前后)",
+      "什么时候不用": [
+        "1 张 → 用 H1",
+        "3+ 张 → 用 H3/H4/H5"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-h2-editorial",
+        "items_dom_selector": ".gal-pic",
+        "items_count": 2
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "H3",
+      "page_role": "gallery",
+      "描述": "3 张并排图 · img-cell × 3 + 各自 caption",
+      "什么时候用": "3 个并列对象(TOP3 / 三大模式)",
+      "什么时候不用": [
+        "数量 ≠ 3 → 用 H1/H2/H4/H5"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-h3-editorial",
+        "items_dom_selector": ".gal-pic",
+        "items_count": 3
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 3,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "H4",
+      "page_role": "gallery",
+      "描述": "2×2 四宫格图 · img-cell × 4 + 各自 caption",
+      "什么时候用": "4 个等权对象(四大势力 / 四种模式)",
+      "什么时候不用": [
+        "3 张 → 用 H3",
+        "5 张 → 用 H5"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-h4-editorial",
+        "items_dom_selector": ".gal-pic",
+        "items_count": 4
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 4,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "H5",
+      "page_role": "gallery",
+      "描述": "1 主 + 4 侧 五图画廊 · img-main + 4 img-side-cell, 主图占大",
+      "什么时候用": "1 主推 + 4 配角的画廊",
+      "什么时候不用": [
+        "数量 ≠ 5 → 用 H1-H4"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-h5-editorial",
+        "items_dom_selector": ".gal-pic",
+        "items_count": 5
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 5,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "GC-A",
+      "page_role": "gallery",
+      "描述": "1 图左 + 右多条文字 · img-panel(左 50%)+ 右侧 3 条 text-item 列表",
+      "什么时候用": "1 张主图 + 3 条要点解读",
+      "什么时候不用": [
+        "1 图右 + 左文 → 用 GC-B",
+        "上图下多列 → 用 GC-C",
+        "多图佐证 1 结论 → 用 GC-D"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-gc-a-editorial",
+        "items_dom_selector": ".gal-pic",
+        "items_count": 6
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 6,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "GC-B",
+      "page_role": "gallery",
+      "描述": "1 图右 + 左多条文字 · 镜像版 GC-A(图在右)",
+      "什么时候用": "GC-A 的镜像, 主图在右侧",
+      "什么时候不用": [
+        "图在左 → 用 GC-A"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-gc-b-editorial",
+        "items_dom_selector": ".gcb-cap",
+        "items_count": 4
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 7,
+        "默认": 4,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {},
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "GC-C",
+      "page_role": "gallery",
+      "描述": "1 宽图上 + 下多列文字 · 顶部宽图 + 下方双列 text-col",
+      "什么时候用": "横向宽图配多列文字解读",
+      "什么时候不用": [
+        "图在左/右 → 用 GC-A/B",
+        "多图佐证 → 用 GC-D"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-gc-c-editorial",
+        "items_dom_selector": ".gal-pic",
+        "items_count": 4
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 7,
+        "默认": 4,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "GC-D",
+      "page_role": "gallery",
+      "描述": "多图佐证 1 个结论 · 3 张 img-cell + 各自 caption + 顶部大结论",
+      "什么时候用": "1 结论 + 多张图佐证",
+      "什么时候不用": [
+        "图 + 文字解读 → 用 GC-A/B/C",
+        "纯图 → 用 H1-H5"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-gc-d-editorial",
+        "items_dom_selector": ".gal-pic",
+        "items_count": 8
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 6,
+        "最多": 11,
+        "默认": 8,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "TL-A",
+      "page_role": "timeline",
+      "描述": "横向时间轴 · N 个 tl-node(dot + year + title + desc), 横向排列",
+      "什么时候用": "横向叙事的时间轴(年份 / 阶段并排)",
+      "什么时候不用": [
+        "阶段分组 → 用 TL-B",
+        "纵向步骤 → 用 TL-C",
+        "阶段展开带子项 → 用 TL-D"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-tl-a-editorial",
+        "items_dom_selector": ".tl-point",
+        "items_count": 4
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 7,
+        "默认": 4,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-year": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-year)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-event-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-event-desc": {
+          "类型": "富文本",
+          "描述": "描述文字",
+          "最大字数": 80,
+          "示例": "描述内容"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "TL-B",
+      "page_role": "timeline",
+      "描述": "阶段分组(3 大段)· 3 个 phase-block,每段含 tag + title + period + 多个 phase-item",
+      "什么时候用": "时间线分大阶段(启动期 / 增长期 / 成熟期), 每段有子项",
+      "什么时候不用": [
+        "线性节点 → 用 TL-A",
+        "纵向步骤 → 用 TL-C",
+        "甘特图 → 用 TL-D"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-tl-b-editorial",
+        "items_dom_selector": ".event",
+        "items_count": 5
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 3,
+        "最多": 8,
+        "默认": 5,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "PRC-A",
+      "page_role": "process",
+      "描述": "横向箭头流程 · N 个 flow-step + 箭头 →, 线性单向(A→B→C)",
+      "什么时候用": "线性单向流程, 3-5 步",
+      "什么时候不用": [
+        "纵向列表 → 用 PRC-B",
+        "循环闭环 → 用 PRC-C",
+        "漏斗 → 用 PRC-D",
+        "树状 → 用 PRC-E"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-prc-a-editorial",
+        "items_dom_selector": ".prc-step",
+        "items_count": 3
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 6,
+        "默认": 3,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-step-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-step-desc": {
+          "类型": "富文本",
+          "描述": "描述文字",
+          "最大字数": 80,
+          "示例": "描述内容"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "FRW-A",
+      "page_role": "framework",
+      "描述": "2×2 象限矩阵(波士顿)· 4 quadrant(tag + title + desc + q-item 列表)",
+      "什么时候用": "2×2 矩阵(经典咨询框架)",
+      "什么时候不用": [
+        "金字塔层级 → 用 FRW-B",
+        "同心圆 → 用 FRW-C",
+        "维恩图 → 用 FRW-D"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-frw-a-editorial",
+        "items_dom_selector": ".quadrant",
+        "items_count": 4
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 4,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-quadrant-label": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-quadrant-label)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-quadrant-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-quadrant-desc": {
+          "类型": "富文本",
+          "描述": "描述文字",
+          "最大字数": 80,
+          "示例": "描述内容"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "FRW-D",
+      "page_role": "framework",
+      "描述": "维恩图(交集)· 2-3 个 venn-circle 交叉, 显示重叠区域",
+      "什么时候用": "交集关系 / 重叠区域(2-3 个圆)",
+      "什么时候不用": [
+        "象限 → 用 FRW-A",
+        "金字塔 → 用 FRW-B",
+        "同心圆 → 用 FRW-C"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-frw-d-editorial",
+        "items_dom_selector": ".frwd-layer",
+        "items_count": 4
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 7,
+        "默认": 4,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CLO-A",
+      "page_role": "closing",
+      "描述": "3 条核心结论(竖向列表)· conclusion-item × 3(num + title + text)+ 底部 insight",
+      "什么时候用": "3 条结论收尾(经典咨询风结尾)",
+      "什么时候不用": [
+        "结论 + 行动 → 用 CLO-B",
+        "4 个支柱 → 用 CLO-C",
+        "全屏结论 + 行动 → 用 CLO-D",
+        "Thank You → 用 CLO-E"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-clo-a-editorial",
+        "items_dom_selector": ".clo-card",
+        "items_count": 3
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 3,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-conclusion": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-conclusion)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        },
+        "slot-conclusion-desc": {
+          "类型": "富文本",
+          "描述": "描述文字",
+          "最大字数": 80,
+          "示例": "描述内容"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CLO-D",
+      "page_role": "closing",
+      "描述": "全屏核心结论 + 底部行动清单 · hero-conclusion 大字 + action-bar(4 短句)",
+      "什么时候用": "1 大结论 + 4 个行动短句(强冲击收尾)",
+      "什么时候不用": [
+        "3 结论 → 用 CLO-A",
+        "左右双栏 → 用 CLO-B"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-clo-d-editorial",
+        "items_dom_selector": ".item-row",
+        "items_count": 10
+      },
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 10,
+        "支持自适应": false,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "描述": "上方小标签",
+          "最大字数": 40,
+          "示例": "[ EYEBROW LABEL ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    },
+    {
+      "id": "CLO-E",
+      "page_role": "closing",
+      "描述": "Thank You 致谢页 · 大字 hero(THANK YOU)+ message + confidential",
+      "什么时候用": "致谢 / 联系 / Q&A 收尾",
+      "什么时候不用": [
+        "需要结论 → 用 CLO-A/B/C/D"
+      ],
+      "_renderer": {
+        "dom_selector": ".variant-clo-e-editorial",
+        "items_dom_selector": ".item",
+        "items_count": 4
+      },
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 7,
+        "默认": 4,
+        "支持自适应": true,
+        "对象描述": "重复元素"
+      },
+      "slots": {
+        "slot-next-title": {
+          "类型": "富文本",
+          "描述": "标题",
+          "最大字数": 30,
+          "示例": "主标题"
+        },
+        "slot-next-lede": {
+          "类型": "纯文本",
+          "描述": "内容字段(slot-next-lede)",
+          "最大字数": 60,
+          "示例": "示例文本"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
+    }
+  ]
+}

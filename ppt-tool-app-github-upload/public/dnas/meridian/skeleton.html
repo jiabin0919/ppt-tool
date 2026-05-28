@@ -1,0 +1,5217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>Meridian Skeleton · v0.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500&family=Inter+Tight:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   MERIDIAN SKELETON · v0.1
+   Polestar-inspired scandinavian restraint design language.
+   Independent from shared/skeleton_demo.html (Archive DNA).
+   ============================================================ */
+
+/* ============================================================
+   §1 · Token system
+   3 sub-skins. Default = meridian-light.
+   ============================================================ */
+:root {
+  /* INK gradient (10 levels) */
+  --ink-900: #0E1013;
+  --ink-800: #1A1D22;
+  --ink-700: #2A2E35;
+  --ink-500: #5A6069;
+  --ink-400: #858A92;
+  --ink-300: #B4B8BD;
+  --ink-200: #D8DADC;
+  --ink-100: #ECEDEE;
+
+  /* Paper variants */
+  --paper:   #F5F4F0;
+  --paper-2: #FAF9F6;
+
+  /* Accents · skin-specific to ensure WCAG AA contrast
+     - electric yellow #C9FF3B works ONLY on dark bg (16:1)
+     - on light/warm bg it's invisible (1.07:1, 1.47:1) — fails WCAG
+     - so light gets deep olive, warm gets burnt amber */
+  --accent-electric: #C9FF3B;  /* dark skin */
+  --accent-olive:    #3D6B00;  /* light skin · olive (5.78:1 on paper) */
+  --accent-amber:    #A0530E;  /* warm skin · burnt amber (4.75:1 on warm) */
+  --accent:          var(--accent-olive);  /* default light */
+  --accent-2:        var(--accent-amber);  /* legacy alias */
+
+  /* Surface roles · meridian-light defaults */
+  --color-bg:           var(--paper);
+  --color-surface:      var(--paper-2);
+  --color-text-primary: var(--ink-900);
+  --color-text-muted:   var(--ink-500);
+  --color-text-faint:   var(--ink-400);
+  --color-border:       var(--ink-200);
+  --color-accent:       var(--accent-olive);
+
+  /* Hairline (the Meridian signature divider) */
+  --hairline:      1px solid var(--color-border);
+  --hairline-dark: 1px solid rgba(255,255,255,0.12);
+
+  /* Fonts */
+  --font-display: 'Archivo', 'Noto Serif SC', serif;
+  --font-body:    'Inter Tight', 'Noto Sans SC', sans-serif;
+  --font-mono:    'IBM Plex Mono', monospace;
+
+  /* Spacing scale (8-stop, more generous than Archive) */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+  --space-5xl: 128px;
+}
+
+/* ---- Sub-skin: meridian-light (default, equivalent to no attr) ---- */
+html[data-theme="meridian-light"] {
+  --color-bg:           var(--paper);
+  --color-surface:      var(--paper-2);
+  --color-text-primary: var(--ink-900);
+  --color-text-muted:   var(--ink-500);
+  --color-text-faint:   var(--ink-400);
+  --color-border:       var(--ink-200);
+  --color-accent:       var(--accent-olive);
+}
+
+/* ---- Sub-skin: meridian-dark (full dark interior) ---- */
+html[data-theme="meridian-dark"] {
+  --color-bg:           var(--ink-900);
+  --color-surface:      var(--ink-800);
+  --color-text-primary: var(--paper);
+  --color-text-muted:   #9DA3AB;
+  --color-text-faint:   #6E747C;
+  --color-border:       var(--ink-700);
+  --color-accent:       var(--accent-electric);
+}
+
+/* ---- Sub-skin: meridian-warm (warm lifestyle) ---- */
+html[data-theme="meridian-warm"] {
+  --color-bg:           #F4EBDB;
+  --color-surface:      #EFE4CE;
+  --color-text-primary: #2C1F0E;
+  --color-text-muted:   #6B5638;
+  --color-text-faint:   #9A8868;
+  --color-border:       #D9CBAE;
+  --color-accent:       var(--accent-amber);
+}
+
+
+/* ============================================================
+   §2 · Reset & base
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  font-weight: 300;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: 0;
+}
+.slide {
+  width: 1280px;
+  height: 720px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  page-break-after: always;
+}
+
+/* Per-slide index/identifier (bottom-right) */
+.slide-index {
+  position: absolute;
+  bottom: 24px;
+  right: 32px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+}
+
+
+/* ============================================================
+   §3 · Core primitives (Meridian DNA signatures)
+   ============================================================ */
+
+/* 3.1 eyebrow · 节拍器 */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* 3.2 hairline · 主要分割手段 */
+.hairline {
+  height: 1px;
+  width: 100%;
+  background: var(--color-border);
+  border: 0;
+  margin: 0;
+}
+.hairline-dark {
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+  border: 0;
+}
+
+/* 3.3 display · Archivo 300 大字 */
+.display {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+.display .dot {
+  color: var(--color-accent);
+}
+
+/* 3.4 lede · 副段落 */
+.lede {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 22px;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  max-width: 56ch;
+  margin: 0;
+}
+
+/* 3.5 mod-head · 模块头 (左小字 + 右标题块) */
+.mod-head {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--space-2xl);
+  align-items: end;
+}
+.mod-head .num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.mod-head .title-stack {
+  display: grid;
+  gap: var(--space-md);
+}
+.mod-head .title-stack .display {
+  font-size: 48px;
+}
+
+/* 3.6 spec-block · 4 列规格表 · 子皮肤自适应
+   Light/warm: 浅底 + hairline 竖线分隔 + 当前主题色字
+   Dark: 深底 + 上下 hairline 包围 + 米白字
+   核心原则：永远 token 驱动，永远不要硬编码深色色块跨进浅色页面 */
+.spec-block {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+  background: transparent;
+}
+.spec-cell {
+  background: transparent;
+  color: var(--color-text-primary);
+  padding: var(--space-xl) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-right: var(--hairline);
+}
+.spec-cell:last-child {
+  border-right: 0;
+}
+.spec-cell .spec-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.spec-cell .spec-value {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 40px;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+.spec-cell .spec-value sup {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  vertical-align: top;
+  margin-left: 4px;
+}
+.spec-cell .spec-note {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin-top: var(--space-xs);
+}
+
+
+/* ============================================================
+   §4 · Variants
+   ============================================================ */
+
+/* ---- COV-MERIDIAN · 永远深色 ---- */
+.variant-cov-a-meridian {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  padding: 72px 72px 56px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--space-2xl);
+}
+.variant-cov-a-meridian::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 75% 40%, color-mix(in srgb, var(--color-accent) 8%, transparent), transparent 60%),
+    radial-gradient(circle at 20% 90%, color-mix(in srgb, var(--color-text-primary) 4%, transparent), transparent 50%);
+  pointer-events: none;
+}
+.variant-cov-a-meridian .eyebrow {
+  color: var(--color-text-muted);
+  position: relative; z-index: 2;
+}
+.variant-cov-a-meridian .cover-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-2xl);
+  position: relative;
+  z-index: 2;
+}
+.variant-cov-a-meridian .cover-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  font-size: clamp(48px, 8vw, 96px);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-cov-a-meridian .cover-zh {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 18px;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+  letter-spacing: 0;
+  max-width: 36ch;
+  text-align: right;
+}
+.variant-cov-a-meridian .cover-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: var(--hairline);
+  position: relative;
+  z-index: 2;
+  margin: 0;
+}
+.variant-cov-a-meridian .stat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.variant-cov-a-meridian .stat-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+.variant-cov-a-meridian .stat-value {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-cov-a-meridian .stat-value sup {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  margin-left: 4px;
+  vertical-align: top;
+}
+.variant-cov-a-meridian .silhouette {
+  position: absolute;
+  right: -4%;
+  bottom: 18%;
+  width: 60%;
+  height: 38%;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1;
+  color: var(--color-text-primary);  /* feeds currentColor in inline SVG */
+}
+.variant-cov-a-meridian .scroll-cue {
+  position: absolute;
+  bottom: 32px;
+  left: 72px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 3;
+}
+.variant-cov-a-meridian .scroll-cue .line {
+  width: 40px;
+  height: 1px;
+  background: var(--color-border);
+  position: relative;
+  overflow: hidden;
+}
+.variant-cov-a-meridian .scroll-cue .line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent);
+  transform: translateX(-100%);
+  animation: mrd-sweep 2.6s cubic-bezier(.22,.61,.36,1) infinite;
+}
+@keyframes mrd-sweep {
+  0% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(100%); }
+}
+
+/* ---- CMP-MERIDIAN · 3-col typographic ---- */
+.variant-cmp-a-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-cmp-a-meridian .mod-head .title-stack .display {
+  font-size: 44px;
+}
+.variant-cmp-a-meridian .mod-sub {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 56ch;
+}
+.variant-cmp-a-meridian .cmp-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+}
+.variant-cmp-a-meridian .cmp-col {
+  padding: var(--space-2xl) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  border-right: var(--hairline);
+  position: relative;
+}
+.variant-cmp-a-meridian .cmp-col:last-child {
+  border-right: 0;
+}
+.variant-cmp-a-meridian .cmp-col.leader {
+  background: var(--color-surface);
+}
+.variant-cmp-a-meridian .cmp-col.leader::before {
+  content: 'LEADER';
+  position: absolute;
+  top: 12px; right: 16px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--ink-900);
+  background: var(--color-accent);
+  padding: 4px 8px;
+}
+.variant-cmp-a-meridian .cmp-name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.variant-cmp-a-meridian .cmp-value {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 56px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-top: var(--space-sm);
+}
+.variant-cmp-a-meridian .cmp-value sup {
+  font-size: 14px;
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+  vertical-align: top;
+  margin-left: 4px;
+}
+.variant-cmp-a-meridian .cmp-col.leader .cmp-value sup {
+  color: var(--ink-900);
+  background: var(--color-accent);
+  padding: 2px 6px;
+}
+.variant-cmp-a-meridian .cmp-spec {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-cmp-a-meridian .cmp-spec .v {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+.variant-cmp-a-meridian .cmp-note {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 0;
+  padding-top: var(--space-md);
+  border-top: var(--hairline);
+  margin-top: auto;
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════════
+   §6 · MS-2A Variants · 24 new Meridian variants
+   Each implements the SEMANTIC intent of its Archive cousin
+   using Meridian's vocabulary: Archivo 300, mono labels,
+   hairlines as primary divider, token-driven everything.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ---- COV-B · Ceremonial centered cover (Meridian way) ---- */
+.variant-cov-b-meridian {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  padding: 96px 96px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: center;
+  text-align: center;
+}
+.variant-cov-b-meridian .eyebrow {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+}
+.variant-cov-b-meridian .ceremonial-stack {
+  display: flex; flex-direction: column; align-items: center;
+  gap: var(--space-lg);
+}
+.variant-cov-b-meridian .ceremonial-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(56px, 7vw, 88px);
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-cov-b-meridian .ceremonial-title .dot { color: var(--color-accent); }
+.variant-cov-b-meridian .ceremonial-zh {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.02em;
+}
+.variant-cov-b-meridian .ceremonial-divider {
+  width: 64px; height: 1px;
+  background: var(--color-border);
+  margin: var(--space-xl) auto;
+}
+.variant-cov-b-meridian .ceremonial-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ---- COV-C · Split panel cover ---- */
+.variant-cov-c-meridian {
+  background: var(--color-bg);
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  height: 720px;
+}
+.variant-cov-c-meridian .img-panel {
+  background: var(--color-surface);
+  border-right: var(--hairline);
+  position: relative;
+  display: flex; align-items: flex-end;
+  padding: 48px;
+}
+.variant-cov-c-meridian .img-panel-mark {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-cov-c-meridian .text-panel {
+  padding: 72px 64px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.variant-cov-c-meridian .text-panel-top {
+  display: flex; flex-direction: column; gap: var(--space-lg);
+}
+.variant-cov-c-meridian .text-panel .title-en {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 52px;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-cov-c-meridian .text-panel .title-zh {
+  font-size: 16px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  max-width: 36ch;
+}
+.variant-cov-c-meridian .meta-list {
+  display: flex; flex-direction: column; gap: 8px;
+  border-top: var(--hairline);
+  padding-top: var(--space-lg);
+}
+.variant-cov-c-meridian .meta-item {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ---- S-A · Asymmetric 60/40 with image ---- */
+.variant-s-a-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-columns: 6fr 4fr;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-2xl);
+}
+.variant-s-a-meridian .head {
+  grid-column: 1 / -1;
+  display: flex; justify-content: space-between; align-items: end;
+  gap: var(--space-xl);
+  border-bottom: var(--hairline);
+  padding-bottom: var(--space-lg);
+}
+.variant-s-a-meridian .head .display {
+  font-size: 36px;
+  margin: 0;
+}
+.variant-s-a-meridian .head .head-meta {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-s-a-meridian .body {
+  display: flex; flex-direction: column; gap: var(--space-md);
+  padding-right: var(--space-2xl);
+}
+.variant-s-a-meridian .body p {
+  font-size: 15px; line-height: 1.6;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-s-a-meridian .body p:not(:last-child) {
+  padding-bottom: var(--space-md);
+  border-bottom: var(--hairline);
+}
+.variant-s-a-meridian .figure {
+  display: flex; flex-direction: column; gap: var(--space-sm);
+}
+.variant-s-a-meridian .figure-image {
+  background: var(--color-surface);
+  height: 280px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-s-a-meridian .figure-caption {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ---- S-B · Immersive background ---- */
+.variant-s-b-meridian {
+  padding: 96px 96px 72px;
+  background: var(--color-bg);
+  display: grid; grid-template-rows: 1fr auto;
+  position: relative;
+}
+.variant-s-b-meridian::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--color-accent) 6%, transparent), transparent 50%),
+    radial-gradient(circle at 10% 90%, color-mix(in srgb, var(--color-text-primary) 4%, transparent), transparent 50%);
+  pointer-events: none;
+}
+.variant-s-b-meridian .immersive-content {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; gap: var(--space-2xl);
+  max-width: 60ch;
+}
+.variant-s-b-meridian .immersive-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-s-b-meridian .immersive-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 56px;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-s-b-meridian .immersive-body {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  max-width: 56ch;
+  margin: 0;
+}
+.variant-s-b-meridian .immersive-foot {
+  position: relative; z-index: 2;
+  border-top: var(--hairline);
+  padding-top: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ---- S-D · 2x2 code-block enumeration ---- */
+.variant-s-d-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-s-d-meridian .code-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+}
+.variant-s-d-meridian .code-cell {
+  padding: var(--space-xl) var(--space-lg);
+  border-right: var(--hairline);
+  border-bottom: var(--hairline);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.variant-s-d-meridian .code-cell:nth-child(2n) { border-right: 0; }
+.variant-s-d-meridian .code-cell:nth-last-child(-n+2) { border-bottom: 0; }
+.variant-s-d-meridian .code-cell .cell-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-s-d-meridian .code-cell .cell-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-s-d-meridian .code-cell .cell-body {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- S-E · Dual column text points ---- */
+.variant-s-e-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-s-e-meridian .dual-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3xl);
+  padding-top: var(--space-lg);
+  border-top: var(--hairline);
+}
+.variant-s-e-meridian .dual-point {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.variant-s-e-meridian .dual-point + .dual-point { margin-top: var(--space-xl); }
+.variant-s-e-meridian .dual-point-label {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-accent);
+}
+.variant-s-e-meridian .dual-point-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-s-e-meridian .dual-point-body {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- CLX-A · Focal number (Meridian "quiet thunder" climax) ---- */
+.variant-clx-a-meridian {
+  padding: 96px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: center;
+  text-align: center;
+}
+.variant-clx-a-meridian .focal-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+.variant-clx-a-meridian .focal-stack {
+  display: flex; flex-direction: column; align-items: center;
+  gap: var(--space-lg);
+}
+.variant-clx-a-meridian .focal-number {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(120px, 18vw, 220px);
+  letter-spacing: -0.04em;
+  line-height: 0.85;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-clx-a-meridian .focal-number sup {
+  font-size: 0.3em;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  vertical-align: top;
+  margin-left: 0.1em;
+}
+.variant-clx-a-meridian .focal-caption {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--color-text-muted);
+  letter-spacing: -0.005em;
+  max-width: 40ch;
+  line-height: 1.4;
+}
+.variant-clx-a-meridian .focal-foot {
+  border-top: var(--hairline);
+  padding-top: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-faint);
+  text-align: left;
+}
+
+/* ---- CLX-B · Cliff-drop with signal hairline ---- */
+.variant-clx-b-meridian {
+  padding: 72px;
+  display: grid;
+  grid-template-rows: 1fr auto auto auto;
+  gap: var(--space-md);
+}
+.variant-clx-b-meridian .cliff-empty { content: ''; }
+.variant-clx-b-meridian .cliff-signal {
+  height: 1px;
+  width: 100%;
+  background: var(--color-accent);
+}
+.variant-clx-b-meridian .cliff-number {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(140px, 20vw, 240px);
+  letter-spacing: -0.04em;
+  line-height: 0.85;
+  color: var(--color-text-primary);
+  margin: 0;
+  margin-top: var(--space-md);
+}
+.variant-clx-b-meridian .cliff-number sup {
+  font-size: 0.25em;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  vertical-align: top;
+  margin-left: 0.08em;
+}
+.variant-clx-b-meridian .cliff-caption {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--color-text-muted);
+  max-width: 50ch;
+  line-height: 1.4;
+  margin: 0;
+}
+.variant-clx-b-meridian .cliff-meta {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-faint);
+  margin-top: var(--space-md);
+}
+
+/* ---- CLX-D · Before/after split ---- */
+.variant-clx-d-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-2xl);
+}
+.variant-clx-d-meridian .ba-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--space-2xl);
+  align-items: center;
+}
+.variant-clx-d-meridian .ba-side {
+  display: flex; flex-direction: column;
+  gap: var(--space-md);
+}
+.variant-clx-d-meridian .ba-side.right { text-align: right; }
+.variant-clx-d-meridian .ba-label {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-clx-d-meridian .ba-number {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 96px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-clx-d-meridian .ba-side.right .ba-number {
+  color: var(--color-text-primary);
+}
+.variant-clx-d-meridian .ba-side.right .ba-number sup {
+  color: var(--color-accent);
+  font-size: 0.25em;
+  font-family: var(--font-mono);
+  margin-left: 0.08em;
+  vertical-align: top;
+}
+.variant-clx-d-meridian .ba-note {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+.variant-clx-d-meridian .ba-arrow {
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  color: var(--color-accent);
+  padding: 0 var(--space-md);
+}
+
+/* ---- CMP-B · Asymmetric 1.5:1 duel ---- */
+.variant-cmp-b-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-2xl);
+}
+.variant-cmp-b-meridian .duel-row {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 0;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+}
+.variant-cmp-b-meridian .duel-side {
+  padding: var(--space-2xl);
+  border-right: var(--hairline);
+  display: flex; flex-direction: column; gap: var(--space-md);
+}
+.variant-cmp-b-meridian .duel-side:last-child { border-right: 0; }
+.variant-cmp-b-meridian .duel-side.primary {
+  background: var(--color-surface);
+}
+.variant-cmp-b-meridian .duel-label {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-cmp-b-meridian .duel-name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 24px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-cmp-b-meridian .duel-value {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 64px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: 0;
+}
+.variant-cmp-b-meridian .duel-side.primary .duel-value sup {
+  font-size: 0.22em;
+  color: var(--color-accent);
+  background: none;
+  padding: 0;
+  font-family: var(--font-mono);
+  margin-left: 0.1em;
+  vertical-align: top;
+}
+.variant-cmp-b-meridian .duel-side .duel-value sup {
+  font-size: 0.22em;
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+  margin-left: 0.1em;
+  vertical-align: top;
+}
+.variant-cmp-b-meridian .duel-note {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ---- CMP-C · Minimalist axis dual-column ---- */
+.variant-cmp-c-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-2xl);
+}
+.variant-cmp-c-meridian .axis-row {
+  display: grid;
+  grid-template-columns: 1fr 2px 1fr;
+  gap: var(--space-2xl);
+  align-items: stretch;
+}
+.variant-cmp-c-meridian .axis-divider {
+  background: var(--color-border);
+}
+.variant-cmp-c-meridian .axis-side {
+  display: flex; flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+}
+.variant-cmp-c-meridian .axis-label {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-cmp-c-meridian .axis-value {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 72px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-cmp-c-meridian .axis-value sup {
+  font-size: 0.22em;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  margin-left: 0.08em;
+  vertical-align: top;
+}
+.variant-cmp-c-meridian .axis-bullets {
+  display: flex; flex-direction: column; gap: 8px;
+  border-top: var(--hairline);
+  padding-top: var(--space-md);
+}
+.variant-cmp-c-meridian .axis-bullet {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* ---- INS-A · Centered quote ---- */
+.variant-ins-a-meridian {
+  padding: 96px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: center;
+  text-align: center;
+}
+.variant-ins-a-meridian .quote-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-ins-a-meridian .quote-body {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 44px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  max-width: 22ch;
+  margin: 0 auto;
+}
+.variant-ins-a-meridian .quote-body .em { color: var(--color-accent); }
+.variant-ins-a-meridian .quote-attribution {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-top: var(--hairline);
+  padding-top: var(--space-md);
+  display: inline-block;
+  margin-top: var(--space-xl);
+}
+
+/* ---- INS-B · Left quote with decoration ---- */
+.variant-ins-b-meridian {
+  padding: 96px 96px 72px;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--space-xl);
+  position: relative;
+}
+.variant-ins-b-meridian .quote-mark {
+  position: absolute;
+  top: 64px; left: 88px;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 220px;
+  line-height: 1;
+  color: var(--color-accent);
+  opacity: 0.5;
+  pointer-events: none;
+}
+.variant-ins-b-meridian .quote-content {
+  display: flex; flex-direction: column; justify-content: center;
+  gap: var(--space-2xl);
+  max-width: 32ch;
+  position: relative; z-index: 2;
+  padding-top: var(--space-2xl);
+}
+.variant-ins-b-meridian .quote-content .body {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 36px;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-ins-b-meridian .quote-foot {
+  border-top: var(--hairline);
+  padding-top: var(--space-md);
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ---- CB-A · Chapter break centered ---- */
+.variant-cb-a-meridian {
+  padding: 96px;
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  align-items: center;
+  text-align: center;
+}
+.variant-cb-a-meridian .cb-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-md);
+}
+.variant-cb-a-meridian .cb-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 80px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-cb-a-meridian .cb-zh {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--color-text-muted);
+  margin-top: var(--space-md);
+}
+.variant-cb-a-meridian .cb-divider {
+  width: 64px; height: 1px;
+  background: var(--color-accent);
+  margin: var(--space-xl) auto 0;
+}
+
+/* ---- CB-B · Chapter break bottom-left narrative ---- */
+.variant-cb-b-meridian {
+  padding: 64px 72px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  gap: var(--space-md);
+  position: relative;
+}
+.variant-cb-b-meridian::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 80% 30%, color-mix(in srgb, var(--color-accent) 4%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.variant-cb-b-meridian .cb-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  position: relative; z-index: 2;
+}
+.variant-cb-b-meridian .cb-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 88px;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--color-text-primary);
+  margin: 0;
+  position: relative; z-index: 2;
+}
+.variant-cb-b-meridian .cb-zh {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--color-text-muted);
+  max-width: 36ch;
+  margin-top: var(--space-md);
+  position: relative; z-index: 2;
+}
+.variant-cb-b-meridian .cb-rule {
+  width: 100%;
+  height: 1px;
+  background: var(--color-border);
+  margin-top: var(--space-xl);
+  position: relative; z-index: 2;
+}
+
+/* ---- CLO-A · Vertical conclusions ---- */
+.variant-clo-a-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: var(--space-xl);
+}
+.variant-clo-a-meridian .conclusions {
+  display: flex; flex-direction: column;
+  border-top: var(--hairline);
+}
+.variant-clo-a-meridian .conclusion-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: var(--space-xl);
+  padding: var(--space-lg) 0;
+  border-bottom: var(--hairline);
+}
+.variant-clo-a-meridian .conclusion-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--color-accent);
+  padding-top: 4px;
+}
+.variant-clo-a-meridian .conclusion-text {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.variant-clo-a-meridian .conclusion-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-clo-a-meridian .conclusion-body {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- CLO-B · Split conclusion + actions ---- */
+.variant-clo-b-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-2xl);
+}
+.variant-clo-b-meridian .clo-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+}
+.variant-clo-b-meridian .clo-side {
+  padding: var(--space-2xl);
+  display: flex; flex-direction: column; gap: var(--space-md);
+  border-right: var(--hairline);
+}
+.variant-clo-b-meridian .clo-side:last-child { border-right: 0; }
+.variant-clo-b-meridian .clo-side-label {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-clo-b-meridian .clo-side-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-clo-b-meridian .clo-list {
+  display: flex; flex-direction: column; gap: 12px;
+  margin-top: var(--space-md);
+}
+.variant-clo-b-meridian .clo-list-item {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.variant-clo-b-meridian .clo-list-item .num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-accent);
+  padding-top: 3px;
+}
+.variant-clo-b-meridian .clo-list-item .text {
+  color: var(--color-text-primary);
+}
+
+/* ---- GC-A · Image left + text right ---- */
+.variant-gc-a-meridian {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 720px;
+}
+.variant-gc-a-meridian .img-side {
+  background: var(--color-surface);
+  display: flex; align-items: flex-end;
+  padding: 32px;
+  border-right: var(--hairline);
+}
+.variant-gc-a-meridian .img-side .img-mark {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-gc-a-meridian .text-side {
+  padding: 64px 72px;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: var(--space-md);
+}
+.variant-gc-a-meridian .text-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-gc-a-meridian .text-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 52px;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-gc-a-meridian .text-body {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 40ch;
+}
+.variant-gc-a-meridian .text-meta {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-top: var(--hairline);
+  padding-top: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+/* ---- GC-B · Text left + image right ---- */
+.variant-gc-b-meridian {
+  display: grid;
+  grid-template-columns: 5fr 6fr;
+  height: 720px;
+}
+.variant-gc-b-meridian .text-side {
+  padding: 64px 72px;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: var(--space-md);
+  border-right: var(--hairline);
+}
+.variant-gc-b-meridian .text-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-gc-b-meridian .text-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 48px;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-gc-b-meridian .text-body {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-gc-b-meridian .img-side {
+  background: var(--color-surface);
+  display: flex; align-items: flex-end;
+  padding: 32px;
+}
+.variant-gc-b-meridian .img-side .img-mark {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+
+/* ---- TL-A · Horizontal timeline ---- */
+.variant-tl-a-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: var(--space-xl);
+  align-content: start;
+}
+.variant-tl-a-meridian .tl-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  position: relative;
+  padding-top: 32px;
+}
+.variant-tl-a-meridian .tl-row::before {
+  content: '';
+  position: absolute;
+  top: 16px; left: 0; right: 0;
+  height: 1px;
+  background: var(--color-border);
+}
+.variant-tl-a-meridian .tl-node {
+  padding: 0 var(--space-md);
+  border-right: var(--hairline);
+  position: relative;
+}
+.variant-tl-a-meridian .tl-node:last-child { border-right: 0; }
+.variant-tl-a-meridian .tl-node::before {
+  content: '';
+  position: absolute;
+  top: -22px; left: 0;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+.variant-tl-a-meridian .tl-year {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--color-accent);
+  display: block;
+  margin-bottom: 8px;
+}
+.variant-tl-a-meridian .tl-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--color-text-primary);
+  margin: 0 0 6px;
+}
+.variant-tl-a-meridian .tl-body {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- TL-B · Phase blocks ---- */
+.variant-tl-b-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-tl-b-meridian .phase-stack {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+}
+.variant-tl-b-meridian .phase {
+  padding: var(--space-xl) var(--space-lg);
+  border-right: var(--hairline);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.variant-tl-b-meridian .phase:last-child { border-right: 0; }
+.variant-tl-b-meridian .phase-range {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--color-accent);
+}
+.variant-tl-b-meridian .phase-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-tl-b-meridian .phase-bullets {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: var(--space-sm);
+}
+.variant-tl-b-meridian .phase-bullet {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* ---- PRC-A · Horizontal arrow flow
+   Density: 3-5 steps. Each step: title + 1-2 line body.
+   Box height grows with content; the rest of the page is breathing space — that's Meridian.
+   ---- */
+.variant-prc-a-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: var(--space-xl);
+  align-content: start;
+}
+.variant-prc-a-meridian .flow-row {
+  display: grid;
+  grid-template-columns: 1fr 24px 1fr 24px 1fr;
+  gap: var(--space-md);
+  align-items: start;
+}
+.variant-prc-a-meridian .flow-step {
+  padding: var(--space-lg);
+  border: var(--hairline);
+  display: flex; flex-direction: column; gap: var(--space-sm);
+}
+.variant-prc-a-meridian .flow-step-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--color-accent);
+}
+.variant-prc-a-meridian .flow-step-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-prc-a-meridian .flow-step-body {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+.variant-prc-a-meridian .flow-arrow {
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--color-accent);
+  padding-top: 32px;
+}
+.variant-prc-a-meridian .flow-arrow {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--color-accent);
+  text-align: center;
+  letter-spacing: 0;
+}
+
+/* ---- PRC-B · Vertical steps ---- */
+.variant-prc-b-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-prc-b-meridian .step-stack {
+  display: flex; flex-direction: column;
+  border-top: var(--hairline);
+}
+.variant-prc-b-meridian .step-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: var(--space-xl);
+  padding: var(--space-md) 0;
+  border-bottom: var(--hairline);
+}
+.variant-prc-b-meridian .step-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--color-accent);
+  padding-top: 4px;
+}
+.variant-prc-b-meridian .step-text {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.variant-prc-b-meridian .step-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-prc-b-meridian .step-body {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- FRW-A · 2x2 matrix ---- */
+.variant-frw-a-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-frw-a-meridian .matrix {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr;
+  grid-template-rows: 60px 1fr 1fr;
+  border-top: var(--hairline);
+  border-left: var(--hairline);
+}
+.variant-frw-a-meridian .matrix-axis-y {
+  grid-row: 2 / 4; grid-column: 1;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  border-bottom: var(--hairline);
+  border-right: var(--hairline);
+}
+.variant-frw-a-meridian .matrix-axis-x {
+  grid-row: 1; grid-column: 2 / 4;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-right: var(--hairline);
+  border-bottom: var(--hairline);
+}
+.variant-frw-a-meridian .quadrant {
+  padding: var(--space-lg);
+  border-right: var(--hairline);
+  border-bottom: var(--hairline);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.variant-frw-a-meridian .quadrant-q1 { grid-row: 2; grid-column: 2; }
+.variant-frw-a-meridian .quadrant-q2 { grid-row: 2; grid-column: 3; }
+.variant-frw-a-meridian .quadrant-q3 { grid-row: 3; grid-column: 2; }
+.variant-frw-a-meridian .quadrant-q4 { grid-row: 3; grid-column: 3; }
+.variant-frw-a-meridian .quadrant-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+.variant-frw-a-meridian .quadrant-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-frw-a-meridian .quadrant-body {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- FRW-B · Pyramid hierarchy ---- */
+.variant-frw-b-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-frw-b-meridian .pyramid {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px;
+  padding-top: var(--space-md);
+}
+.variant-frw-b-meridian .pyramid-row {
+  display: flex; align-items: center; justify-content: center;
+  border: var(--hairline);
+  padding: var(--space-md) var(--space-xl);
+  text-align: center;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.variant-frw-b-meridian .pyramid-row.top    { width: 280px; background: var(--color-surface); }
+.variant-frw-b-meridian .pyramid-row.mid    { width: 460px; }
+.variant-frw-b-meridian .pyramid-row.bottom { width: 640px; }
+.variant-frw-b-meridian .pyramid-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+.variant-frw-b-meridian .pyramid-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-frw-b-meridian .pyramid-body {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════════
+   §7 · MS-2B · 31 remaining variants to reach 58 (full Archive parity)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ---- H1 · Single Full Bleed image ---- */
+.variant-h1-meridian {
+  padding: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  position: relative;
+}
+.variant-h1-meridian .h1-image {
+  background: var(--color-surface);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-h1-meridian .h1-caption {
+  padding: var(--space-xl) 72px;
+  display: flex; justify-content: space-between; align-items: end;
+  gap: var(--space-xl);
+  border-top: var(--hairline);
+}
+.variant-h1-meridian .h1-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-h1-meridian .h1-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ---- H2 · Two images side by side ---- */
+.variant-h2-meridian {
+  padding: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.variant-h2-meridian .h2-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  min-height: 0;
+  height: 100%;
+}
+.variant-h2-meridian .h2-cell {
+  background: var(--color-surface);
+  display: flex; align-items: flex-end;
+  padding: var(--space-xl);
+  position: relative;
+}
+.variant-h2-meridian .h2-cell + .h2-cell {
+  border-left: var(--hairline);
+}
+.variant-h2-meridian .h2-cell-mark {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-h2-meridian .h2-cell-caption {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  margin-top: 4px;
+}
+.variant-h2-meridian .h2-foot {
+  padding: var(--space-md) 72px;
+  border-top: var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  display: flex; justify-content: space-between;
+}
+
+/* ---- H3 · Three images side by side ---- */
+.variant-h3-meridian {
+  padding: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.variant-h3-meridian .h3-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  min-height: 0;
+  height: 100%;
+}
+.variant-h3-meridian .h3-cell {
+  background: var(--color-surface);
+  display: flex; align-items: flex-end;
+  padding: var(--space-lg);
+}
+.variant-h3-meridian .h3-cell + .h3-cell {
+  border-left: var(--hairline);
+}
+.variant-h3-meridian .h3-cell-mark {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-h3-meridian .h3-foot {
+  padding: var(--space-md) 72px;
+  border-top: var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  display: flex; justify-content: space-between;
+}
+
+/* ---- H4 · Four images 2x2 ---- */
+.variant-h4-meridian {
+  padding: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.variant-h4-meridian .h4-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0;
+  min-height: 0;
+  height: 100%;
+}
+.variant-h4-meridian .h4-cell {
+  background: var(--color-surface);
+  display: flex; align-items: flex-end;
+  padding: var(--space-lg);
+  border-right: var(--hairline);
+  border-bottom: var(--hairline);
+  min-height: 0;
+}
+.variant-h4-meridian .h4-cell:nth-child(2n) { border-right: 0; }
+.variant-h4-meridian .h4-cell:nth-last-child(-n+2) { border-bottom: 0; }
+.variant-h4-meridian .h4-cell-mark {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-h4-meridian .h4-foot {
+  padding: var(--space-md) 72px;
+  border-top: var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  display: flex; justify-content: space-between;
+}
+
+/* ---- H5 · One main + 4 small ---- */
+.variant-h5-meridian {
+  padding: 0;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  height: 720px;
+}
+.variant-h5-meridian .h5-main {
+  background: var(--color-surface);
+  display: flex; align-items: flex-end;
+  padding: var(--space-xl);
+  border-right: var(--hairline);
+}
+.variant-h5-meridian .h5-main-mark {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-h5-meridian .h5-side {
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+}
+.variant-h5-meridian .h5-side-cell {
+  background: var(--color-surface);
+  display: flex; align-items: flex-end;
+  padding: var(--space-md);
+  border-bottom: var(--hairline);
+}
+.variant-h5-meridian .h5-side-cell:last-child { border-bottom: 0; }
+.variant-h5-meridian .h5-side-mark {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+
+/* ---- S-C · Conclusion overlord ---- */
+.variant-s-c-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: var(--space-xl);
+  align-content: start;
+}
+.variant-s-c-meridian .conclusion-block {
+  display: flex; flex-direction: column; gap: var(--space-md);
+  padding-bottom: var(--space-xl);
+  border-bottom: var(--hairline);
+}
+.variant-s-c-meridian .conclusion-tag {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-accent);
+}
+.variant-s-c-meridian .conclusion-statement {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 44px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 30ch;
+}
+.variant-s-c-meridian .evidence-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+.variant-s-c-meridian .evidence-cell {
+  padding: var(--space-md) var(--space-lg);
+  border-right: var(--hairline);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.variant-s-c-meridian .evidence-cell:first-child { padding-left: 0; }
+.variant-s-c-meridian .evidence-cell:last-child { border-right: 0; }
+.variant-s-c-meridian .evidence-num {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-s-c-meridian .evidence-text {
+  font-size: 13px; line-height: 1.55;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* ---- S-F · Conclusion + 6 dense findings 2x3 ---- */
+.variant-s-f-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: var(--space-xl);
+  align-content: start;
+}
+.variant-s-f-meridian .findings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+}
+.variant-s-f-meridian .finding-cell {
+  padding: var(--space-md) var(--space-lg);
+  border-right: var(--hairline);
+  border-bottom: var(--hairline);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.variant-s-f-meridian .finding-cell:nth-child(2n) { border-right: 0; }
+.variant-s-f-meridian .finding-cell:nth-last-child(-n+2) { border-bottom: 0; }
+.variant-s-f-meridian .finding-num {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em;
+  color: var(--color-accent);
+}
+.variant-s-f-meridian .finding-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-s-f-meridian .finding-body {
+  font-size: 12px; line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- S-G · Academic chart page ---- */
+.variant-s-g-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--space-xl);
+}
+.variant-s-g-meridian .chart-area {
+  background: var(--color-surface);
+  border: var(--hairline);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-faint);
+  min-height: 360px;
+}
+.variant-s-g-meridian .chart-foot {
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-top: var(--hairline);
+  padding-top: var(--space-md);
+}
+
+/* ---- CLX-C · Binary star (diagonal duel) ---- */
+.variant-clx-c-meridian {
+  padding: 72px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0;
+}
+.variant-clx-c-meridian .star {
+  display: flex; flex-direction: column;
+  gap: var(--space-md);
+}
+.variant-clx-c-meridian .star-1 {
+  grid-row: 1; grid-column: 1;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.variant-clx-c-meridian .star-2 {
+  grid-row: 2; grid-column: 2;
+  align-items: flex-end;
+  justify-content: flex-end;
+  text-align: right;
+}
+.variant-clx-c-meridian .star-label {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-clx-c-meridian .star-number {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 96px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-clx-c-meridian .star-number sup {
+  font-size: 0.25em;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  vertical-align: top;
+  margin-left: 0.08em;
+}
+.variant-clx-c-meridian .star-note {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 30ch;
+}
+
+/* ---- CLX-E · Ghost number background ---- */
+.variant-clx-e-meridian {
+  padding: 64px 72px;
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+.variant-clx-e-meridian .ghost {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 480px;
+  letter-spacing: -0.05em;
+  line-height: 0.85;
+  color: var(--color-text-primary);
+  opacity: 0.05;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.variant-clx-e-meridian .ghost-overlay {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: var(--space-lg);
+  text-align: center;
+}
+.variant-clx-e-meridian .ghost-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-accent);
+}
+.variant-clx-e-meridian .ghost-statement {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 36px;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  max-width: 28ch;
+  margin: 0;
+}
+.variant-clx-e-meridian .ghost-foot {
+  position: relative; z-index: 2;
+  border-top: var(--hairline);
+  padding-top: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ---- CMP-D · Binary decision split ---- */
+.variant-cmp-d-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-cmp-d-meridian .binary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+}
+.variant-cmp-d-meridian .binary-side {
+  padding: var(--space-2xl);
+  border-right: var(--hairline);
+  display: flex; flex-direction: column;
+  gap: var(--space-md);
+}
+.variant-cmp-d-meridian .binary-side:last-child { border-right: 0; }
+.variant-cmp-d-meridian .binary-tag {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-cmp-d-meridian .binary-decision {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 44px;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-cmp-d-meridian .binary-side.recommended .binary-decision {
+  color: var(--color-text-primary);
+}
+.variant-cmp-d-meridian .binary-side.recommended .binary-tag::after {
+  content: ' · RECOMMENDED';
+  color: var(--color-accent);
+}
+.variant-cmp-d-meridian .binary-pros {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: var(--hairline);
+}
+.variant-cmp-d-meridian .binary-pros-label {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-cmp-d-meridian .binary-pro {
+  font-size: 13px; line-height: 1.55;
+  color: var(--color-text-primary);
+}
+
+/* ---- CMP-E · Scorecard table ---- */
+.variant-cmp-e-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: var(--space-xl);
+  align-content: start;
+}
+.variant-cmp-e-meridian .scorecard {
+  display: grid;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+}
+.variant-cmp-e-meridian .score-header,
+.variant-cmp-e-meridian .score-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  border-bottom: var(--hairline);
+}
+.variant-cmp-e-meridian .score-row:last-child { border-bottom: 0; }
+.variant-cmp-e-meridian .score-cell {
+  padding: var(--space-md) var(--space-lg);
+  border-right: var(--hairline);
+  display: flex; align-items: center;
+  font-size: 13px;
+}
+.variant-cmp-e-meridian .score-cell:last-child { border-right: 0; }
+.variant-cmp-e-meridian .score-header .score-cell {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-cmp-e-meridian .score-row .score-cell {
+  color: var(--color-text-primary);
+}
+.variant-cmp-e-meridian .score-row .score-criterion {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 14px;
+}
+.variant-cmp-e-meridian .score-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+.variant-cmp-e-meridian .score-value.win {
+  color: var(--color-accent);
+}
+
+/* ---- INS-C · Cascading lines (decreasing font size) ---- */
+.variant-ins-c-meridian {
+  padding: 96px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--space-xl);
+  align-content: center;
+}
+.variant-ins-c-meridian .cascade-stack {
+  display: flex; flex-direction: column;
+  gap: var(--space-md);
+}
+.variant-ins-c-meridian .cascade-line {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-ins-c-meridian .cascade-line:nth-child(1) { font-size: 42px; }
+.variant-ins-c-meridian .cascade-line:nth-child(2) { font-size: 32px; color: var(--color-text-muted); }
+.variant-ins-c-meridian .cascade-line:nth-child(3) { font-size: 22px; color: var(--color-text-muted); }
+.variant-ins-c-meridian .cascade-line:nth-child(4) {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--color-accent);
+}
+
+/* ---- INS-D · Data insight (centered big number) ---- */
+.variant-ins-d-meridian {
+  padding: 96px;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: var(--space-lg);
+  align-content: center;
+  text-align: center;
+}
+.variant-ins-d-meridian .insight-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-ins-d-meridian .insight-number {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 144px;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-ins-d-meridian .insight-number sup {
+  font-size: 0.25em;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  vertical-align: top;
+  margin-left: 0.08em;
+}
+.variant-ins-d-meridian .insight-takeaway {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 24px;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  max-width: 36ch;
+  margin: 0 auto;
+}
+.variant-ins-d-meridian .insight-takeaway .em { color: var(--color-accent); }
+
+/* ---- CB-C · Giant text chapter (no image, watermark number) ---- */
+.variant-cb-c-meridian {
+  padding: 64px 72px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  position: relative;
+}
+.variant-cb-c-meridian .cb-watermark {
+  position: absolute;
+  top: 50%; right: 72px;
+  transform: translateY(-50%);
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 360px;
+  letter-spacing: -0.05em;
+  line-height: 0.8;
+  color: var(--color-text-primary);
+  opacity: 0.06;
+  pointer-events: none;
+}
+.variant-cb-c-meridian .cb-content {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column;
+  gap: var(--space-md);
+}
+.variant-cb-c-meridian .cb-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-accent);
+}
+.variant-cb-c-meridian .cb-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 96px;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-cb-c-meridian .cb-zh {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--color-text-muted);
+  margin-top: var(--space-md);
+  max-width: 50ch;
+}
+
+/* ---- CB-D · Full screen title ---- */
+.variant-cb-d-meridian {
+  padding: 64px 72px;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  text-align: center;
+  position: relative;
+}
+.variant-cb-d-meridian .cb-num {
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2xl);
+}
+.variant-cb-d-meridian .cb-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(80px, 10vw, 140px);
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-cb-d-meridian .cb-title .dot { color: var(--color-accent); }
+.variant-cb-d-meridian .cb-zh {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--color-text-muted);
+  margin-top: var(--space-xl);
+  max-width: 40ch;
+}
+
+/* ---- CB-E · Vertical number + right content ---- */
+.variant-cb-e-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3xl);
+  align-items: center;
+}
+.variant-cb-e-meridian .cb-vnum {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 200px;
+  letter-spacing: -0.04em;
+  line-height: 0.85;
+  color: var(--color-text-primary);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-orientation: mixed;
+  margin: 0;
+}
+.variant-cb-e-meridian .cb-content {
+  display: flex; flex-direction: column;
+  gap: var(--space-lg);
+  border-left: var(--hairline);
+  padding-left: var(--space-2xl);
+}
+.variant-cb-e-meridian .cb-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-accent);
+}
+.variant-cb-e-meridian .cb-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 64px;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-cb-e-meridian .cb-zh {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--color-text-muted);
+  max-width: 40ch;
+  line-height: 1.5;
+}
+
+/* ---- CLO-C · Card grid (2x2 conclusions) ---- */
+.variant-clo-c-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: var(--space-xl);
+  align-content: start;
+}
+.variant-clo-c-meridian .clo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+}
+.variant-clo-c-meridian .clo-card {
+  padding: var(--space-xl) var(--space-lg);
+  border-right: var(--hairline);
+  border-bottom: var(--hairline);
+  display: flex; flex-direction: column; gap: var(--space-sm);
+}
+.variant-clo-c-meridian .clo-card:nth-child(2n) { border-right: 0; }
+.variant-clo-c-meridian .clo-card:nth-last-child(-n+2) { border-bottom: 0; }
+.variant-clo-c-meridian .clo-card-num {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em;
+  color: var(--color-accent);
+}
+.variant-clo-c-meridian .clo-card-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-clo-c-meridian .clo-card-body {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- CLO-D · Hero conclusion + action bar ---- */
+.variant-clo-d-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--space-xl);
+}
+.variant-clo-d-meridian .hero-statement {
+  display: flex; flex-direction: column; justify-content: center;
+  gap: var(--space-lg);
+  padding-bottom: var(--space-2xl);
+  border-bottom: var(--hairline);
+}
+.variant-clo-d-meridian .hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-accent);
+}
+.variant-clo-d-meridian .hero-text {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 56px;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 24ch;
+}
+.variant-clo-d-meridian .action-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+.variant-clo-d-meridian .action-cell {
+  padding: var(--space-md) var(--space-lg);
+  border-right: var(--hairline);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.variant-clo-d-meridian .action-cell:first-child { padding-left: 0; }
+.variant-clo-d-meridian .action-cell:last-child { border-right: 0; }
+.variant-clo-d-meridian .action-num {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em;
+  color: var(--color-accent);
+}
+.variant-clo-d-meridian .action-text {
+  font-size: 14px;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+/* ---- CLO-E · Thank you ---- */
+.variant-clo-e-meridian {
+  padding: 96px;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  text-align: center;
+}
+.variant-clo-e-meridian .thanks-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-xl);
+}
+.variant-clo-e-meridian .thanks-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 96px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-clo-e-meridian .thanks-title .dot { color: var(--color-accent); }
+.variant-clo-e-meridian .thanks-divider {
+  width: 64px; height: 1px;
+  background: var(--color-accent);
+  margin: var(--space-xl) auto;
+}
+.variant-clo-e-meridian .thanks-meta {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  display: flex; gap: var(--space-xl);
+  flex-wrap: wrap; justify-content: center;
+}
+
+/* ---- GC-2 · Two column image+text ---- */
+.variant-gc-2-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-gc-2-meridian .gc2-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xl);
+}
+.variant-gc-2-meridian .gc2-col {
+  display: flex; flex-direction: column; gap: var(--space-md);
+}
+.variant-gc-2-meridian .gc2-image {
+  background: var(--color-surface);
+  height: 240px;
+  border: var(--hairline);
+  display: flex; align-items: flex-end;
+  padding: var(--space-md);
+}
+.variant-gc-2-meridian .gc2-image-mark {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-gc-2-meridian .gc2-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-accent);
+}
+.variant-gc-2-meridian .gc2-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-gc-2-meridian .gc2-body {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- GC-3 · Three column image+text ---- */
+.variant-gc-3-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-gc-3-meridian .gc3-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-xl);
+}
+.variant-gc-3-meridian .gc3-col {
+  display: flex; flex-direction: column; gap: var(--space-md);
+}
+.variant-gc-3-meridian .gc3-image {
+  background: var(--color-surface);
+  height: 200px;
+  border: var(--hairline);
+  display: flex; align-items: flex-end;
+  padding: var(--space-md);
+}
+.variant-gc-3-meridian .gc3-image-mark {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-gc-3-meridian .gc3-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-accent);
+}
+.variant-gc-3-meridian .gc3-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-gc-3-meridian .gc3-body {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- GC-C · Image top + text bottom ---- */
+.variant-gc-c-meridian {
+  display: grid;
+  grid-template-rows: 3fr 2fr;
+  height: 720px;
+}
+.variant-gc-c-meridian .gcc-image {
+  background: var(--color-surface);
+  display: flex; align-items: flex-end;
+  padding: var(--space-xl);
+  border-bottom: var(--hairline);
+}
+.variant-gc-c-meridian .gcc-image-mark {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.variant-gc-c-meridian .gcc-text {
+  padding: var(--space-xl) 72px;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: var(--space-md);
+}
+.variant-gc-c-meridian .gcc-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-accent);
+}
+.variant-gc-c-meridian .gcc-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 36px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-gc-c-meridian .gcc-body {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 0;
+  max-width: 60ch;
+}
+
+/* ---- GC-D · Text top + images bottom ---- */
+.variant-gc-d-meridian {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 720px;
+}
+.variant-gc-d-meridian .gcd-text {
+  padding: var(--space-xl) 72px;
+  display: flex; flex-direction: column;
+  gap: var(--space-md);
+  border-bottom: var(--hairline);
+}
+.variant-gc-d-meridian .gcd-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-accent);
+}
+.variant-gc-d-meridian .gcd-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 36px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-gc-d-meridian .gcd-images {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+.variant-gc-d-meridian .gcd-cell {
+  background: var(--color-surface);
+  display: flex; align-items: flex-end;
+  padding: var(--space-lg);
+  border-right: var(--hairline);
+}
+.variant-gc-d-meridian .gcd-cell:last-child { border-right: 0; }
+.variant-gc-d-meridian .gcd-cell-mark {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+
+/* ---- TL-C · Vertical milestones ---- */
+.variant-tl-c-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-tl-c-meridian .tlc-stack {
+  display: flex; flex-direction: column;
+  border-left: var(--hairline);
+  padding-left: var(--space-2xl);
+  position: relative;
+}
+.variant-tl-c-meridian .tlc-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: var(--space-xl);
+  padding: var(--space-md) 0;
+  border-bottom: var(--hairline);
+  position: relative;
+}
+.variant-tl-c-meridian .tlc-row::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--space-2xl) - 4px);
+  top: var(--space-md);
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+.variant-tl-c-meridian .tlc-row:last-child { border-bottom: 0; }
+.variant-tl-c-meridian .tlc-year {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--color-accent);
+  padding-top: 4px;
+}
+.variant-tl-c-meridian .tlc-content {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.variant-tl-c-meridian .tlc-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-tl-c-meridian .tlc-body {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- TL-D · Gantt roadmap ---- */
+.variant-tl-d-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-tl-d-meridian .gantt {
+  display: flex; flex-direction: column;
+  border-top: var(--hairline);
+  padding-top: var(--space-md);
+}
+.variant-tl-d-meridian .gantt-header {
+  display: grid;
+  grid-template-columns: 200px repeat(4, 1fr);
+  gap: 0;
+  padding-bottom: var(--space-sm);
+  border-bottom: var(--hairline);
+}
+.variant-tl-d-meridian .gantt-header-cell {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  padding: 0 var(--space-sm);
+}
+.variant-tl-d-meridian .gantt-row {
+  display: grid;
+  grid-template-columns: 200px repeat(4, 1fr);
+  gap: 0;
+  padding: var(--space-sm) 0;
+  border-bottom: var(--hairline);
+  align-items: center;
+}
+.variant-tl-d-meridian .gantt-row:last-child { border-bottom: 0; }
+.variant-tl-d-meridian .gantt-track-name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  padding: 0 var(--space-sm);
+}
+.variant-tl-d-meridian .gantt-cell {
+  padding: 0 4px;
+  position: relative;
+  height: 16px;
+}
+.variant-tl-d-meridian .gantt-bar {
+  position: absolute;
+  top: 4px; bottom: 4px;
+  background: var(--color-accent);
+  height: 8px;
+}
+
+/* ---- PRC-C · Circular loop ---- */
+.variant-prc-c-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+  align-content: start;
+}
+.variant-prc-c-meridian .loop-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0;
+  border-top: var(--hairline);
+  border-left: var(--hairline);
+  position: relative;
+}
+.variant-prc-c-meridian .loop-step {
+  padding: var(--space-xl) var(--space-lg);
+  border-right: var(--hairline);
+  border-bottom: var(--hairline);
+  display: flex; flex-direction: column; gap: var(--space-sm);
+}
+.variant-prc-c-meridian .loop-step-num {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em;
+  color: var(--color-accent);
+}
+.variant-prc-c-meridian .loop-step-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-prc-c-meridian .loop-step-body {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- PRC-D · Funnel flow ---- */
+.variant-prc-d-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+  align-content: start;
+}
+.variant-prc-d-meridian .funnel {
+  display: flex; flex-direction: column; align-items: center;
+  gap: var(--space-sm);
+}
+.variant-prc-d-meridian .funnel-row {
+  border: var(--hairline);
+  padding: var(--space-md) var(--space-xl);
+  display: flex; flex-direction: column; gap: 4px;
+  text-align: center;
+}
+.variant-prc-d-meridian .funnel-row.f1 { width: 600px; }
+.variant-prc-d-meridian .funnel-row.f2 { width: 480px; }
+.variant-prc-d-meridian .funnel-row.f3 { width: 360px; }
+.variant-prc-d-meridian .funnel-row.f4 { width: 240px; background: var(--color-surface); }
+.variant-prc-d-meridian .funnel-num {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em;
+  color: var(--color-accent);
+}
+.variant-prc-d-meridian .funnel-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--color-text-primary);
+}
+.variant-prc-d-meridian .funnel-metric {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* ---- PRC-E · Causal tree ---- */
+.variant-prc-e-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-prc-e-meridian .tree {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-xl);
+  align-items: start;
+  padding-top: var(--space-md);
+  border-top: var(--hairline);
+}
+.variant-prc-e-meridian .tree-col {
+  display: flex; flex-direction: column;
+  gap: var(--space-md);
+}
+.variant-prc-e-meridian .tree-col-label {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  padding-bottom: var(--space-sm);
+  border-bottom: var(--hairline);
+}
+.variant-prc-e-meridian .tree-node {
+  display: flex; flex-direction: column;
+  gap: 4px;
+  padding: var(--space-sm) var(--space-md);
+  border-left: 2px solid var(--color-accent);
+}
+.variant-prc-e-meridian .tree-node-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-prc-e-meridian .tree-node-body {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- FRW-C · Concentric circles ---- */
+.variant-frw-c-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-frw-c-meridian .concentric {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: var(--space-2xl);
+  align-items: center;
+}
+.variant-frw-c-meridian .concentric-diagram {
+  position: relative;
+  width: 320px; height: 320px;
+  margin: 0 auto;
+}
+.variant-frw-c-meridian .ring {
+  position: absolute;
+  border-radius: 50%;
+  border: var(--hairline);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.variant-frw-c-meridian .ring-1 {
+  inset: 0; border: 1px solid var(--color-accent);
+}
+.variant-frw-c-meridian .ring-2 { inset: 40px; }
+.variant-frw-c-meridian .ring-3 { inset: 80px; background: var(--color-surface); }
+.variant-frw-c-meridian .ring-4 {
+  inset: 120px; background: var(--color-text-primary);
+  color: var(--color-bg);
+}
+.variant-frw-c-meridian .concentric-legend {
+  display: flex; flex-direction: column;
+  border-top: var(--hairline);
+}
+.variant-frw-c-meridian .legend-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  border-bottom: var(--hairline);
+}
+.variant-frw-c-meridian .legend-label {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-accent);
+}
+.variant-frw-c-meridian .legend-content h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--color-text-primary);
+  margin: 0 0 4px;
+}
+.variant-frw-c-meridian .legend-content p {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- FRW-D · Venn diagram ---- */
+.variant-frw-d-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-xl);
+}
+.variant-frw-d-meridian .venn {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xl);
+  align-items: center;
+}
+.variant-frw-d-meridian .venn-diagram {
+  position: relative;
+  width: 360px; height: 280px;
+  margin: 0 auto;
+}
+.variant-frw-d-meridian .circle {
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  border: var(--hairline);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+.variant-frw-d-meridian .circle-a { left: 0; top: 40px; }
+.variant-frw-d-meridian .circle-b { right: 0; top: 40px; }
+.variant-frw-d-meridian .venn-overlap {
+  position: absolute;
+  left: 50%; top: 50%; transform: translate(-50%, -50%);
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em;
+  color: var(--color-accent);
+  z-index: 2;
+}
+.variant-frw-d-meridian .venn-legend {
+  display: flex; flex-direction: column; gap: var(--space-md);
+  border-top: var(--hairline);
+  padding-top: var(--space-md);
+}
+.variant-frw-d-meridian .venn-legend-row {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: var(--space-md);
+}
+.variant-frw-d-meridian .venn-legend-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-accent);
+}
+.variant-frw-d-meridian .venn-legend-content h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  margin: 0 0 2px;
+}
+.variant-frw-d-meridian .venn-legend-content p {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════════
+   §8 · Outline (TOC) page_role · 3 new variants
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ---- OUT-A · Numbered list TOC ---- */
+.variant-out-a-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: var(--space-xl);
+  align-content: start;
+}
+.variant-out-a-meridian .out-list {
+  display: flex; flex-direction: column;
+  border-top: var(--hairline);
+}
+.variant-out-a-meridian .out-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 90px;
+  gap: var(--space-xl);
+  padding: var(--space-md) 0;
+  border-bottom: var(--hairline);
+  align-items: baseline;
+}
+.variant-out-a-meridian .out-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--color-accent);
+}
+.variant-out-a-meridian .out-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-out-a-meridian .out-page {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+/* ---- OUT-B · Two-column visual TOC ---- */
+.variant-out-b-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: var(--space-xl);
+  align-content: start;
+}
+.variant-out-b-meridian .out-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+}
+.variant-out-b-meridian .out-card {
+  padding: var(--space-lg) var(--space-xl);
+  border-right: var(--hairline);
+  border-bottom: var(--hairline);
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: var(--space-md);
+  align-items: start;
+}
+.variant-out-b-meridian .out-card:nth-child(2n) { border-right: 0; }
+.variant-out-b-meridian .out-card:nth-last-child(-n+2) { border-bottom: 0; }
+.variant-out-b-meridian .out-card-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--color-accent);
+  padding-top: 4px;
+}
+.variant-out-b-meridian .out-card-content {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.variant-out-b-meridian .out-card-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-out-b-meridian .out-card-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- OUT-C · Spread cards TOC ---- */
+.variant-out-c-meridian {
+  padding: 64px 72px;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: var(--space-xl);
+  align-content: start;
+}
+.variant-out-c-meridian .out-spread {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+}
+.variant-out-c-meridian .out-spread-card {
+  padding: var(--space-lg);
+  border-right: var(--hairline);
+  display: flex; flex-direction: column;
+  gap: var(--space-sm);
+  min-height: 160px;
+}
+.variant-out-c-meridian .out-spread-card:last-child { border-right: 0; }
+.variant-out-c-meridian .out-spread-num {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+.variant-out-c-meridian .out-spread-num sup {
+  font-size: 0.4em;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  vertical-align: top;
+  margin-left: 2px;
+}
+.variant-out-c-meridian .out-spread-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.variant-out-c-meridian .out-spread-desc {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+  margin-top: auto;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   §9 · Image-fit modifier system
+   Default: cover (any photo fills container, may crop)
+   data-image-fit="contain" → product photos / logos (no cropping)
+   data-image-fit="scale-down" → small assets (no upscale)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* All image containers must constrain their <img> children, not let them push out
+   the parent grid (caption / footer / etc.) */
+.h1-image, .h2-cell, .h3-cell, .h4-cell, .h5-main, .h5-side-cell,
+.gc2-image, .gc3-image, .gcc-image, .gcd-cell,
+.img-side, .img-panel, .figure-image {
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+/* When a real <img> is placed inside an image container, ensure it follows the fit rule */
+.h1-image img,
+.h2-cell img,
+.h3-cell img,
+.h4-cell img,
+.h5-main img,
+.h5-side-cell img,
+.gc2-image img,
+.gc3-image img,
+.gcc-image img,
+.gcd-cell img,
+.img-side img,
+.img-panel img,
+.figure-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Override: image-fit=contain · for product/logo style (preserves aspect, may show whitespace) */
+[data-image-fit="contain"] img,
+.h1-image[data-image-fit="contain"] img,
+.h2-cell[data-image-fit="contain"] img,
+.h3-cell[data-image-fit="contain"] img,
+.h4-cell[data-image-fit="contain"] img,
+.h5-main[data-image-fit="contain"] img,
+.h5-side-cell[data-image-fit="contain"] img,
+.gc2-image[data-image-fit="contain"] img,
+.gc3-image[data-image-fit="contain"] img,
+.gcc-image[data-image-fit="contain"] img,
+.gcd-cell[data-image-fit="contain"] img,
+.img-side[data-image-fit="contain"] img,
+.img-panel[data-image-fit="contain"] img,
+.figure-image[data-image-fit="contain"] img {
+  object-fit: contain;
+  padding: 16px;
+}
+
+/* Override: image-fit=scale-down · prevents upscaling small images */
+[data-image-fit="scale-down"] img {
+  object-fit: scale-down;
+  padding: 24px;
+}
+
+/* Universal safety: any direct grid child that contains an image must allow shrinking */
+.variant-h2-meridian, .variant-h3-meridian, .variant-h4-meridian {
+  overflow: hidden;
+}
+/* When using image-fit=contain, give the container a neutral product-display surface */
+[data-image-fit="contain"],
+[data-image-fit="scale-down"] {
+  background: var(--color-surface);
+}
+
+
+/* ============================================================
+   §5 · Floating skin-switcher (3 Meridian sub-skins only)
+   ============================================================ */
+.theme-switcher {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 9999;
+  font-family: var(--font-mono);
+}
+.theme-switcher-toggle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 25%, transparent);
+  background: color-mix(in srgb, var(--color-bg) 92%, var(--color-text-primary));
+  color: var(--color-text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.18s ease;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+.theme-switcher-toggle:hover { transform: scale(1.06); }
+.theme-switcher-toggle svg {
+  width: 18px; height: 18px;
+  fill: none; stroke: currentColor; stroke-width: 1.4;
+}
+.theme-switcher-panel {
+  position: absolute;
+  bottom: 56px;
+  right: 0;
+  width: 240px;
+  padding: 8px;
+  background: color-mix(in srgb, var(--color-bg) 96%, var(--color-text-primary));
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+  border-radius: 4px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+}
+.theme-switcher.open .theme-switcher-panel { display: flex; }
+.theme-switcher-header {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text-primary) 55%, transparent);
+  padding: 8px 10px 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+  margin-bottom: 4px;
+}
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  border-radius: 2px;
+}
+.theme-option:hover {
+  background: color-mix(in srgb, var(--color-text-primary) 5%, transparent);
+}
+.theme-option.active {
+  border-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+.theme-option .swatches { display: flex; gap: 2px; flex-shrink: 0; }
+.theme-option .swatch { width: 10px; height: 18px; }
+.theme-option .text {
+  display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0;
+}
+.theme-option .name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+}
+.theme-option .desc {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: color-mix(in srgb, var(--color-text-primary) 55%, transparent);
+}
+.theme-option .check {
+  font-size: 12px;
+  color: var(--color-accent);
+  font-weight: 600;
+  opacity: 0;
+  flex-shrink: 0;
+}
+.theme-option.active .check { opacity: 1; }
+@media print { .theme-switcher { display: none !important; } }
+
+</style>
+</head>
+<body>
+
+<!-- ═══ COV-MERIDIAN ═══════════════════════════════════════════════════ -->
+<div class="slide variant-cov-a-meridian">
+  <div class="eyebrow slot-eyebrow">[ 2026 · ANNUAL REPORT / №04 ]</div>
+
+  <div class="cover-title-row">
+    <h1 class="cover-title slot-title-en">CHINA EV<br>DEEP RESEARCH<span class="dot">.</span></h1>
+    <div class="cover-zh slot-title-zh">2024 年中国新能源汽车行业深度研究报告 — 一份为董事会和投资人准备的战略文本。</div>
+  </div>
+
+  <dl class="cover-stats slot-cover-stats">
+    <div class="stat">
+      <dt class="stat-label slot-stat-label">ISSUE</dt>
+      <dd class="stat-value slot-stat-value">№04<sup>V1.0</sup></dd>
+    </div>
+    <div class="stat">
+      <dt class="stat-label slot-stat-label">COVERAGE</dt>
+      <dd class="stat-value slot-stat-value">42<sup>MRK</sup></dd>
+    </div>
+    <div class="stat">
+      <dt class="stat-label slot-stat-label">PAGES</dt>
+      <dd class="stat-value slot-stat-value">128</dd>
+    </div>
+    <div class="stat">
+      <dt class="stat-label slot-stat-label">PUBLISHED</dt>
+      <dd class="stat-value slot-stat-value">MAR/26</dd>
+    </div>
+  </dl>
+
+  <div class="silhouette" aria-hidden="true">
+    <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="mrd-shape" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="currentColor" stop-opacity="0.02"/>
+          <stop offset="60%" stop-color="currentColor" stop-opacity="0.10"/>
+          <stop offset="100%" stop-color="currentColor" stop-opacity="0.05"/>
+        </linearGradient>
+      </defs>
+      <path d="M 80 220 L 160 200 Q 220 170 320 160 L 560 160 Q 640 162 700 188 L 740 218 Q 750 228 740 232 L 88 232 Q 72 230 80 220 Z"
+            fill="url(#mrd-shape)" stroke="currentColor" stroke-opacity="0.18" stroke-width="1"/>
+      <circle cx="200" cy="230" r="26" fill="none" stroke="currentColor" stroke-opacity="0.25" stroke-width="1"/>
+      <circle cx="620" cy="230" r="26" fill="none" stroke="currentColor" stroke-opacity="0.25" stroke-width="1"/>
+    </svg>
+  </div>
+
+  <div class="scroll-cue">
+    <span>SCROLL</span>
+    <span class="line"></span>
+  </div>
+
+  <div class="slide-index">COV-MERIDIAN · 01</div>
+</div>
+
+
+  <hr class="hairline">
+
+  <div class="spec-block slot-spec-block">
+    <div class="spec-cell">
+      <div class="spec-label slot-spec-label">USER GROWTH</div>
+      <div class="spec-value slot-spec-value">2.3<sup>×</sup></div>
+      <div class="spec-note slot-spec-note">月活增长倍数 / 行业均值 0.8×</div>
+    </div>
+    <div class="spec-cell">
+      <div class="spec-label slot-spec-label">CAC REDUCTION</div>
+      <div class="spec-value slot-spec-value">-34<sup>%</sup></div>
+      <div class="spec-note slot-spec-note">获客成本同比下降 / 规模效应显现</div>
+    </div>
+    <div class="spec-cell">
+      <div class="spec-label slot-spec-label">CROSS-SELL</div>
+      <div class="spec-value slot-spec-value">41<sup>%</sup></div>
+      <div class="spec-note slot-spec-note">交叉销售收入占比 / 矩阵协同验证</div>
+    </div>
+    <div class="spec-cell">
+      <div class="spec-label slot-spec-label">RETENTION</div>
+      <div class="spec-value slot-spec-value">92<sup>%</sup></div>
+      <div class="spec-note slot-spec-note">12 个月留存 / 高于行业 27pp</div>
+    </div>
+  </div>
+
+  <div class="source slot-source">SOURCE · INTERNAL ANALYTICS / Q4 2024 / 95% CI</div>
+
+  <div class="slide-index">S-MERIDIAN · 02</div>
+</div>
+
+
+<!-- ═══ CMP-MERIDIAN ═══════════════════════════════════════════════════ -->
+<div class="slide variant-cmp-a-meridian">
+
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 03 · MARKET POSITION</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">三大市场 · 同一把尺<span class="dot">.</span></h2>
+      <p class="mod-sub slot-mod-sub">
+        美国 / 中国 / 欧盟 — 同一产品线在三个市场的份额、增速、阶段定位。用于本轮战略分配决策。
+      </p>
+    </div>
+  </div>
+
+  <hr class="hairline">
+
+  <div class="cmp-row">
+    <div class="cmp-col leader slot-cmp-col-1">
+      <div class="eyebrow slot-cmp-eyebrow">MARKET · US</div>
+      <h3 class="cmp-name slot-cmp-name">Americas</h3>
+      <div class="cmp-value slot-cmp-value">40.9<sup>%</sup></div>
+      <div class="cmp-spec slot-cmp-spec">
+        <span>STAGE</span><span class="v">EXPANSION</span>
+        <span>YOY</span><span class="v">+3.4 PP</span>
+        <span>RANK</span><span class="v">№1</span>
+      </div>
+      <p class="cmp-note slot-cmp-note">连续 3 季度份额增长，连续 2 季度盈利正向。已进入自我强化阶段。</p>
+    </div>
+    <div class="cmp-col slot-cmp-col-2">
+      <div class="eyebrow slot-cmp-eyebrow">MARKET · CN</div>
+      <h3 class="cmp-name slot-cmp-name">Greater China</h3>
+      <div class="cmp-value slot-cmp-value">28.3<sup>%</sup></div>
+      <div class="cmp-spec slot-cmp-spec">
+        <span>STAGE</span><span class="v">PRESSURE</span>
+        <span>YOY</span><span class="v">-4.2 PP</span>
+        <span>RANK</span><span class="v">№2</span>
+      </div>
+      <p class="cmp-note slot-cmp-note">本地玩家加速布局，价格战格局持续；需在技术护城河和渠道纵深上加注。</p>
+    </div>
+    <div class="cmp-col slot-cmp-col-3">
+      <div class="eyebrow slot-cmp-eyebrow">MARKET · EU</div>
+      <h3 class="cmp-name slot-cmp-name">Europe</h3>
+      <div class="cmp-value slot-cmp-value">17.1<sup>%</sup></div>
+      <div class="cmp-spec slot-cmp-spec">
+        <span>STAGE</span><span class="v">CONSOLIDATE</span>
+        <span>YOY</span><span class="v">-0.8 PP</span>
+        <span>RANK</span><span class="v">№3</span>
+      </div>
+      <p class="cmp-note slot-cmp-note">整合期，单客获取成本见顶。下一阶段价值来自交叉销售而非新增。</p>
+    </div>
+  </div>
+
+  <div class="slide-index">CMP-MERIDIAN · 03</div>
+</div>
+
+
+
+<!-- ═══ COV-B · Ceremonial centered ═══ -->
+<div class="slide variant-cov-b-meridian">
+  <div class="eyebrow slot-eyebrow">[ BRAND STRATEGY · 2025 ]</div>
+  <div class="ceremonial-stack">
+    <h1 class="ceremonial-title slot-title-en">THE NEXT<br>CHAPTER<span class="dot">.</span></h1>
+    <div class="ceremonial-zh slot-title-zh">下一个十年的战略蓝图</div>
+    <div class="ceremonial-divider"></div>
+    <div class="ceremonial-meta slot-meta">[ PREPARED FOR BOARD OF DIRECTORS · Q1 2025 ]</div>
+  </div>
+  <div></div>
+  <div class="slide-index">COV-B-MERIDIAN</div>
+</div>
+
+<!-- ═══ COV-C · Split panel consulting ═══ -->
+<div class="slide variant-cov-c-meridian">
+  <div class="img-panel">
+    <div class="img-panel-mark slot-img-mark">[ ABSTRACT · GRADIENT IDX-04 ]</div>
+  </div>
+  <div class="text-panel">
+    <div class="text-panel-top">
+      <div class="eyebrow slot-eyebrow">[ CONSULTING REPORT ]</div>
+      <h1 class="title-en slot-title-en">STRATEGIC<br>TRANSFORMATION<br>ROADMAP<span class="dot">.</span></h1>
+      <div class="title-zh slot-title-zh">战略转型路线图：从规模扩张到价值深耕的系统性重构</div>
+    </div>
+    <div class="meta-list slot-meta-list">
+      <div class="meta-item slot-meta-item-1">[ CLIENT: FORTUNE 500 ENTERPRISE ]</div>
+      <div class="meta-item slot-meta-item-2">[ DATE: MARCH 2025 ]</div>
+      <div class="meta-item slot-meta-item-3">[ CONFIDENTIAL ]</div>
+    </div>
+  </div>
+  <div class="slide-index">COV-C-MERIDIAN</div>
+</div>
+
+<!-- ═══ S-A · Asymmetric 60/40 ═══ -->
+<div class="slide variant-s-a-meridian">
+  <div class="head">
+    <h2 class="display slot-title">市场份额逆势增长<span class="dot">.</span></h2>
+    <div class="head-meta slot-head-meta">§ 03 · MARKET DYNAMICS</div>
+  </div>
+  <div class="body">
+    <p class="slot-body-1">过去 12 个月，市场整体规模收缩 4.2%，但我们在三个核心子赛道实现了平均 18% 的份额提升。</p>
+    <p class="slot-body-2">驱动力主要来自两个方面：早期投入的渠道纵深开始结出果实；同时竞品在价格战中的产能透支让我们获得自然份额转移。</p>
+    <p class="slot-body-3">我们判断这种"被动获客"窗口期还有 6-9 个月——之后竞争格局会重新固化。</p>
+  </div>
+  <figure class="figure">
+    <div class="figure-image slot-figure-image">[ TREND CHART · MOM SHARE %  ]</div>
+    <figcaption class="figure-caption slot-figure-caption">FIG.01 · QUARTERLY MARKET SHARE / 2024</figcaption>
+  </figure>
+  <div class="slide-index">S-A-MERIDIAN</div>
+</div>
+
+<!-- ═══ S-B · Immersive bg ═══ -->
+<div class="slide variant-s-b-meridian">
+  <div class="immersive-content">
+    <div class="immersive-eyebrow slot-eyebrow">§ 04 · STRATEGIC OBSERVATION</div>
+    <h2 class="immersive-title slot-title">用户不再为"形式"买单<span class="dot">.</span></h2>
+    <p class="immersive-body slot-body">2025 年消费品最大的转变：用户从"购买产品"转向"购买氛围"。形式美学的边际价值正在快速衰减——人们要的是"被这个东西包裹住"的感觉，而不是"它好看"。</p>
+  </div>
+  <div class="immersive-foot slot-foot">SOURCE · CONSUMER PANEL Q3 2024 / N=2,400</div>
+  <div class="slide-index">S-B-MERIDIAN</div>
+</div>
+
+<!-- ═══ S-D · 2x2 code-block enumeration ═══ -->
+<div class="slide variant-s-d-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 05 · KEY DRIVERS</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">四个支撑点<span class="dot">.</span></h2>
+    </div>
+  </div>
+  <hr class="hairline">
+  <div class="code-grid">
+    <div class="code-cell">
+      <div class="cell-num slot-cell-num-1">[ 01 ]</div>
+      <h3 class="cell-title slot-cell-title-1">渠道纵深</h3>
+      <p class="cell-body slot-cell-body-1">在三个核心城市建立 200+ 体验点位，覆盖通勤动线和生活半径。</p>
+    </div>
+    <div class="code-cell">
+      <div class="cell-num slot-cell-num-2">[ 02 ]</div>
+      <h3 class="cell-title slot-cell-title-2">数据资产</h3>
+      <p class="cell-body slot-cell-body-2">用户行为数据库已积累 4 年，识别出 14 类高价值消费旅程。</p>
+    </div>
+    <div class="code-cell">
+      <div class="cell-num slot-cell-num-3">[ 03 ]</div>
+      <h3 class="cell-title slot-cell-title-3">供应链协同</h3>
+      <p class="cell-body slot-cell-body-3">柔性反应链路从 14 天压缩到 3 天，新品测试成本下降 70%。</p>
+    </div>
+    <div class="code-cell">
+      <div class="cell-num slot-cell-num-4">[ 04 ]</div>
+      <h3 class="cell-title slot-cell-title-4">品牌资产</h3>
+      <p class="cell-body slot-cell-body-4">无提示品牌识别度从 12% 提升到 38%，进入第二梯队心智。</p>
+    </div>
+  </div>
+  <div class="slide-index">S-D-MERIDIAN</div>
+</div>
+
+<!-- ═══ S-E · Dual column points ═══ -->
+<div class="slide variant-s-e-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 06 · TWIN INSIGHTS</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">两个并行观察<span class="dot">.</span></h2>
+    </div>
+  </div>
+  <hr class="hairline">
+  <div class="dual-col">
+    <div class="dual-col-side">
+      <div class="dual-point">
+        <div class="dual-point-label slot-left-label-1">A · DEMAND SIDE</div>
+        <h3 class="dual-point-title slot-left-title-1">高净值用户消费节奏放缓</h3>
+        <p class="dual-point-body slot-left-body-1">客单价不变但购买频次下降 22%，转向"购买后久用"的耐用品语境。</p>
+      </div>
+      <div class="dual-point">
+        <div class="dual-point-label slot-left-label-2">B · BEHAVIOR SHIFT</div>
+        <h3 class="dual-point-title slot-left-title-2">购买决策周期延长 1.6 倍</h3>
+        <p class="dual-point-body slot-left-body-2">从首次接触到下单平均 38 天，对内容深度和品牌信任度要求更高。</p>
+      </div>
+    </div>
+    <div class="dual-col-side">
+      <div class="dual-point">
+        <div class="dual-point-label slot-right-label-1">C · SUPPLY SIDE</div>
+        <h3 class="dual-point-title slot-right-title-1">头部品牌库存积压加剧</h3>
+        <p class="dual-point-body slot-right-body-1">3 月底头部 10 品牌平均库存周转天数达 86 天，创 5 年新高。</p>
+      </div>
+      <div class="dual-point">
+        <div class="dual-point-label slot-right-label-2">D · COMPETITIVE</div>
+        <h3 class="dual-point-title slot-right-title-2">价格战进入第三季度</h3>
+        <p class="dual-point-body slot-right-body-2">行业整体毛利率压至 18%，比 2022 年下降 11 个百分点。</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index">S-E-MERIDIAN</div>
+</div>
+
+<!-- ═══ CLX-A · Focal number Meridian ═══ -->
+<div class="slide variant-clx-a-meridian">
+  <div class="focal-eyebrow slot-eyebrow">[ KEY METRIC · 2024 FY ]</div>
+  <div class="focal-stack">
+    <div class="focal-number slot-number">40.9<sup>%</sup></div>
+    <p class="focal-caption slot-caption">市场份额，连续 12 个月增长——这是过去十年最快的复合扩张速度。</p>
+  </div>
+  <div class="focal-foot slot-foot">SOURCE · INTERNAL DATA / KANTAR  /  Q4 2024 · 95% CI</div>
+  <div class="slide-index">CLX-A-MERIDIAN</div>
+</div>
+
+<!-- ═══ CLX-B · Cliff drop ═══ -->
+<div class="slide variant-clx-b-meridian">
+  <div class="cliff-empty"></div>
+  <div class="cliff-signal"></div>
+  <h1 class="cliff-number slot-number">2.4<sup>×</sup></h1>
+  <p class="cliff-caption slot-caption">用户增长倍数——超过去年同期的两倍多，远高于行业平均的 0.8 倍。</p>
+  <div class="cliff-meta slot-meta">SOURCE · INTERNAL ANALYTICS · Q4 2024</div>
+  <div class="slide-index">CLX-B-MERIDIAN</div>
+</div>
+
+<!-- ═══ CLX-D · Before/after ═══ -->
+<div class="slide variant-clx-d-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 07 · TRANSFORMATION</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">从 18% 到 40.9%<span class="dot">.</span></h2>
+    </div>
+  </div>
+  <div class="ba-row">
+    <div class="ba-side left">
+      <div class="ba-label slot-before-label">[ BEFORE · Q1 2024 ]</div>
+      <h3 class="ba-number slot-before-number">18%</h3>
+      <p class="ba-note slot-before-note">市场份额，行业第 4，增速持平。</p>
+    </div>
+    <div class="ba-arrow">→</div>
+    <div class="ba-side right">
+      <div class="ba-label slot-after-label">[ AFTER · Q4 2024 ]</div>
+      <h3 class="ba-number slot-after-number">40.9<sup>%</sup></h3>
+      <p class="ba-note slot-after-note">市场份额，行业第 1，连续 3 季度领先。</p>
+    </div>
+  </div>
+  <div class="slide-index">CLX-D-MERIDIAN</div>
+</div>
+
+<!-- ═══ CMP-B · Asymmetric 1.5:1 duel ═══ -->
+<div class="slide variant-cmp-b-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 08 · MARKET DUEL</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">主导玩家 vs 挑战者<span class="dot">.</span></h2>
+    </div>
+  </div>
+  <div class="duel-row">
+    <div class="duel-side primary">
+      <div class="duel-label slot-primary-label">[ MARKET LEADER ]</div>
+      <h3 class="duel-name slot-primary-name">Americas Inc.</h3>
+      <div class="duel-value slot-primary-value">40.9<sup>%</sup></div>
+      <p class="duel-note slot-primary-note">连续 3 季度份额增长，进入自我强化阶段。</p>
+    </div>
+    <div class="duel-side">
+      <div class="duel-label slot-secondary-label">[ CHALLENGER ]</div>
+      <h3 class="duel-name slot-secondary-name">Greater China Co.</h3>
+      <div class="duel-value slot-secondary-value">28.3<sup>%</sup></div>
+      <p class="duel-note slot-secondary-note">本地玩家加速布局，增长动能强但毛利承压。</p>
+    </div>
+  </div>
+  <div class="slide-index">CMP-B-MERIDIAN</div>
+</div>
+
+<!-- ═══ CMP-C · Minimalist axis ═══ -->
+<div class="slide variant-cmp-c-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 09 · BREADTH vs DEPTH</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">广度优先 vs 深度优先<span class="dot">.</span></h2>
+    </div>
+  </div>
+  <div class="axis-row">
+    <div class="axis-side left">
+      <div class="axis-label slot-left-label">[ BREADTH ]</div>
+      <h3 class="axis-value slot-left-value">88<sup>%</sup></h3>
+      <div class="axis-bullets">
+        <div class="axis-bullet slot-left-b1">覆盖城市数：120+</div>
+        <div class="axis-bullet slot-left-b2">SKU 数：380</div>
+        <div class="axis-bullet slot-left-b3">渠道伙伴：1,400+</div>
+      </div>
+    </div>
+    <div class="axis-divider"></div>
+    <div class="axis-side right">
+      <div class="axis-label slot-right-label">[ DEPTH ]</div>
+      <h3 class="axis-value slot-right-value">62<sup>%</sup></h3>
+      <div class="axis-bullets">
+        <div class="axis-bullet slot-right-b1">用户复购率：62%</div>
+        <div class="axis-bullet slot-right-b2">NPS：+58</div>
+        <div class="axis-bullet slot-right-b3">单客 LTV：1.8 倍行业均值</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index">CMP-C-MERIDIAN</div>
+</div>
+
+<!-- ═══ INS-A · Centered quote ═══ -->
+<div class="slide variant-ins-a-meridian">
+  <div class="quote-eyebrow slot-eyebrow">[ INSIGHT · 01 ]</div>
+  <p class="quote-body slot-body">市场不再奖励"做得多"——它开始奖励 <span class="em">做得对</span> 的人。</p>
+  <span class="quote-attribution slot-attribution">— STRATEGIC OBSERVATION · 2024</span>
+  <div class="slide-index">INS-A-MERIDIAN</div>
+</div>
+
+<!-- ═══ INS-B · Left quote with decoration ═══ -->
+<div class="slide variant-ins-b-meridian">
+  <div class="quote-mark" aria-hidden="true">"</div>
+  <div class="quote-content">
+    <p class="body slot-body">设计的克制不是"少做一些"——是"想清楚不做什么"。一个真正成熟的品牌，是它敢拒绝什么的总和。</p>
+  </div>
+  <div class="quote-foot">
+    <span class="slot-attr-name">— DIRECTOR'S NOTE</span>
+    <span class="slot-attr-meta">§ INSIGHT · 02</span>
+  </div>
+  <div class="slide-index">INS-B-MERIDIAN</div>
+</div>
+
+<!-- ═══ CB-A · Chapter break centered ═══ -->
+<div class="slide variant-cb-a-meridian">
+  <div></div>
+  <div>
+    <div class="cb-num slot-cb-num">CHAPTER · 03</div>
+    <h1 class="cb-title slot-cb-title">Forward<span class="dot">.</span></h1>
+    <div class="cb-zh slot-cb-zh">下一阶段：从规模到深耕</div>
+    <div class="cb-divider"></div>
+  </div>
+  <div></div>
+  <div class="slide-index">CB-A-MERIDIAN</div>
+</div>
+
+<!-- ═══ CB-B · Chapter break bottom-left narrative ═══ -->
+<div class="slide variant-cb-b-meridian">
+  <div class="cb-meta slot-cb-meta">CHAPTER · 04 · NARRATIVE</div>
+  <h1 class="cb-title slot-cb-title">Quiet<br>Conviction<span class="dot">.</span></h1>
+  <div class="cb-zh slot-cb-zh">本章从一个判断开始：在喧嚣的市场里，最有力的姿态是不发声而前行。</div>
+  <div class="cb-rule"></div>
+  <div class="slide-index">CB-B-MERIDIAN</div>
+</div>
+
+<!-- ═══ CLO-A · Vertical conclusions ═══ -->
+<div class="slide variant-clo-a-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 10 · CONCLUSIONS</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">三个核心判断<span class="dot">.</span></h2>
+    </div>
+  </div>
+  <div></div>
+  <div class="conclusions">
+    <div class="conclusion-row">
+      <div class="conclusion-num slot-c-num-1">[ 01 ]</div>
+      <div class="conclusion-text">
+        <h3 class="conclusion-title slot-c-title-1">市场窗口期约为 6-9 个月</h3>
+        <p class="conclusion-body slot-c-body-1">竞品在价格战中的产能透支让我们获得自然份额转移，但这种"被动获客"窗口会在年底重新固化。</p>
+      </div>
+    </div>
+    <div class="conclusion-row">
+      <div class="conclusion-num slot-c-num-2">[ 02 ]</div>
+      <div class="conclusion-text">
+        <h3 class="conclusion-title slot-c-title-2">从规模扩张转向深耕</h3>
+        <p class="conclusion-body slot-c-body-2">单客 LTV 已达行业 1.8 倍，进一步规模扩张边际收益递减——下阶段重点是单客深度而非数量。</p>
+      </div>
+    </div>
+    <div class="conclusion-row">
+      <div class="conclusion-num slot-c-num-3">[ 03 ]</div>
+      <div class="conclusion-text">
+        <h3 class="conclusion-title slot-c-title-3">数据资产是最持久的护城河</h3>
+        <p class="conclusion-body slot-c-body-3">4 年累积的 14 类消费旅程模型让产品迭代速度比同行快 2 倍——这是无法被快速复制的优势。</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index">CLO-A-MERIDIAN</div>
+</div>
+
+<!-- ═══ CLO-B · Split conclusions + actions ═══ -->
+<div class="slide variant-clo-b-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 11 · CLOSING</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">结论与行动建议<span class="dot">.</span></h2>
+    </div>
+  </div>
+  <div class="clo-row">
+    <div class="clo-side">
+      <div class="clo-side-label slot-left-label">[ FINDINGS ]</div>
+      <h3 class="clo-side-title slot-left-title">三个核心判断</h3>
+      <div class="clo-list">
+        <div class="clo-list-item">
+          <span class="num">01</span>
+          <span class="text slot-left-1">窗口期约 6-9 个月</span>
+        </div>
+        <div class="clo-list-item">
+          <span class="num">02</span>
+          <span class="text slot-left-2">从规模转向深耕</span>
+        </div>
+        <div class="clo-list-item">
+          <span class="num">03</span>
+          <span class="text slot-left-3">数据是最强护城河</span>
+        </div>
+      </div>
+    </div>
+    <div class="clo-side">
+      <div class="clo-side-label slot-right-label">[ NEXT STEPS ]</div>
+      <h3 class="clo-side-title slot-right-title">90 天内的关键动作</h3>
+      <div class="clo-list">
+        <div class="clo-list-item">
+          <span class="num">→</span>
+          <span class="text slot-right-1">锁定头部 200 客户深度服务</span>
+        </div>
+        <div class="clo-list-item">
+          <span class="num">→</span>
+          <span class="text slot-right-2">开放数据中台二级产品</span>
+        </div>
+        <div class="clo-list-item">
+          <span class="num">→</span>
+          <span class="text slot-right-3">完成 B 轮融资 / 战略投资</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index">CLO-B-MERIDIAN</div>
+</div>
+
+<!-- ═══ GC-A · Image left + text right ═══ -->
+<div class="slide variant-gc-a-meridian">
+  <div class="img-side">
+    <div class="img-mark slot-img-mark">[ FIG.02 · PRODUCT ARCHIVE ]</div>
+  </div>
+  <div class="text-side">
+    <div class="text-eyebrow slot-eyebrow">§ 12 · CASE STUDY</div>
+    <h2 class="text-title slot-title">十年迭代<br>一种姿态<span class="dot">.</span></h2>
+    <p class="text-body slot-body">从 2014 年到 2024 年，产品的功能在变，但姿态没变——克制、精密、不向情绪让步。这种连续性本身已经成为品牌资产。</p>
+    <div class="text-meta slot-meta">PRODUCT GENERATIONS · 01 - 12</div>
+  </div>
+  <div class="slide-index">GC-A-MERIDIAN</div>
+</div>
+
+<!-- ═══ GC-B · Text left + image right ═══ -->
+<div class="slide variant-gc-b-meridian">
+  <div class="text-side">
+    <div class="text-eyebrow slot-eyebrow">§ 13 · DESIGN POSITION</div>
+    <h2 class="text-title slot-title">一种克制的<br>美学态度<span class="dot">.</span></h2>
+    <p class="text-body slot-body">不追求"被注意到"——追求"在被看见的瞬间，一切刚刚好"。我们的设计语言定义了这种"刚好"。</p>
+  </div>
+  <div class="img-side">
+    <div class="img-mark slot-img-mark">[ DESIGN STUDY · IDX-08 ]</div>
+  </div>
+  <div class="slide-index">GC-B-MERIDIAN</div>
+</div>
+
+<!-- ═══ TL-A · Horizontal timeline ═══ -->
+<div class="slide variant-tl-a-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 14 · TIMELINE</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">十年发展节点<span class="dot">.</span></h2>
+    </div>
+  </div>
+  <div class="tl-row">
+    <div class="tl-node">
+      <span class="tl-year slot-y1">2015</span>
+      <h3 class="tl-title slot-t1">首款产品上市</h3>
+      <p class="tl-body slot-b1">小批量测试销售，跑通早期供应链。</p>
+    </div>
+    <div class="tl-node">
+      <span class="tl-year slot-y2">2018</span>
+      <h3 class="tl-title slot-t2">渠道纵深建立</h3>
+      <p class="tl-body slot-b2">200 + 体验店覆盖三大核心市场。</p>
+    </div>
+    <div class="tl-node">
+      <span class="tl-year slot-y3">2021</span>
+      <h3 class="tl-title slot-t3">数据中台完成</h3>
+      <p class="tl-body slot-b3">用户行为数据库累积达战略级规模。</p>
+    </div>
+    <div class="tl-node">
+      <span class="tl-year slot-y4">2024</span>
+      <h3 class="tl-title slot-t4">市场份额第一</h3>
+      <p class="tl-body slot-b4">连续 3 季度行业领先，进入新阶段。</p>
+    </div>
+  </div>
+  <div class="slide-index">TL-A-MERIDIAN</div>
+</div>
+
+<!-- ═══ TL-B · Phase blocks ═══ -->
+<div class="slide variant-tl-b-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 15 · PHASES</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">三个发展阶段<span class="dot">.</span></h2>
+    </div>
+  </div>
+  <div class="phase-stack">
+    <div class="phase">
+      <div class="phase-range slot-p1-range">2015-2018</div>
+      <h3 class="phase-title slot-p1-title">起步期</h3>
+      <div class="phase-bullets">
+        <div class="phase-bullet slot-p1-b1">建立产品线 / 第一批种子用户</div>
+        <div class="phase-bullet slot-p1-b2">市场份额：3% → 8%</div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-range slot-p2-range">2019-2022</div>
+      <h3 class="phase-title slot-p2-title">扩张期</h3>
+      <div class="phase-bullets">
+        <div class="phase-bullet slot-p2-b1">多渠道布局 / 数据资产形成</div>
+        <div class="phase-bullet slot-p2-b2">市场份额：8% → 22%</div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-range slot-p3-range">2023-2024</div>
+      <h3 class="phase-title slot-p3-title">领先期</h3>
+      <div class="phase-bullets">
+        <div class="phase-bullet slot-p3-b1">深耕单客价值 / 行业第一</div>
+        <div class="phase-bullet slot-p3-b2">市场份额：22% → 40.9%</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index">TL-B-MERIDIAN</div>
+</div>
+
+<!-- ═══ PRC-A · Horizontal arrow flow ═══ -->
+<div class="slide variant-prc-a-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 16 · PROCESS</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">三步交付流程<span class="dot">.</span></h2>
+    </div>
+  </div>
+  <div class="flow-row">
+    <div class="flow-step">
+      <div class="flow-step-num slot-s1-num">STEP 01</div>
+      <h3 class="flow-step-title slot-s1-title">需求洞察</h3>
+      <p class="flow-step-body slot-s1-body">访谈 + 数据分析，确认核心痛点。</p>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-step-num slot-s2-num">STEP 02</div>
+      <h3 class="flow-step-title slot-s2-title">方案设计</h3>
+      <p class="flow-step-body slot-s2-body">原型迭代 3 轮，关键节点共创。</p>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-step-num slot-s3-num">STEP 03</div>
+      <h3 class="flow-step-title slot-s3-title">交付落地</h3>
+      <p class="flow-step-body slot-s3-body">分阶段实施 + 90 天跟踪反馈。</p>
+    </div>
+  </div>
+  <div class="slide-index">PRC-A-MERIDIAN</div>
+</div>
+
+<!-- ═══ PRC-B · Vertical steps ═══ -->
+<div class="slide variant-prc-b-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 17 · WORKFLOW</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">五步实施路径<span class="dot">.</span></h2>
+    </div>
+  </div>
+  <div class="step-stack">
+    <div class="step-row">
+      <div class="step-num slot-n1">STEP 01</div>
+      <div class="step-text">
+        <h3 class="step-title slot-t1">现状审计</h3>
+        <p class="step-body slot-b1">梳理团队、流程、数据现状，识别关键瓶颈。</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num slot-n2">STEP 02</div>
+      <div class="step-text">
+        <h3 class="step-title slot-t2">目标对齐</h3>
+        <p class="step-body slot-b2">高管访谈 + 跨部门 workshop，确定 12 个月战略目标。</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num slot-n3">STEP 03</div>
+      <div class="step-text">
+        <h3 class="step-title slot-t3">方案设计</h3>
+        <p class="step-body slot-b3">3 轮原型迭代 + 关键决策点共创会。</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num slot-n4">STEP 04</div>
+      <div class="step-text">
+        <h3 class="step-title slot-t4">小范围试点</h3>
+        <p class="step-body slot-b4">在 1-2 个业务单元跑 60 天，验证假设和指标。</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num slot-n5">STEP 05</div>
+      <div class="step-text">
+        <h3 class="step-title slot-t5">全面推广</h3>
+        <p class="step-body slot-b5">基于试点结果调整，分阶段推广至全公司。</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index">PRC-B-MERIDIAN</div>
+</div>
+
+<!-- ═══ FRW-A · 2x2 matrix ═══ -->
+<div class="slide variant-frw-a-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 18 · FRAMEWORK</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">价值×风险 矩阵<span class="dot">.</span></h2>
+    </div>
+  </div>
+  <div class="matrix">
+    <div class="matrix-axis-y slot-axis-y">VALUE  →  HIGH</div>
+    <div class="matrix-axis-x slot-axis-x">RISK  →  HIGH</div>
+    <div class="quadrant quadrant-q1">
+      <div class="quadrant-label slot-q1-label">[ Q1 · INVEST ]</div>
+      <h3 class="quadrant-title slot-q1-title">高价值 / 低风险</h3>
+      <p class="quadrant-body slot-q1-body">已验证客群深耕：稳定回报，需重点投入。</p>
+    </div>
+    <div class="quadrant quadrant-q2">
+      <div class="quadrant-label slot-q2-label">[ Q2 · BET ]</div>
+      <h3 class="quadrant-title slot-q2-title">高价值 / 高风险</h3>
+      <p class="quadrant-body slot-q2-body">下一代产品：高潜力但需小步验证。</p>
+    </div>
+    <div class="quadrant quadrant-q3">
+      <div class="quadrant-label slot-q3-label">[ Q3 · MAINTAIN ]</div>
+      <h3 class="quadrant-title slot-q3-title">低价值 / 低风险</h3>
+      <p class="quadrant-body slot-q3-body">现有渠道维护：保持现状，不增投入。</p>
+    </div>
+    <div class="quadrant quadrant-q4">
+      <div class="quadrant-label slot-q4-label">[ Q4 · DROP ]</div>
+      <h3 class="quadrant-title slot-q4-title">低价值 / 高风险</h3>
+      <p class="quadrant-body slot-q4-body">边缘市场：建议主动退出。</p>
+    </div>
+  </div>
+  <div class="slide-index">FRW-A-MERIDIAN</div>
+</div>
+
+<!-- ═══ FRW-B · Pyramid ═══ -->
+<div class="slide variant-frw-b-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 19 · HIERARCHY</div>
+    <div class="title-stack">
+      <h2 class="display slot-mod-title">价值层级<span class="dot">.</span></h2>
+    </div>
+  </div>
+  <div class="pyramid">
+    <div class="pyramid-row top">
+      <div class="pyramid-label slot-p1-label">[ APEX ]</div>
+      <h3 class="pyramid-title slot-p1-title">品牌资产</h3>
+      <p class="pyramid-body slot-p1-body">不可被快速复制的长期资产</p>
+    </div>
+    <div class="pyramid-row mid">
+      <div class="pyramid-label slot-p2-label">[ MID ]</div>
+      <h3 class="pyramid-title slot-p2-title">产品 / 服务能力</h3>
+      <p class="pyramid-body slot-p2-body">基础体验质量与差异化创新</p>
+    </div>
+    <div class="pyramid-row bottom">
+      <div class="pyramid-label slot-p3-label">[ BASE ]</div>
+      <h3 class="pyramid-title slot-p3-title">运营效率与渠道触达</h3>
+      <p class="pyramid-body slot-p3-body">规模、成本、覆盖率的基础工程</p>
+    </div>
+  </div>
+  <div class="slide-index">FRW-B-MERIDIAN</div>
+</div>
+
+
+
+<!-- ═══ H1 ═══ -->
+<div class="slide variant-h1-meridian">
+  <div class="h1-image">
+    <span class="slot-h1-mark">[ FULL BLEED · IDX-01 ]</span>
+  </div>
+  <div class="h1-caption">
+    <h2 class="h1-title slot-h1-title">沉静一刻 · 量产之外的另一个工厂</h2>
+    <span class="h1-meta slot-h1-meta">FIG.01 · MARCH 2025</span>
+  </div>
+  <div class="slide-index">H1-MERIDIAN</div>
+</div>
+
+<!-- ═══ H2 ═══ -->
+<div class="slide variant-h2-meridian">
+  <div class="h2-grid">
+    <div class="h2-cell">
+      <div>
+        <div class="h2-cell-mark slot-h2-m1">[ IMG · 01 ]</div>
+        <div class="h2-cell-caption slot-h2-c1">手工工艺 · 上海</div>
+      </div>
+    </div>
+    <div class="h2-cell">
+      <div>
+        <div class="h2-cell-mark slot-h2-m2">[ IMG · 02 ]</div>
+        <div class="h2-cell-caption slot-h2-c2">机械装配 · 慕尼黑</div>
+      </div>
+    </div>
+  </div>
+  <div class="h2-foot">
+    <span class="slot-h2-foot-l">FIG.02 · TWIN STUDIES</span>
+    <span class="slot-h2-foot-r">2025</span>
+  </div>
+  <div class="slide-index">H2-MERIDIAN</div>
+</div>
+
+<!-- ═══ H3 ═══ -->
+<div class="slide variant-h3-meridian">
+  <div class="h3-grid">
+    <div class="h3-cell"><span class="h3-cell-mark slot-h3-m1">[ IMG · 01 ]</span></div>
+    <div class="h3-cell"><span class="h3-cell-mark slot-h3-m2">[ IMG · 02 ]</span></div>
+    <div class="h3-cell"><span class="h3-cell-mark slot-h3-m3">[ IMG · 03 ]</span></div>
+  </div>
+  <div class="h3-foot">
+    <span class="slot-h3-foot-l">FIG.03 · TRIPTYCH</span>
+    <span class="slot-h3-foot-r">2025</span>
+  </div>
+  <div class="slide-index">H3-MERIDIAN</div>
+</div>
+
+<!-- ═══ H4 ═══ -->
+<div class="slide variant-h4-meridian">
+  <div class="h4-grid">
+    <div class="h4-cell"><span class="h4-cell-mark slot-h4-m1">[ IMG · 01 ]</span></div>
+    <div class="h4-cell"><span class="h4-cell-mark slot-h4-m2">[ IMG · 02 ]</span></div>
+    <div class="h4-cell"><span class="h4-cell-mark slot-h4-m3">[ IMG · 03 ]</span></div>
+    <div class="h4-cell"><span class="h4-cell-mark slot-h4-m4">[ IMG · 04 ]</span></div>
+  </div>
+  <div class="h4-foot">
+    <span class="slot-h4-foot-l">FIG.04 · QUARTET STUDY</span>
+    <span class="slot-h4-foot-r">2025</span>
+  </div>
+  <div class="slide-index">H4-MERIDIAN</div>
+</div>
+
+<!-- ═══ H5 ═══ -->
+<div class="slide variant-h5-meridian">
+  <div class="h5-main">
+    <span class="h5-main-mark slot-h5-main">[ HERO · IDX-MAIN ]</span>
+  </div>
+  <div class="h5-side">
+    <div class="h5-side-cell"><span class="h5-side-mark slot-h5-s1">[ S-01 ]</span></div>
+    <div class="h5-side-cell"><span class="h5-side-mark slot-h5-s2">[ S-02 ]</span></div>
+    <div class="h5-side-cell"><span class="h5-side-mark slot-h5-s3">[ S-03 ]</span></div>
+    <div class="h5-side-cell"><span class="h5-side-mark slot-h5-s4">[ S-04 ]</span></div>
+  </div>
+  <div class="slide-index">H5-MERIDIAN</div>
+</div>
+
+<!-- ═══ S-C · Conclusion overlord ═══ -->
+<div class="slide variant-s-c-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 20 · CONCLUSION</div>
+    <div class="title-stack"></div>
+  </div>
+  <div class="conclusion-block">
+    <div class="conclusion-tag slot-tag">[ CORE FINDING ]</div>
+    <h2 class="conclusion-statement slot-statement">市场窗口期最多 9 个月——之后竞争格局会重新固化。</h2>
+  </div>
+  <div class="evidence-row">
+    <div class="evidence-cell">
+      <span class="evidence-num slot-e1-num">EVIDENCE 01</span>
+      <p class="evidence-text slot-e1-text">头部品牌库存周转天数已达 86 天，价格战进入第三季度。</p>
+    </div>
+    <div class="evidence-cell">
+      <span class="evidence-num slot-e2-num">EVIDENCE 02</span>
+      <p class="evidence-text slot-e2-text">供应链产能透支让我们获得自然份额转移机会。</p>
+    </div>
+    <div class="evidence-cell">
+      <span class="evidence-num slot-e3-num">EVIDENCE 03</span>
+      <p class="evidence-text slot-e3-text">用户决策周期延长 1.6 倍，深度内容价值上升。</p>
+    </div>
+  </div>
+  <div class="slide-index">S-C-MERIDIAN</div>
+</div>
+
+<!-- ═══ S-F · 6 dense findings ═══ -->
+<div class="slide variant-s-f-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 21 · DENSE FINDINGS</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">六个并行观察<span class="dot">.</span></h2></div>
+  </div>
+  <div class="findings-grid">
+    <div class="finding-cell">
+      <span class="finding-num slot-f1-num">[ 01 ]</span>
+      <h3 class="finding-title slot-f1-title">需求结构转变</h3>
+      <p class="finding-body slot-f1-body">高净值用户客单价不变但购买频次下降 22%。</p>
+    </div>
+    <div class="finding-cell">
+      <span class="finding-num slot-f2-num">[ 02 ]</span>
+      <h3 class="finding-title slot-f2-title">决策周期延长</h3>
+      <p class="finding-body slot-f2-body">从首次接触到下单平均 38 天，比 2022 年长 1.6 倍。</p>
+    </div>
+    <div class="finding-cell">
+      <span class="finding-num slot-f3-num">[ 03 ]</span>
+      <h3 class="finding-title slot-f3-title">库存周转恶化</h3>
+      <p class="finding-body slot-f3-body">头部品牌平均库存周转天数达 86 天，5 年新高。</p>
+    </div>
+    <div class="finding-cell">
+      <span class="finding-num slot-f4-num">[ 04 ]</span>
+      <h3 class="finding-title slot-f4-title">毛利率压缩</h3>
+      <p class="finding-body slot-f4-body">行业整体毛利率压至 18%，比 2022 年下降 11 个 pp。</p>
+    </div>
+    <div class="finding-cell">
+      <span class="finding-num slot-f5-num">[ 05 ]</span>
+      <h3 class="finding-title slot-f5-title">交叉销售上升</h3>
+      <p class="finding-body slot-f5-body">交叉销售收入占比 41%，矩阵协同模式得到验证。</p>
+    </div>
+    <div class="finding-cell">
+      <span class="finding-num slot-f6-num">[ 06 ]</span>
+      <h3 class="finding-title slot-f6-title">留存率突破</h3>
+      <p class="finding-body slot-f6-body">12 个月留存达 92%，高于行业基准 27 个 pp。</p>
+    </div>
+  </div>
+  <div class="slide-index">S-F-MERIDIAN</div>
+</div>
+
+<!-- ═══ S-G · Academic chart ═══ -->
+<div class="slide variant-s-g-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 22 · CHART STUDY</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">12 季度趋势<span class="dot">.</span></h2></div>
+  </div>
+  <div class="chart-area">
+    <span class="slot-chart-mark">[ CHART · LINE / 12-QUARTER TREND ]</span>
+  </div>
+  <div class="chart-foot">
+    <span class="slot-chart-foot-l">SOURCE · INTERNAL ANALYTICS</span>
+    <span class="slot-chart-foot-r">N=2,400 · 95% CI</span>
+  </div>
+  <div class="slide-index">S-G-MERIDIAN</div>
+</div>
+
+<!-- ═══ CLX-C · Binary star ═══ -->
+<div class="slide variant-clx-c-meridian">
+  <div class="star star-1">
+    <div class="star-label slot-s1-label">[ 2022 · BASELINE ]</div>
+    <h3 class="star-number slot-s1-num">12<sup>%</sup></h3>
+    <p class="star-note slot-s1-note">市场份额，行业第 4，增长缓慢。</p>
+  </div>
+  <div class="star star-2">
+    <div class="star-label slot-s2-label">[ 2024 · CURRENT ]</div>
+    <h3 class="star-number slot-s2-num">40.9<sup>%</sup></h3>
+    <p class="star-note slot-s2-note">市场份额，行业第 1，连续领先。</p>
+  </div>
+  <div class="slide-index">CLX-C-MERIDIAN</div>
+</div>
+
+<!-- ═══ CLX-E · Ghost number ═══ -->
+<div class="slide variant-clx-e-meridian">
+  <div class="ghost slot-ghost">2026</div>
+  <div class="ghost-overlay">
+    <div class="ghost-eyebrow slot-eyebrow">[ NEXT FRONTIER ]</div>
+    <p class="ghost-statement slot-statement">下一个战略窗口将在 2026 上半年开启——这是我们必须抢占的时间。</p>
+  </div>
+  <div class="ghost-foot slot-foot">SOURCE · STRATEGIC OUTLOOK 2025</div>
+  <div class="slide-index">CLX-E-MERIDIAN</div>
+</div>
+
+<!-- ═══ CMP-D · Binary decision ═══ -->
+<div class="slide variant-cmp-d-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 23 · BINARY DECISION</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">两条路径 · 一个选择<span class="dot">.</span></h2></div>
+  </div>
+  <div class="binary-row">
+    <div class="binary-side recommended">
+      <div class="binary-tag slot-l-tag">PATH A</div>
+      <h3 class="binary-decision slot-l-decision">深耕高净值客群</h3>
+      <div class="binary-pros">
+        <div class="binary-pros-label">CORE PROS</div>
+        <div class="binary-pro slot-l-p1">— 单客 LTV 1.8 倍行业均值</div>
+        <div class="binary-pro slot-l-p2">— 数据资产可持续累积</div>
+        <div class="binary-pro slot-l-p3">— 已验证的护城河</div>
+      </div>
+    </div>
+    <div class="binary-side">
+      <div class="binary-tag slot-r-tag">PATH B</div>
+      <h3 class="binary-decision slot-r-decision">规模扩张至下沉市场</h3>
+      <div class="binary-pros">
+        <div class="binary-pros-label">CORE PROS</div>
+        <div class="binary-pro slot-r-p1">— 短期 GMV 提升空间大</div>
+        <div class="binary-pro slot-r-p2">— 同业仍未深度进入</div>
+        <div class="binary-pro slot-r-p3">— 品牌调性稀释风险</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index">CMP-D-MERIDIAN</div>
+</div>
+
+<!-- ═══ CMP-E · Scorecard ═══ -->
+<div class="slide variant-cmp-e-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 24 · SCORECARD</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">三大供应商评分<span class="dot">.</span></h2></div>
+  </div>
+  <div class="scorecard">
+    <div class="score-header">
+      <div class="score-cell">CRITERION</div>
+      <div class="score-cell">VENDOR A</div>
+      <div class="score-cell">VENDOR B</div>
+      <div class="score-cell">VENDOR C</div>
+    </div>
+    <div class="score-row">
+      <div class="score-cell score-criterion slot-c1">交付速度</div>
+      <div class="score-cell score-value win slot-r1-a">9.2</div>
+      <div class="score-cell score-value slot-r1-b">7.8</div>
+      <div class="score-cell score-value slot-r1-c">8.4</div>
+    </div>
+    <div class="score-row">
+      <div class="score-cell score-criterion slot-c2">质量稳定性</div>
+      <div class="score-cell score-value slot-r2-a">8.5</div>
+      <div class="score-cell score-value win slot-r2-b">9.4</div>
+      <div class="score-cell score-value slot-r2-c">8.1</div>
+    </div>
+    <div class="score-row">
+      <div class="score-cell score-criterion slot-c3">价格竞争力</div>
+      <div class="score-cell score-value slot-r3-a">7.6</div>
+      <div class="score-cell score-value slot-r3-b">8.2</div>
+      <div class="score-cell score-value win slot-r3-c">9.1</div>
+    </div>
+    <div class="score-row">
+      <div class="score-cell score-criterion slot-c4">协同能力</div>
+      <div class="score-cell score-value win slot-r4-a">9.0</div>
+      <div class="score-cell score-value slot-r4-b">7.5</div>
+      <div class="score-cell score-value slot-r4-c">8.3</div>
+    </div>
+    <div class="score-row">
+      <div class="score-cell score-criterion slot-c5">综合评分</div>
+      <div class="score-cell score-value win slot-r5-a">8.6</div>
+      <div class="score-cell score-value slot-r5-b">8.2</div>
+      <div class="score-cell score-value slot-r5-c">8.5</div>
+    </div>
+  </div>
+  <div class="slide-index">CMP-E-MERIDIAN</div>
+</div>
+
+<!-- ═══ INS-C · Cascading lines ═══ -->
+<div class="slide variant-ins-c-meridian">
+  <div class="cascade-stack">
+    <p class="cascade-line slot-l1">市场不奖励"做得多"——</p>
+    <p class="cascade-line slot-l2">它开始奖励"做得对"。</p>
+    <p class="cascade-line slot-l3">而"做得对"的代价是放弃做错的勇气。</p>
+    <p class="cascade-line slot-l4">— STRATEGIC NOTE · 2024</p>
+  </div>
+  <div class="slide-index">INS-C-MERIDIAN</div>
+</div>
+
+<!-- ═══ INS-D · Data insight ═══ -->
+<div class="slide variant-ins-d-meridian">
+  <div class="insight-eyebrow slot-eyebrow">[ DATA INSIGHT · 04 ]</div>
+  <h2 class="insight-number slot-number">2.4<sup>×</sup></h2>
+  <p class="insight-takeaway slot-takeaway">这是同业增长速度的两倍多——也是我们 <span class="em">必须保持</span> 的相对距离。</p>
+  <div class="slide-index">INS-D-MERIDIAN</div>
+</div>
+
+<!-- ═══ CB-C · Giant text watermark ═══ -->
+<div class="slide variant-cb-c-meridian">
+  <div class="cb-watermark slot-watermark">05</div>
+  <div class="cb-content">
+    <div class="cb-eyebrow slot-eyebrow">CHAPTER · 05</div>
+    <h1 class="cb-title slot-title">Forward<br>Trajectory<span class="dot">.</span></h1>
+    <div class="cb-zh slot-zh">从已验证的现状走向未被定义的可能</div>
+  </div>
+  <div class="slide-index">CB-C-MERIDIAN</div>
+</div>
+
+<!-- ═══ CB-D · Full screen title ═══ -->
+<div class="slide variant-cb-d-meridian">
+  <div class="cb-num slot-num">CHAPTER · 06</div>
+  <h1 class="cb-title slot-title">The Long View<span class="dot">.</span></h1>
+  <div class="cb-zh slot-zh">从五年视角看一年决策</div>
+  <div class="slide-index">CB-D-MERIDIAN</div>
+</div>
+
+<!-- ═══ CB-E · Vertical number + content ═══ -->
+<div class="slide variant-cb-e-meridian">
+  <div class="cb-vnum slot-num">07</div>
+  <div class="cb-content">
+    <div class="cb-eyebrow slot-eyebrow">CHAPTER · 07</div>
+    <h1 class="cb-title slot-title">Implementation<span class="dot">.</span></h1>
+    <div class="cb-zh slot-zh">从战略到具体动作 · 90 天落地</div>
+  </div>
+  <div class="slide-index">CB-E-MERIDIAN</div>
+</div>
+
+<!-- ═══ CLO-C · Card grid 2x2 ═══ -->
+<div class="slide variant-clo-c-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 25 · CONCLUSIONS</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">四个关键判断<span class="dot">.</span></h2></div>
+  </div>
+  <div class="clo-grid">
+    <div class="clo-card">
+      <span class="clo-card-num slot-c1-num">CONCLUSION 01</span>
+      <h3 class="clo-card-title slot-c1-title">市场窗口收窄</h3>
+      <p class="clo-card-body slot-c1-body">竞争格局将在 9 个月内重新固化，必须把握当前时间。</p>
+    </div>
+    <div class="clo-card">
+      <span class="clo-card-num slot-c2-num">CONCLUSION 02</span>
+      <h3 class="clo-card-title slot-c2-title">深耕高于扩张</h3>
+      <p class="clo-card-body slot-c2-body">单客 LTV 已达 1.8 倍行业均值，深度比广度更经济。</p>
+    </div>
+    <div class="clo-card">
+      <span class="clo-card-num slot-c3-num">CONCLUSION 03</span>
+      <h3 class="clo-card-title slot-c3-title">数据是护城河</h3>
+      <p class="clo-card-body slot-c3-body">4 年累积的消费旅程模型让产品迭代速度行业领先。</p>
+    </div>
+    <div class="clo-card">
+      <span class="clo-card-num slot-c4-num">CONCLUSION 04</span>
+      <h3 class="clo-card-title slot-c4-title">设计调性不可妥协</h3>
+      <p class="clo-card-body slot-c4-body">克制美学是品牌资产的核心，下沉市场不能稀释调性。</p>
+    </div>
+  </div>
+  <div class="slide-index">CLO-C-MERIDIAN</div>
+</div>
+
+<!-- ═══ CLO-D · Hero conclusion + actions ═══ -->
+<div class="slide variant-clo-d-meridian">
+  <div class="hero-statement">
+    <div class="hero-eyebrow slot-eyebrow">[ FINAL THESIS ]</div>
+    <h2 class="hero-text slot-text">从规模扩张<br>转向价值深耕<span class="dot">.</span></h2>
+  </div>
+  <div class="action-bar">
+    <div class="action-cell">
+      <span class="action-num slot-a1-num">ACTION 01</span>
+      <span class="action-text slot-a1-text">锁定 200 高价值客户深度服务</span>
+    </div>
+    <div class="action-cell">
+      <span class="action-num slot-a2-num">ACTION 02</span>
+      <span class="action-text slot-a2-text">数据中台开放二级产品</span>
+    </div>
+    <div class="action-cell">
+      <span class="action-num slot-a3-num">ACTION 03</span>
+      <span class="action-text slot-a3-text">B 轮战略融资</span>
+    </div>
+  </div>
+  <div class="slide-index">CLO-D-MERIDIAN</div>
+</div>
+
+<!-- ═══ CLO-E · Thank you ═══ -->
+<div class="slide variant-clo-e-meridian">
+  <div class="thanks-eyebrow slot-eyebrow">[ END OF REPORT ]</div>
+  <h1 class="thanks-title slot-title">Thank you<span class="dot">.</span></h1>
+  <div class="thanks-divider"></div>
+  <div class="thanks-meta">
+    <span class="slot-meta-1">CONTACT · STRATEGY OFFICE</span>
+    <span class="slot-meta-2">2025 · INTERNAL</span>
+    <span class="slot-meta-3">CONFIDENTIAL</span>
+  </div>
+  <div class="slide-index">CLO-E-MERIDIAN</div>
+</div>
+
+<!-- ═══ GC-2 · Two col image+text ═══ -->
+<div class="slide variant-gc-2-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 26 · DUAL STUDY</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">两个案例对照<span class="dot">.</span></h2></div>
+  </div>
+  <div class="gc2-row">
+    <div class="gc2-col">
+      <div class="gc2-image"><span class="gc2-image-mark slot-i1">[ CASE 01 · IDX ]</span></div>
+      <div class="gc2-eyebrow slot-e1">CASE 01</div>
+      <h3 class="gc2-title slot-t1">Tokyo Rebrand</h3>
+      <p class="gc2-body slot-b1">12 个月品牌重塑，识别度从 12% 升至 38%。</p>
+    </div>
+    <div class="gc2-col">
+      <div class="gc2-image"><span class="gc2-image-mark slot-i2">[ CASE 02 · IDX ]</span></div>
+      <div class="gc2-eyebrow slot-e2">CASE 02</div>
+      <h3 class="gc2-title slot-t2">Berlin Reset</h3>
+      <p class="gc2-body slot-b2">9 个月渠道重构，净推荐值从 +12 升至 +58。</p>
+    </div>
+  </div>
+  <div class="slide-index">GC-2-MERIDIAN</div>
+</div>
+
+<!-- ═══ GC-3 · Three col image+text ═══ -->
+<div class="slide variant-gc-3-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 27 · TRIPLE STUDY</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">三个市场观察<span class="dot">.</span></h2></div>
+  </div>
+  <div class="gc3-row">
+    <div class="gc3-col">
+      <div class="gc3-image"><span class="gc3-image-mark slot-i1">[ MARKET A ]</span></div>
+      <div class="gc3-eyebrow slot-e1">UNITED STATES</div>
+      <h3 class="gc3-title slot-t1">扩张期</h3>
+      <p class="gc3-body slot-b1">连续 3 季度份额增长，已进入自我强化阶段。</p>
+    </div>
+    <div class="gc3-col">
+      <div class="gc3-image"><span class="gc3-image-mark slot-i2">[ MARKET B ]</span></div>
+      <div class="gc3-eyebrow slot-e2">GREATER CHINA</div>
+      <h3 class="gc3-title slot-t2">承压期</h3>
+      <p class="gc3-body slot-b2">本地玩家加速布局，毛利率压至 18% 历史新低。</p>
+    </div>
+    <div class="gc3-col">
+      <div class="gc3-image"><span class="gc3-image-mark slot-i3">[ MARKET C ]</span></div>
+      <div class="gc3-eyebrow slot-e3">EUROPE</div>
+      <h3 class="gc3-title slot-t3">整合期</h3>
+      <p class="gc3-body slot-b3">单客获取成本见顶，下阶段价值来自交叉销售。</p>
+    </div>
+  </div>
+  <div class="slide-index">GC-3-MERIDIAN</div>
+</div>
+
+<!-- ═══ GC-C · Image top + text bottom ═══ -->
+<div class="slide variant-gc-c-meridian">
+  <div class="gcc-image"><span class="gcc-image-mark slot-image">[ FEATURE STUDY · IDX-09 ]</span></div>
+  <div class="gcc-text">
+    <div class="gcc-eyebrow slot-eyebrow">§ 28 · FEATURE</div>
+    <h2 class="gcc-title slot-title">十年迭代 · 一种姿态<span class="dot">.</span></h2>
+    <p class="gcc-body slot-body">从 2014 年到 2024 年，产品形态在变，但姿态没变——这种连续性本身已成为品牌资产。</p>
+  </div>
+  <div class="slide-index">GC-C-MERIDIAN</div>
+</div>
+
+<!-- ═══ GC-D · Text top + images bottom ═══ -->
+<div class="slide variant-gc-d-meridian">
+  <div class="gcd-text">
+    <div class="gcd-eyebrow slot-eyebrow">§ 29 · GENERATIONS</div>
+    <h2 class="gcd-title slot-title">三代设计 · 同一基因<span class="dot">.</span></h2>
+  </div>
+  <div class="gcd-images">
+    <div class="gcd-cell"><span class="gcd-cell-mark slot-i1">[ GEN-01 · 2014 ]</span></div>
+    <div class="gcd-cell"><span class="gcd-cell-mark slot-i2">[ GEN-02 · 2019 ]</span></div>
+    <div class="gcd-cell"><span class="gcd-cell-mark slot-i3">[ GEN-03 · 2024 ]</span></div>
+  </div>
+  <div class="slide-index">GC-D-MERIDIAN</div>
+</div>
+
+<!-- ═══ TL-C · Vertical milestones ═══ -->
+<div class="slide variant-tl-c-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 30 · MILESTONES</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">九年节点<span class="dot">.</span></h2></div>
+  </div>
+  <div class="tlc-stack">
+    <div class="tlc-row">
+      <div class="tlc-year slot-y1">2015 Q1</div>
+      <div class="tlc-content">
+        <h3 class="tlc-title slot-t1">首款产品上市</h3>
+        <p class="tlc-body slot-b1">小批量测试销售，跑通早期供应链。</p>
+      </div>
+    </div>
+    <div class="tlc-row">
+      <div class="tlc-year slot-y2">2017 Q3</div>
+      <div class="tlc-content">
+        <h3 class="tlc-title slot-t2">A 轮融资完成</h3>
+        <p class="tlc-body slot-b2">3,000 万美元，估值达 1.2 亿美元。</p>
+      </div>
+    </div>
+    <div class="tlc-row">
+      <div class="tlc-year slot-y3">2019 Q2</div>
+      <div class="tlc-content">
+        <h3 class="tlc-title slot-t3">渠道纵深建立</h3>
+        <p class="tlc-body slot-b3">200+ 体验店覆盖三大核心市场。</p>
+      </div>
+    </div>
+    <div class="tlc-row">
+      <div class="tlc-year slot-y4">2021 Q4</div>
+      <div class="tlc-content">
+        <h3 class="tlc-title slot-t4">数据中台完成</h3>
+        <p class="tlc-body slot-b4">用户行为数据库累积达战略级规模。</p>
+      </div>
+    </div>
+    <div class="tlc-row">
+      <div class="tlc-year slot-y5">2024 Q4</div>
+      <div class="tlc-content">
+        <h3 class="tlc-title slot-t5">市场份额第一</h3>
+        <p class="tlc-body slot-b5">连续 3 季度行业领先。</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index">TL-C-MERIDIAN</div>
+</div>
+
+<!-- ═══ TL-D · Gantt roadmap ═══ -->
+<div class="slide variant-tl-d-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 31 · ROADMAP</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">90 天路线<span class="dot">.</span></h2></div>
+  </div>
+  <div class="gantt">
+    <div class="gantt-header">
+      <div class="gantt-header-cell">TRACK</div>
+      <div class="gantt-header-cell">M1</div>
+      <div class="gantt-header-cell">M2</div>
+      <div class="gantt-header-cell">M3</div>
+      <div class="gantt-header-cell">M4+</div>
+    </div>
+    <div class="gantt-row">
+      <div class="gantt-track-name slot-tr1">客户深耕</div>
+      <div class="gantt-cell"><div class="gantt-bar" style="left:4px;right:4px;"></div></div>
+      <div class="gantt-cell"><div class="gantt-bar" style="left:4px;right:4px;"></div></div>
+      <div class="gantt-cell"><div class="gantt-bar" style="left:4px;right:50%;"></div></div>
+      <div class="gantt-cell"></div>
+    </div>
+    <div class="gantt-row">
+      <div class="gantt-track-name slot-tr2">数据中台</div>
+      <div class="gantt-cell"></div>
+      <div class="gantt-cell"><div class="gantt-bar" style="left:25%;right:4px;"></div></div>
+      <div class="gantt-cell"><div class="gantt-bar" style="left:4px;right:4px;"></div></div>
+      <div class="gantt-cell"><div class="gantt-bar" style="left:4px;right:50%;"></div></div>
+    </div>
+    <div class="gantt-row">
+      <div class="gantt-track-name slot-tr3">B 轮融资</div>
+      <div class="gantt-cell"></div>
+      <div class="gantt-cell"></div>
+      <div class="gantt-cell"><div class="gantt-bar" style="left:25%;right:4px;"></div></div>
+      <div class="gantt-cell"><div class="gantt-bar" style="left:4px;right:4px;"></div></div>
+    </div>
+    <div class="gantt-row">
+      <div class="gantt-track-name slot-tr4">品牌升级</div>
+      <div class="gantt-cell"><div class="gantt-bar" style="left:4px;right:25%;"></div></div>
+      <div class="gantt-cell"><div class="gantt-bar" style="left:4px;right:4px;"></div></div>
+      <div class="gantt-cell"></div>
+      <div class="gantt-cell"></div>
+    </div>
+  </div>
+  <div class="slide-index">TL-D-MERIDIAN</div>
+</div>
+
+<!-- ═══ PRC-C · Circular loop ═══ -->
+<div class="slide variant-prc-c-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 32 · LOOP</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">闭环优化循环<span class="dot">.</span></h2></div>
+  </div>
+  <div class="loop-grid">
+    <div class="loop-step">
+      <span class="loop-step-num slot-l1-num">[ 01 · LEARN ]</span>
+      <h3 class="loop-step-title slot-l1-title">观察与数据</h3>
+      <p class="loop-step-body slot-l1-body">用户行为追踪 + 季度访谈，识别新出现的需求模式。</p>
+    </div>
+    <div class="loop-step">
+      <span class="loop-step-num slot-l2-num">[ 02 · DESIGN ]</span>
+      <h3 class="loop-step-title slot-l2-title">假设与原型</h3>
+      <p class="loop-step-body slot-l2-body">基于洞察提出 3-5 个假设方案，做小规模 A/B 测试。</p>
+    </div>
+    <div class="loop-step">
+      <span class="loop-step-num slot-l4-num">[ 04 · MEASURE ]</span>
+      <h3 class="loop-step-title slot-l4-title">复盘与回流</h3>
+      <p class="loop-step-body slot-l4-body">90 天后检视核心指标，反馈进入下一循环。</p>
+    </div>
+    <div class="loop-step">
+      <span class="loop-step-num slot-l3-num">[ 03 · DEPLOY ]</span>
+      <h3 class="loop-step-title slot-l3-title">实施与扩展</h3>
+      <p class="loop-step-body slot-l3-body">最优方案放大至全量，建立标准化流程。</p>
+    </div>
+  </div>
+  <div class="slide-index">PRC-C-MERIDIAN</div>
+</div>
+
+<!-- ═══ PRC-D · Funnel ═══ -->
+<div class="slide variant-prc-d-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 33 · FUNNEL</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">用户转化漏斗<span class="dot">.</span></h2></div>
+  </div>
+  <div class="funnel">
+    <div class="funnel-row f1">
+      <span class="funnel-num slot-f1-num">STAGE 01 · AWARENESS</span>
+      <span class="funnel-title slot-f1-title">总曝光受众</span>
+      <span class="funnel-metric slot-f1-metric">1,200,000</span>
+    </div>
+    <div class="funnel-row f2">
+      <span class="funnel-num slot-f2-num">STAGE 02 · INTEREST</span>
+      <span class="funnel-title slot-f2-title">主动了解</span>
+      <span class="funnel-metric slot-f2-metric">240,000 · 20%</span>
+    </div>
+    <div class="funnel-row f3">
+      <span class="funnel-num slot-f3-num">STAGE 03 · CONSIDERATION</span>
+      <span class="funnel-title slot-f3-title">深度评估</span>
+      <span class="funnel-metric slot-f3-metric">48,000 · 4%</span>
+    </div>
+    <div class="funnel-row f4">
+      <span class="funnel-num slot-f4-num">STAGE 04 · CONVERSION</span>
+      <span class="funnel-title slot-f4-title">成交客户</span>
+      <span class="funnel-metric slot-f4-metric">9,600 · 0.8%</span>
+    </div>
+  </div>
+  <div class="slide-index">PRC-D-MERIDIAN</div>
+</div>
+
+<!-- ═══ PRC-E · Causal tree ═══ -->
+<div class="slide variant-prc-e-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 34 · CAUSAL CHAIN</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">增长拆解<span class="dot">.</span></h2></div>
+  </div>
+  <div class="tree">
+    <div class="tree-col">
+      <div class="tree-col-label">PRIMARY DRIVER</div>
+      <div class="tree-node">
+        <h4 class="tree-node-title slot-p1">市场份额增长</h4>
+        <p class="tree-node-body slot-p1b">+22 个 pp / 12 个月</p>
+      </div>
+    </div>
+    <div class="tree-col">
+      <div class="tree-col-label">SECONDARY DRIVERS</div>
+      <div class="tree-node">
+        <h4 class="tree-node-title slot-s1">渠道纵深</h4>
+        <p class="tree-node-body slot-s1b">200+ 体验点 / 三大市场</p>
+      </div>
+      <div class="tree-node">
+        <h4 class="tree-node-title slot-s2">用户深耕</h4>
+        <p class="tree-node-body slot-s2b">单客 LTV 1.8×</p>
+      </div>
+    </div>
+    <div class="tree-col">
+      <div class="tree-col-label">UNDERLYING CAUSES</div>
+      <div class="tree-node">
+        <h4 class="tree-node-title slot-u1">数据资产</h4>
+        <p class="tree-node-body slot-u1b">14 类消费旅程模型</p>
+      </div>
+      <div class="tree-node">
+        <h4 class="tree-node-title slot-u2">供应链协同</h4>
+        <p class="tree-node-body slot-u2b">柔性反应 14d→3d</p>
+      </div>
+      <div class="tree-node">
+        <h4 class="tree-node-title slot-u3">品牌资产</h4>
+        <p class="tree-node-body slot-u3b">无提示识别 12%→38%</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index">PRC-E-MERIDIAN</div>
+</div>
+
+<!-- ═══ FRW-C · Concentric circles ═══ -->
+<div class="slide variant-frw-c-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 35 · CONCENTRIC</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">价值同心圆<span class="dot">.</span></h2></div>
+  </div>
+  <div class="concentric">
+    <div class="concentric-diagram">
+      <div class="ring ring-1"></div>
+      <div class="ring ring-2"></div>
+      <div class="ring ring-3"></div>
+      <div class="ring ring-4">CORE</div>
+    </div>
+    <div class="concentric-legend">
+      <div class="legend-row">
+        <span class="legend-label slot-l1-label">CORE</span>
+        <div class="legend-content">
+          <h4 class="slot-l1-title">品牌资产</h4>
+          <p class="slot-l1-body">不可复制的长期资产</p>
+        </div>
+      </div>
+      <div class="legend-row">
+        <span class="legend-label slot-l2-label">RING 02</span>
+        <div class="legend-content">
+          <h4 class="slot-l2-title">产品能力</h4>
+          <p class="slot-l2-body">基础体验与差异化</p>
+        </div>
+      </div>
+      <div class="legend-row">
+        <span class="legend-label slot-l3-label">RING 03</span>
+        <div class="legend-content">
+          <h4 class="slot-l3-title">运营效率</h4>
+          <p class="slot-l3-body">规模、成本、协同</p>
+        </div>
+      </div>
+      <div class="legend-row">
+        <span class="legend-label slot-l4-label">OUTER</span>
+        <div class="legend-content">
+          <h4 class="slot-l4-title">市场触达</h4>
+          <p class="slot-l4-body">渠道与触点</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index">FRW-C-MERIDIAN</div>
+</div>
+
+<!-- ═══ FRW-D · Venn ═══ -->
+<div class="slide variant-frw-d-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ 36 · INTERSECTION</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">三圆交集<span class="dot">.</span></h2></div>
+  </div>
+  <div class="venn">
+    <div class="venn-diagram">
+      <div class="circle circle-a"><span class="slot-a-label">DESIRABILITY</span></div>
+      <div class="circle circle-b"><span class="slot-b-label">FEASIBILITY</span></div>
+      <span class="venn-overlap slot-overlap">SWEET SPOT</span>
+    </div>
+    <div class="venn-legend">
+      <div class="venn-legend-row">
+        <span class="venn-legend-label">A</span>
+        <div class="venn-legend-content">
+          <h4 class="slot-a-title">用户期望</h4>
+          <p class="slot-a-body">市场需要的、愿意付费的产品。</p>
+        </div>
+      </div>
+      <div class="venn-legend-row">
+        <span class="venn-legend-label">B</span>
+        <div class="venn-legend-content">
+          <h4 class="slot-b-title">技术可行</h4>
+          <p class="slot-b-body">我们能稳定生产、规模化交付的能力。</p>
+        </div>
+      </div>
+      <div class="venn-legend-row">
+        <span class="venn-legend-label">A ∩ B</span>
+        <div class="venn-legend-content">
+          <h4 class="slot-i-title">战略最优区</h4>
+          <p class="slot-i-body">用户想要、我们能做、且对手做不了的事。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index">FRW-D-MERIDIAN</div>
+</div>
+
+
+
+<!-- ═══ OUT-A · Numbered list ═══ -->
+<div class="slide variant-out-a-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ TOC · 2025 ANNUAL REPORT</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">本期报告 · 大纲<span class="dot">.</span></h2></div>
+  </div>
+  <div class="out-list">
+    <div class="out-row">
+      <span class="out-num slot-n1">CHAPTER 01</span>
+      <h3 class="out-title slot-t1">市场结构性巨变</h3>
+      <span class="out-page slot-p1">P. 03 - 12</span>
+    </div>
+    <div class="out-row">
+      <span class="out-num slot-n2">CHAPTER 02</span>
+      <h3 class="out-title slot-t2">三条出海路径分化</h3>
+      <span class="out-page slot-p2">P. 13 - 22</span>
+    </div>
+    <div class="out-row">
+      <span class="out-num slot-n3">CHAPTER 03</span>
+      <h3 class="out-title slot-t3">系统性壁垒诊断</h3>
+      <span class="out-page slot-p3">P. 23 - 34</span>
+    </div>
+    <div class="out-row">
+      <span class="out-num slot-n4">CHAPTER 04</span>
+      <h3 class="out-title slot-t4">2026 战略选择</h3>
+      <span class="out-page slot-p4">P. 35 - 44</span>
+    </div>
+    <div class="out-row">
+      <span class="out-num slot-n5">CHAPTER 05</span>
+      <h3 class="out-title slot-t5">建议与行动清单</h3>
+      <span class="out-page slot-p5">P. 45 - 50</span>
+    </div>
+  </div>
+  <div class="slide-index">OUT-A-MERIDIAN</div>
+</div>
+
+<!-- ═══ OUT-B · Two-column visual ═══ -->
+<div class="slide variant-out-b-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ TOC · CHAPTER OVERVIEW</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">本期议程<span class="dot">.</span></h2></div>
+  </div>
+  <div class="out-grid">
+    <div class="out-card">
+      <span class="out-card-num slot-n1">CH 01</span>
+      <div class="out-card-content">
+        <h3 class="out-card-title slot-t1">市场结构性巨变</h3>
+        <p class="out-card-desc slot-d1">出口量、单价、出口结构 —— 三大维度看 NEV 出海完成质变。</p>
+      </div>
+    </div>
+    <div class="out-card">
+      <span class="out-card-num slot-n2">CH 02</span>
+      <div class="out-card-content">
+        <h3 class="out-card-title slot-t2">三条出海路径</h3>
+        <p class="out-card-desc slot-d2">比亚迪 / 奇瑞 / 新势力 —— 同样出海，三种结局。</p>
+      </div>
+    </div>
+    <div class="out-card">
+      <span class="out-card-num slot-n3">CH 03</span>
+      <div class="out-card-content">
+        <h3 class="out-card-title slot-t3">系统性壁垒</h3>
+        <p class="out-card-desc slot-d3">关税 / 碳税 / 本地化 / 补贴退坡 —— 四个系统性变量。</p>
+      </div>
+    </div>
+    <div class="out-card">
+      <span class="out-card-num slot-n4">CH 04</span>
+      <div class="out-card-content">
+        <h3 class="out-card-title slot-t4">2026 战略选择</h3>
+        <p class="out-card-desc slot-d4">本地化、合作还是收缩 —— 每家车企的二选一时刻。</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index">OUT-B-MERIDIAN</div>
+</div>
+
+<!-- ═══ OUT-C · Spread cards ═══ -->
+<div class="slide variant-out-c-meridian">
+  <div class="mod-head">
+    <div class="num slot-mod-num">§ TOC · FIVE TOPICS</div>
+    <div class="title-stack"><h2 class="display slot-mod-title">五个议题<span class="dot">.</span></h2></div>
+  </div>
+  <div class="out-spread">
+    <div class="out-spread-card">
+      <div class="out-spread-num slot-n1">01<sup>·</sup></div>
+      <h3 class="out-spread-title slot-t1">市场质变</h3>
+      <p class="out-spread-desc slot-d1">三年 CAGR 78%</p>
+    </div>
+    <div class="out-spread-card">
+      <div class="out-spread-num slot-n2">02<sup>·</sup></div>
+      <h3 class="out-spread-title slot-t2">路径分化</h3>
+      <p class="out-spread-desc slot-d2">BYD / Chery / 新势力</p>
+    </div>
+    <div class="out-spread-card">
+      <div class="out-spread-num slot-n3">03<sup>·</sup></div>
+      <h3 class="out-spread-title slot-t3">系统壁垒</h3>
+      <p class="out-spread-desc slot-d3">关税 + 碳税 + 本地化</p>
+    </div>
+    <div class="out-spread-card">
+      <div class="out-spread-num slot-n4">04<sup>·</sup></div>
+      <h3 class="out-spread-title slot-t4">战略选择</h3>
+      <p class="out-spread-desc slot-d4">本地化 vs 合作 vs 收缩</p>
+    </div>
+    <div class="out-spread-card">
+      <div class="out-spread-num slot-n5">05<sup>·</sup></div>
+      <h3 class="out-spread-title slot-t5">行动建议</h3>
+      <p class="out-spread-desc slot-d5">90 天关键动作</p>
+    </div>
+  </div>
+  <div class="slide-index">OUT-C-MERIDIAN</div>
+</div>
+
+
+<!-- ═══ Floating skin-switcher ═══════════════════════════════════════ -->
+<script>
+(function () {
+  'use strict';
+  const SKINS = [
+    { id: '',                name: 'meridian-light',
+      desc: 'Aesop / Apartamento',
+      swatches: ['#F5F4F0', '#FAF9F6', '#0E1013', '#3D6B00'] },
+    { id: 'meridian-dark',   name: 'meridian-dark',
+      desc: 'Polestar 4 reveal',
+      swatches: ['#0E1013', '#1A1D22', '#F5F4F0', '#C9FF3B'] },
+    { id: 'meridian-warm',   name: 'meridian-warm',
+      desc: 'Ralph Lauren heirloom',
+      swatches: ['#F4EBDB', '#EFE4CE', '#2C1F0E', '#A0530E'] },
+  ];
+
+  const REPORT_KEY = (() => {
+    const composite = (document.title || '') + '|' + (location.pathname || '');
+    let h = 5381;
+    for (let i = 0; i < composite.length; i++) {
+      h = ((h << 5) + h) + composite.charCodeAt(i);
+      h = h & h;
+    }
+    return 'mrd-skin:' + (h >>> 0).toString(36);
+  })();
+
+  // Restore saved skin
+  let saved = null;
+  try { saved = localStorage.getItem(REPORT_KEY); } catch (e) {}
+  if (saved !== null) {
+    if (saved === '') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+  }
+
+  function build() {
+    const root = document.createElement('div');
+    root.className = 'theme-switcher';
+
+    const toggle = document.createElement('button');
+    toggle.className = 'theme-switcher-toggle';
+    toggle.setAttribute('aria-label', '切换 Meridian 子皮肤');
+    toggle.innerHTML = `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="9"/>
+        <circle cx="7.5" cy="9.5" r="1.2" fill="currentColor"/>
+        <circle cx="11.5" cy="6.5" r="1.2" fill="currentColor"/>
+        <circle cx="16" cy="9" r="1.2" fill="currentColor"/>
+        <circle cx="16.5" cy="13.5" r="1.2" fill="currentColor"/>
+      </svg>`;
+    root.appendChild(toggle);
+
+    const panel = document.createElement('div');
+    panel.className = 'theme-switcher-panel';
+
+    const header = document.createElement('div');
+    header.className = 'theme-switcher-header';
+    header.textContent = '[ MERIDIAN · 3 SUB-SKINS ]';
+    panel.appendChild(header);
+
+    const current = document.documentElement.getAttribute('data-theme') || '';
+
+    SKINS.forEach(function (s) {
+      const opt = document.createElement('button');
+      opt.className = 'theme-option' + (s.id === current ? ' active' : '');
+      opt.dataset.skinId = s.id;
+
+      const swrap = document.createElement('div');
+      swrap.className = 'swatches';
+      s.swatches.forEach(function (c) {
+        const sw = document.createElement('span');
+        sw.className = 'swatch';
+        sw.style.background = c;
+        swrap.appendChild(sw);
+      });
+      opt.appendChild(swrap);
+
+      const text = document.createElement('div');
+      text.className = 'text';
+      const nameEl = document.createElement('div');
+      nameEl.className = 'name';
+      nameEl.textContent = s.name;
+      const descEl = document.createElement('div');
+      descEl.className = 'desc';
+      descEl.textContent = s.desc;
+      text.appendChild(nameEl);
+      text.appendChild(descEl);
+      opt.appendChild(text);
+
+      const ck = document.createElement('span');
+      ck.className = 'check';
+      ck.textContent = '✓';
+      opt.appendChild(ck);
+
+      opt.addEventListener('click', function () {
+        apply(s.id);
+        panel.querySelectorAll('.theme-option').forEach(function (o) {
+          o.classList.toggle('active', o.dataset.skinId === s.id);
+        });
+      });
+
+      panel.appendChild(opt);
+    });
+
+    root.appendChild(panel);
+
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      root.classList.toggle('open');
+    });
+    document.addEventListener('click', function (e) {
+      if (!root.contains(e.target)) root.classList.remove('open');
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') root.classList.remove('open');
+    });
+
+    document.body.appendChild(root);
+  }
+
+  function apply(id) {
+    if (id === '') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', id);
+    }
+    try { localStorage.setItem(REPORT_KEY, id); } catch (e) {}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', build);
+  } else {
+    build();
+  }
+})();
+</script>
+
+</body>
+</html>

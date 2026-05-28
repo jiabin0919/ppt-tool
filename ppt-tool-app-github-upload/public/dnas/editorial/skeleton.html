@@ -1,0 +1,6110 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="editorial-paper">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>Editorial Skeleton · v0.1 · 42 Variants · 3 Sub-skins</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   EDITORIAL SKELETON · v0.1
+   Magazine / poster / editorial design language.
+   Independent from Archive (info-dense consulting) and 
+   Meridian (quiet luxury northern).
+   Hallmark: big display type, generous whitespace,
+   single bold accent, hero-driven pages.
+   ============================================================ */
+
+/* ============================================================
+   ★ 给大模型 / 复用者的说明 (PRODUCTION CHECKLIST)
+   ============================================================
+   1. 所有 class="dev-tag" 的元素是开发期调试标签 (variant 名/页号等),
+      仅供 skeleton 自我标识用。生成真实 PPT 时:
+      
+      方案 A (推荐): 在 <html> 上加 class="hide-dev-tags",所有
+                     dev 标签自动隐藏,无需修改 HTML。
+      方案 B: 不复制带 .dev-tag class 的元素。
+   
+   2. 所有 slot-* 开头的元素是内容占位符,大模型应填真实内容。
+      class 名以 slot- 开头的都是可替换的内容点 (标题/数字/图等)。
+   
+   3. EDITORIAL 风格元素 (例 "EDITORIAL · ISSUE №04 · MAR 2026"):
+      这些是 colophon / folio 元素 (期刊号/页码/署名),是 DNA 设计意图,
+      不要删除。 应填入真实期刊/报告的元数据。
+   
+   4. 自适应 variant 的 --rows / --cols CSS 变量:
+      OUT-A/B, CMP-D, CLO-A, FRW-D, GC-B 支持 --rows (默认 3-6 范围)
+      TL-A, PRC-A         支持 --cols (默认 3-6 范围)
+      用法: <div class="slide variant-xxx" style="--rows: 5;">
+   ============================================================ */
+
+/* ============================================================
+   §1 · Token system
+   3 sub-skins: paper (default) / mono (dark) / poster (high contrast)
+   ============================================================ */
+:root {
+  /* === INK gradient (10 levels) === */
+  --ink-900: #1A1410;
+  --ink-800: #2A211C;
+  --ink-700: #3D3128;
+  --ink-500: #6B5A4C;
+  --ink-400: #8C7B6D;
+  --ink-300: #B5A693;
+  --ink-200: #D8CCBC;
+  --ink-100: #ECE3D5;
+
+  /* === Paper variants (warm, off-white, true white) === */
+  --paper-warm: #F5EFE3;   /* editorial-paper bg */
+  --paper-2:    #FAF6EC;   /* editorial-paper surface */
+  --paper-pure: #FFFFFF;   /* editorial-poster bg */
+  --paper-snow: #FAFAF8;   /* editorial-poster surface */
+
+  /* === Dark grounds === */
+  --ground-dark:    #1E1B17;
+  --ground-dark-2:  #2A2520;
+
+  /* === Accents · skin-specific for visual punch === */
+  --accent-red:     #C8362B;  /* paper · red */
+  --accent-yellow:  #E9B527;  /* mono · yellow */
+  --accent-blue:    #1B3D8F;  /* poster · cobalt */
+  
+  /* === Default → paper skin === */
+  --color-bg:           var(--paper-warm);
+  --color-surface:      var(--paper-2);
+  --color-text-primary: var(--ink-900);
+  --color-text-muted:   var(--ink-500);
+  --color-text-faint:   var(--ink-400);
+  --color-border:       var(--ink-200);
+  --color-accent:       var(--accent-red);
+
+  /* === Hairlines === */
+  --hairline:       1px solid var(--color-border);
+  --hairline-strong: 2px solid var(--color-text-primary);
+
+  /* === Fonts ===
+     Display: Fraunces (modern serif with optical sizing) — Editorial signature
+     Body: Inter Tight — clean modern sans
+     Mono: JetBrains Mono — code/meta
+     ZH-Serif: Noto Serif SC — Chinese display
+     ZH-Sans: Noto Sans SC — Chinese body */
+  --font-display: 'Fraunces', 'Noto Serif SC', Georgia, serif;
+  --font-body:    'Inter Tight', 'Noto Sans SC', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+  --font-zh-display: 'Noto Serif SC', 'Fraunces', serif;
+
+  /* === Spacing (8-stop, generous like a magazine) === */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  40px;
+  --space-2xl: 56px;
+  --space-3xl: 80px;
+  --space-4xl: 120px;
+  --space-5xl: 160px;
+}
+
+/* ---- Sub-skin: editorial-paper (default, warm cream + red) ---- */
+html[data-theme="editorial-paper"] {
+  --color-bg:           var(--paper-warm);
+  --color-surface:      var(--paper-2);
+  --color-text-primary: var(--ink-900);
+  --color-text-muted:   var(--ink-500);
+  --color-text-faint:   var(--ink-400);
+  --color-border:       var(--ink-200);
+  --color-accent:       var(--accent-red);
+}
+
+/* ---- Sub-skin: editorial-mono (dark + warm yellow) ---- */
+html[data-theme="editorial-mono"] {
+  --color-bg:           var(--ground-dark);
+  --color-surface:      var(--ground-dark-2);
+  --color-text-primary: #F0E8D8;
+  --color-text-muted:   #A8998A;
+  --color-text-faint:   #6E635A;
+  --color-border:       #3D3128;
+  --color-accent:       var(--accent-yellow);
+}
+
+/* ---- Sub-skin: editorial-poster (pure white + cobalt blue) ---- */
+html[data-theme="editorial-poster"] {
+  --color-bg:           var(--paper-pure);
+  --color-surface:      var(--paper-snow);
+  --color-text-primary: #000000;
+  --color-text-muted:   #4A4A4A;
+  --color-text-faint:   #888888;
+  --color-border:       #D0D0D0;
+  --color-accent:       var(--accent-blue);
+}
+
+
+/* ============================================================
+   §2 · Reset & base
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+h1, h2, h3, h4, h5, h6, p { margin: 0; }
+body {
+  margin: 0;
+  padding: 40px 0;
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: var(--color-text-primary);
+  background: #0A0808;  /* viewer background (outside slides) */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Slide canvas */
+.slide {
+  width: 1280px;
+  height: 720px;
+  margin: 0 auto 32px auto;
+  position: relative;
+  overflow: hidden;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  page-break-after: always;
+  font-family: var(--font-body);
+}
+
+/* Variant tag (top-right corner during dev) */
+.variant-tag {
+  position: absolute;
+  top: 20px;
+  right: 32px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--color-text-faint);
+  z-index: 10;
+}
+
+/* ============================================================
+   DEV TAGS · 开发标签(供 skeleton 审版式使用)
+   ============================================================
+   所有标记 .dev-tag class 的元素是开发期标签,显示 variant 名/页号等
+   仅供 skeleton 自我标识,真实生成 PPT 时应隐藏或删除
+   
+   两种隐藏方式:
+   1. 给 <html> 加 class="hide-dev-tags"  (一键全隐,推荐)
+   2. 生成 PPT 时不复制 .dev-tag 元素本身
+   
+   也可点 theme switcher 旁的开关切换
+   ============================================================ */
+.dev-tag {
+  /* 默认柔化样式: 半透明 + 虚线下划线提示, 让开发者一眼能区分 */
+  opacity: 0.55;
+  border-bottom: 1px dashed currentColor;
+  padding-bottom: 1px;
+}
+html.hide-dev-tags .dev-tag {
+  display: none !important;
+}
+
+/* Per-slide index (bottom-right) */
+.slide-index {
+  position: absolute;
+  bottom: 28px;
+  right: 32px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--color-text-faint);
+}
+
+/* Section header (between variants) */
+.section-header {
+  width: 1280px;
+  margin: 32px auto 12px auto;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.section-header-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.15);
+}
+.section-header-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+}
+.nav-label {
+  width: 1280px;
+  margin: 16px auto 4px auto;
+  padding: 0 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+}
+
+
+/* ============================================================
+   §3 · Editorial signature elements
+   These are the visual moves that make this DNA recognizable:
+   - Big display type (Fraunces optical-size at large sizes)
+   - Heavy hairline rules
+   - Large drop letters
+   - Generous outer padding (60-100px)
+   - Single bold accent
+   ============================================================ */
+
+/* Base padding for inhabited slides */
+.slide-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 72px;
+}
+
+/* Common eyebrow (small caps label at top) */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* Editorial-style hairline divider */
+.hairline-rule {
+  width: 64px;
+  height: 2px;
+  background: var(--color-text-primary);
+  margin: 0;
+}
+.hairline-rule.accent {
+  background: var(--color-accent);
+}
+.hairline-rule.long {
+  width: 100%;
+}
+
+
+/* ============================================================
+   §4 · COVER variants (3) · COV-A/B/C
+   ============================================================ */
+
+/* ---- COV-A · Magazine full-bleed type · 全屏巨字铺满(α 重构) ---- */
+.variant-cov-a-editorial {
+  background: var(--ground-dark);
+  color: #F0E8D8;
+}
+.variant-cov-a-editorial .cov-bg {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 30% 70%, rgba(200, 54, 43, 0.25), transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(233, 181, 39, 0.08), transparent 60%),
+    linear-gradient(135deg, var(--ink-700) 0%, var(--ground-dark) 100%);
+}
+.variant-cov-a-editorial .cov-bg-grain {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0.6;
+}
+/* 杂志 chrome - 顶部和底部边栏 */
+.variant-cov-a-editorial .cov-top-bar {
+  position: absolute;
+  top: 32px;
+  left: 56px;
+  right: 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--accent-yellow);
+  z-index: 3;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(240,232,216,0.18);
+}
+.variant-cov-a-editorial .cov-top-bar .right {
+  color: rgba(240,232,216,0.5);
+}
+/* 巨字铺满核心区 */
+.variant-cov-a-editorial .cov-hero {
+  position: absolute;
+  inset: 100px 56px 130px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 2;
+}
+.variant-cov-a-editorial .slot-title-en {
+  font-family: var(--font-display);
+  font-size: 220px;
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  font-variation-settings: "opsz" 144;
+  color: #F0E8D8;
+  margin-left: -10px;
+}
+.variant-cov-a-editorial .slot-title-en em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent-yellow);
+}
+/* 底部信息条:中文标题 + meta (无顶部分隔线) */
+.variant-cov-a-editorial .cov-bottom-bar {
+  position: absolute;
+  bottom: 32px;
+  left: 56px;
+  right: 56px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: end;
+  z-index: 3;
+}
+.variant-cov-a-editorial .slot-title-zh {
+  font-family: var(--font-zh-display);
+  font-size: 17px;
+  line-height: 1.55;
+  color: rgba(240,232,216,0.75);
+  font-weight: 400;
+  max-width: 600px;
+}
+.variant-cov-a-editorial .cov-meta-block {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: rgba(240,232,216,0.4);
+  line-height: 1.7;
+}
+.variant-cov-a-editorial .cov-meta-block strong {
+  color: var(--accent-yellow);
+  font-weight: 500;
+}
+
+/* ---- COV-B · Ceremonial centered (poster mode) ---- */
+.variant-cov-b-editorial .cov-pad {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 80px;
+  text-align: center;
+}
+.variant-cov-b-editorial .cov-top-bar {
+  position: absolute;
+  top: 56px;
+  left: 80px;
+  right: 80px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-muted);
+}
+.variant-cov-b-editorial .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  color: var(--color-accent);
+  margin-bottom: 40px;
+  text-transform: uppercase;
+}
+.variant-cov-b-editorial .slot-title-en {
+  font-family: var(--font-display);
+  font-size: 156px;
+  font-weight: 800;
+  line-height: 0.88;
+  letter-spacing: -0.05em;
+  font-variation-settings: "opsz" 144;
+  margin-bottom: 24px;
+  color: var(--color-text-primary);
+}
+.variant-cov-b-editorial .slot-title-en em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+}
+.variant-cov-b-editorial .cov-divider {
+  width: 80px;
+  height: 3px;
+  background: var(--color-accent);
+  margin: 32px 0 24px 0;
+}
+.variant-cov-b-editorial .slot-title-zh {
+  font-family: var(--font-zh-display);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  max-width: 600px;
+  line-height: 1.5;
+}
+.variant-cov-b-editorial .cov-bottom-bar {
+  position: absolute;
+  bottom: 56px;
+  left: 80px;
+  right: 80px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-faint);
+}
+
+/* ---- COV-C · Split layout (editorial cover style) ---- */
+.variant-cov-c-editorial .cov-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.variant-cov-c-editorial .cov-left {
+  padding: 56px 56px 56px 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: var(--hairline);
+}
+.variant-cov-c-editorial .cov-right {
+  padding: 56px 72px 56px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--color-surface);
+}
+.variant-cov-c-editorial .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+}
+.variant-cov-c-editorial .slot-title-en {
+  font-family: var(--font-display);
+  font-size: 88px;
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144;
+}
+.variant-cov-c-editorial .slot-title-en em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+}
+.variant-cov-c-editorial .cov-meta-stack {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--color-text-faint);
+  line-height: 1.8;
+}
+.variant-cov-c-editorial .cov-meta-stack .row {
+  display: flex;
+  gap: 16px;
+}
+.variant-cov-c-editorial .cov-meta-stack .row .key {
+  width: 80px;
+  color: var(--color-text-faint);
+}
+.variant-cov-c-editorial .cov-meta-stack .row .val {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+.variant-cov-c-editorial .slot-title-zh {
+  font-family: var(--font-zh-display);
+  font-size: 22px;
+  line-height: 1.55;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+.variant-cov-c-editorial .cov-pull-quote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  border-left: 3px solid var(--color-accent);
+  padding-left: 16px;
+}
+/* feature card 填补中部空白 */
+.variant-cov-c-editorial .cov-feature-card {
+  padding: 24px 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.variant-cov-c-editorial .cov-feature-card .fc-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 12px;
+  align-items: baseline;
+}
+.variant-cov-c-editorial .cov-feature-card .fc-key {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+}
+.variant-cov-c-editorial .cov-feature-card .fc-val {
+  font-family: var(--font-zh-display);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+.variant-cov-c-editorial .cov-feature-card .fc-val.serif-en {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--color-accent);
+  font-size: 16px;
+  font-weight: 500;
+}
+.variant-cov-c-editorial .cov-feature-card .fc-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--color-accent);
+  margin-bottom: 4px;
+}
+
+
+/* ============================================================
+   §5 · CHAPTER BREAK variant (CB-A · full poster mode)
+   ============================================================ */
+.variant-cb-a-editorial .cb-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+.variant-cb-a-editorial .cb-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-faint);
+}
+.variant-cb-a-editorial .cb-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-cb-a-editorial .cb-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+}
+.variant-cb-a-editorial .slot-chapter-num {
+  font-family: var(--font-display);
+  font-size: 240px;
+  font-weight: 200;
+  line-height: 0.85;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-accent);
+  letter-spacing: -0.06em;
+}
+.variant-cb-a-editorial .slot-chapter-title {
+  font-family: var(--font-display);
+  font-size: 96px;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+  max-width: 900px;
+}
+.variant-cb-a-editorial .slot-chapter-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+}
+.variant-cb-a-editorial .cb-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.variant-cb-a-editorial .slot-chapter-lede {
+  font-family: var(--font-zh-display);
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  max-width: 540px;
+}
+
+/* ---- CB-D · Full-bleed chapter name · 全幅大字 chapter 名 ---- */
+.variant-cb-d-editorial {
+  background: var(--color-surface);
+}
+.variant-cb-d-editorial .cbd-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+.variant-cb-d-editorial .cbd-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-text-muted);
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-cb-d-editorial .cbd-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-cb-d-editorial .cbd-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+.variant-cb-d-editorial .cbd-part-mark {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.variant-cb-d-editorial .slot-chapter-title {
+  font-family: var(--font-display);
+  font-size: 150px;
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+}
+.variant-cb-d-editorial .slot-chapter-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+}
+.variant-cb-d-editorial .cbd-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 16px;
+  border-top: 2px solid var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-faint);
+}
+.variant-cb-d-editorial .slot-chapter-lede {
+  font-family: var(--font-zh-display);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  max-width: 580px;
+  font-style: italic;
+}
+
+/* ---- CB-E · Dark poster chapter · 暗色海报章节 ---- */
+.variant-cb-e-editorial {
+  background: var(--ground-dark);
+  color: #F0E8D8;
+}
+.variant-cb-e-editorial .cbe-bg-grain {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0.5;
+}
+.variant-cb-e-editorial .cbe-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  z-index: 2;
+}
+.variant-cb-e-editorial .cbe-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--accent-yellow);
+}
+.variant-cb-e-editorial .cbe-top .right {
+  color: rgba(240,232,216,0.55);
+}
+.variant-cb-e-editorial .cbe-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.variant-cb-e-editorial .cbe-part-mark {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 24px;
+  color: var(--accent-yellow);
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+.variant-cb-e-editorial .slot-chapter-num {
+  font-family: var(--font-display);
+  font-size: 280px;
+  font-weight: 200;
+  line-height: 0.85;
+  font-variation-settings: "opsz" 144;
+  color: var(--accent-yellow);
+  letter-spacing: -0.06em;
+  margin-bottom: 8px;
+}
+.variant-cb-e-editorial .slot-chapter-title {
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 144;
+  color: #F0E8D8;
+  max-width: 880px;
+}
+.variant-cb-e-editorial .slot-chapter-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent-yellow);
+}
+.variant-cb-e-editorial .cbe-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: rgba(240,232,216,0.55);
+}
+
+
+/* ============================================================
+   §6 · OUTLINE variant (OUT-A · numbered editorial list)
+   ============================================================ */
+/* ============================================================
+   §6 · OUTLINE variant (OUT-A · magazine spread TOC · α 重构)
+   从"全宽列表"改为"杂志双页目录:左大字 In This Issue,右编号大字列表"
+   ============================================================ */
+.variant-out-a-editorial {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  /* --rows 是大模型传入的章节总数,5-14 之间 */
+  --rows: 5;
+}
+.variant-out-a-editorial .out-left {
+  padding: 56px 40px 56px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+}
+.variant-out-a-editorial .out-left-top {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.variant-out-a-editorial .out-left .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+}
+.variant-out-a-editorial .out-left .slot-title {
+  font-family: var(--font-display);
+  font-size: 110px;
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+  margin-top: 16px;
+}
+.variant-out-a-editorial .out-left .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-out-a-editorial .out-left-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-muted);
+  line-height: 1.9;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+.variant-out-a-editorial .out-left-meta strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+/* 右栏 —— 改为 grid 等分,row 高度 = (画布高 - 上下 padding) / N */
+.variant-out-a-editorial .out-right {
+  padding: 40px 80px 40px 56px;
+  display: grid;
+  grid-template-rows: repeat(var(--rows), 1fr);
+  min-height: 0;
+  overflow: hidden;
+}
+.variant-out-a-editorial .out-row {
+  display: grid;
+  grid-template-columns: clamp(48px, calc(120px - var(--rows) * 3px), 80px) 1fr auto;
+  gap: clamp(12px, calc(40px - var(--rows) * 1.5px), 24px);
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  min-height: 0;
+  padding: 0 0;
+}
+.variant-out-a-editorial .out-row:first-child {
+  border-top: 2px solid var(--color-text-primary);
+}
+.variant-out-a-editorial .out-row:last-child {
+  border-bottom: 2px solid var(--color-text-primary);
+}
+/* 数字 num —— N 越大越小,但有下限 18px */
+.variant-out-a-editorial .out-row .num {
+  font-family: var(--font-display);
+  font-size: clamp(18px, calc(56px - var(--rows) * 2px), 36px);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+  font-variation-settings: "opsz" 96;
+  line-height: 1;
+}
+/* 章节标题 —— N 越大字号越小,下限 14px */
+.variant-out-a-editorial .out-row .slot-chapter-title {
+  font-family: var(--font-zh-display);
+  font-size: clamp(14px, calc(40px - var(--rows) * 1.4px), 26px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+/* 章节描述 —— N>=10 时隐藏掉换行后的 figure 数,避免占两行 */
+.variant-out-a-editorial .out-row .slot-chapter-desc {
+  font-family: var(--font-mono);
+  font-size: clamp(9px, calc(16px - var(--rows) * 0.4px), 11px);
+  letter-spacing: 0.14em;
+  color: var(--color-text-muted);
+  text-align: right;
+  line-height: 1.6;
+}
+
+/* ---- OUT-B · Grid index · 跨页 grid 索引(2 列编号卡片, N 自适应) ---- */
+.variant-out-b-editorial {
+  /* --rows 是总章节数 (传入), --row-count 是 grid 行数 = ceil(N/2) */
+  --rows: 6;
+  --row-count: 3;
+}
+.variant-out-b-editorial .outb-pad {
+  position: absolute;
+  inset: 0;
+  padding: 40px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 20px;
+}
+.variant-out-b-editorial .outb-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: flex-end;
+  padding-bottom: 18px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-out-b-editorial .outb-header .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.variant-out-b-editorial .outb-header .slot-title {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variation-settings: "opsz" 96;
+}
+.variant-out-b-editorial .outb-header .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-out-b-editorial .outb-header .outb-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-faint);
+  text-align: right;
+  line-height: 1.8;
+}
+.variant-out-b-editorial .outb-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(var(--row-count), 1fr);
+  gap: clamp(8px, calc(36px - var(--row-count) * 4px), 24px);
+  min-height: 0;
+  overflow: hidden;
+}
+.variant-out-b-editorial .outb-card {
+  display: grid;
+  grid-template-columns: clamp(40px, calc(80px - var(--row-count) * 4px), 64px) 1fr;
+  gap: clamp(10px, calc(24px - var(--row-count) * 1.2px), 16px);
+  padding: clamp(6px, calc(20px - var(--row-count) * 1.5px), 14px) 0;
+  border-bottom: 1px solid var(--color-border);
+  align-items: center;
+  min-height: 0;
+  overflow: hidden;
+}
+.variant-out-b-editorial .outb-card .num {
+  font-family: var(--font-display);
+  font-size: clamp(20px, calc(56px - var(--row-count) * 3px), 40px);
+  font-weight: 400;
+  font-style: italic;
+  font-variation-settings: "opsz" 96;
+  color: var(--color-accent);
+  line-height: 0.95;
+}
+.variant-out-b-editorial .outb-card .body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.variant-out-b-editorial .outb-card .slot-chapter-title {
+  font-family: var(--font-zh-display);
+  font-size: clamp(13px, calc(28px - var(--row-count) * 1.2px), 20px);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.variant-out-b-editorial .outb-card .meta {
+  font-family: var(--font-mono);
+  font-size: clamp(8px, calc(13px - var(--row-count) * 0.3px), 10px);
+  letter-spacing: 0.14em;
+  color: var(--color-text-muted);
+}
+
+
+/* ============================================================
+   §7 · CLIMAX variants · 3 in Editorial · (α) layout-level redesign
+   - CLX-A: ceremonial centered spread (R2 之前)
+   - CLX-Q: number ↔ pull-quote dialogue (R1, EDITORIAL-ONLY)
+   - CLX-X: claim → evidence stacked (R3, EDITORIAL-ONLY)
+   ============================================================ */
+
+/* ---- CLX-A · 居中跨页(R2) · 同 ID 重新构图 ---- */
+.variant-clx-a-editorial .clx-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+.variant-clx-a-editorial .clx-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+  padding-bottom: 18px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-clx-a-editorial .clx-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-clx-a-editorial .clx-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 28px;
+  padding: 0 80px;
+}
+.variant-clx-a-editorial .slot-value {
+  font-family: var(--font-display);
+  font-size: 320px;
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+}
+.variant-clx-a-editorial .slot-value .slot-unit {
+  font-size: 120px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-accent);
+  letter-spacing: -0.02em;
+}
+.variant-clx-a-editorial .clx-divider {
+  width: 80px;
+  height: 3px;
+  background: var(--color-accent);
+}
+.variant-clx-a-editorial .slot-caption {
+  font-family: var(--font-zh-display);
+  font-style: italic;
+  font-size: 28px;
+  line-height: 1.5;
+  font-weight: 500;
+  max-width: 720px;
+  color: var(--color-text-primary);
+}
+.variant-clx-a-editorial .slot-caption em {
+  color: var(--color-accent);
+}
+.variant-clx-a-editorial .clx-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 18px;
+  border-top: 2px solid var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-faint);
+}
+.variant-clx-a-editorial .clx-bottom .data-row {
+  display: flex;
+  gap: 32px;
+}
+.variant-clx-a-editorial .clx-bottom .data-row .item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.variant-clx-a-editorial .clx-bottom .data-row .item .label {
+  font-size: 9px;
+  color: var(--color-text-faint);
+}
+.variant-clx-a-editorial .clx-bottom .data-row .item .val {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
+
+/* ---- CLX-Q · 双栏对话 · EDITORIAL ONLY ---- */
+.variant-clx-q-editorial .clxq-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+}
+.variant-clx-q-editorial .clxq-left {
+  padding: 56px 32px 56px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+.variant-clx-q-editorial .clxq-left .clxq-top {
+  position: absolute;
+  top: 56px;
+  left: 80px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-accent);
+}
+.variant-clx-q-editorial .slot-value {
+  font-family: var(--font-display);
+  font-size: 340px;
+  font-weight: 800;
+  line-height: 0.82;
+  letter-spacing: -0.07em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+  margin-left: -8px;
+}
+.variant-clx-q-editorial .slot-value .slot-unit {
+  font-size: 110px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-accent);
+  letter-spacing: -0.02em;
+}
+.variant-clx-q-editorial .clxq-rule {
+  width: 140px;
+  height: 4px;
+  background: var(--color-accent);
+  margin-top: 16px;
+}
+.variant-clx-q-editorial .clxq-left-bottom {
+  position: absolute;
+  bottom: 56px;
+  left: 80px;
+  display: flex;
+  gap: 40px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-faint);
+}
+.variant-clx-q-editorial .clxq-right {
+  padding: 56px 80px 56px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+  border-left: 1px solid var(--color-border);
+  position: relative;
+}
+.variant-clx-q-editorial .clxq-right .clxq-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+}
+.variant-clx-q-editorial .clxq-quote-mark {
+  font-family: var(--font-display);
+  font-size: 140px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-accent);
+  line-height: 0.4;
+  margin-bottom: 8px;
+}
+.variant-clx-q-editorial .slot-pull-quote {
+  font-family: var(--font-zh-display);
+  font-size: 30px;
+  line-height: 1.4;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+.variant-clx-q-editorial .slot-pull-quote em {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-clx-q-editorial .clxq-attribution {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-faint);
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+.variant-clx-q-editorial .clxq-side-data {
+  position: absolute;
+  bottom: 56px;
+  right: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--color-text-muted);
+}
+.variant-clx-q-editorial .clxq-side-data .v {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+/* ---- CLX-X · 上下分割 (论点→证据) · EDITORIAL ONLY ---- */
+.variant-clx-x-editorial .clxx-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr 1.4fr;
+}
+.variant-clx-x-editorial .clxx-top {
+  background: var(--color-surface);
+  padding: 56px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border);
+  position: relative;
+}
+.variant-clx-x-editorial .clxx-top .clxx-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--color-accent);
+}
+.variant-clx-x-editorial .slot-claim {
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+  max-width: 1000px;
+}
+.variant-clx-x-editorial .slot-claim em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-clx-x-editorial .clxx-top-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--color-text-faint);
+}
+.variant-clx-x-editorial .clxx-bottom {
+  padding: 36px 80px 40px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+}
+.variant-clx-x-editorial .clxx-num-row {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+}
+.variant-clx-x-editorial .slot-value {
+  font-family: var(--font-display);
+  font-size: 220px;
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+}
+.variant-clx-x-editorial .slot-value .slot-unit {
+  font-size: 76px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-accent);
+}
+.variant-clx-x-editorial .clxx-data-strip {
+  display: flex;
+  gap: 56px;
+  padding-top: 12px;
+}
+.variant-clx-x-editorial .clxx-data-strip .item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.variant-clx-x-editorial .clxx-data-strip .item .label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+.variant-clx-x-editorial .clxx-data-strip .item .val {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+.variant-clx-x-editorial .clxx-data-strip .item .val .em {
+  color: var(--color-accent);
+  font-style: italic;
+  font-weight: 400;
+}
+.variant-clx-x-editorial .clxx-bottom-chrome {
+  position: absolute;
+  bottom: 32px;
+  right: 80px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-faint);
+}
+
+
+/* ---- CLX-B · Number + expanded paragraph · 数字 + 解释段落 ---- */
+.variant-clx-b-editorial .clxb-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 24px;
+}
+.variant-clx-b-editorial .clxb-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-clx-b-editorial .clxb-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-clx-b-editorial .clxb-body {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+.variant-clx-b-editorial .clxb-num-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.variant-clx-b-editorial .slot-value {
+  font-family: var(--font-display);
+  font-size: 220px;
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+}
+.variant-clx-b-editorial .slot-value .slot-unit {
+  font-size: 76px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-accent);
+}
+.variant-clx-b-editorial .slot-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  padding-top: 12px;
+  border-top: 3px solid var(--color-accent);
+  width: 200px;
+}
+.variant-clx-b-editorial .clxb-text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.variant-clx-b-editorial .clxb-text-block .slot-headline {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 96;
+  color: var(--color-text-primary);
+}
+.variant-clx-b-editorial .clxb-text-block .slot-headline em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+}
+.variant-clx-b-editorial .clxb-text-block .slot-description {
+  font-family: var(--font-zh-display);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--color-text-muted);
+}
+.variant-clx-b-editorial .clxb-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-faint);
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+
+/* ---- CLX-C · Number + trend line · 数字 + 折线趋势 ---- */
+.variant-clx-c-editorial .clxc-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 16px;
+}
+.variant-clx-c-editorial .clxc-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-clx-c-editorial .clxc-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-clx-c-editorial .clxc-body {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 48px;
+  align-items: center;
+}
+.variant-clx-c-editorial .clxc-num-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.variant-clx-c-editorial .slot-value {
+  font-family: var(--font-display);
+  font-size: 200px;
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+}
+.variant-clx-c-editorial .slot-value .slot-unit {
+  font-size: 70px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-accent);
+}
+.variant-clx-c-editorial .slot-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  padding-top: 12px;
+  border-top: 3px solid var(--color-accent);
+  width: 200px;
+}
+.variant-clx-c-editorial .slot-trend {
+  font-family: var(--font-zh-display);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+.variant-clx-c-editorial .clxc-chart {
+  position: relative;
+  height: 280px;
+  border-left: 1px solid var(--color-border);
+  border-bottom: 2px solid var(--color-text-primary);
+  padding: 14px 0 0 14px;
+}
+.variant-clx-c-editorial .clxc-chart svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.variant-clx-c-editorial .clxc-chart-labels {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-muted);
+}
+.variant-clx-c-editorial .clxc-chart-labels .active {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+.variant-clx-c-editorial .clxc-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-faint);
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+
+/* ---- CLX-D · Before/After dual number · 双数字对比 ---- */
+.variant-clx-d-editorial .clxd-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 24px;
+}
+.variant-clx-d-editorial .clxd-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-clx-d-editorial .clxd-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-clx-d-editorial .clxd-body {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 32px;
+  align-items: center;
+}
+.variant-clx-d-editorial .clxd-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.variant-clx-d-editorial .clxd-side.before {
+  align-items: flex-end;
+  text-align: right;
+}
+.variant-clx-d-editorial .clxd-side .tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+}
+.variant-clx-d-editorial .clxd-side.before .slot-value-before {
+  font-family: var(--font-display);
+  font-size: 180px;
+  font-weight: 600;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+.variant-clx-d-editorial .clxd-side.before .slot-value-before .slot-unit {
+  font-size: 50px;
+  font-style: italic;
+}
+.variant-clx-d-editorial .clxd-side.after .slot-value-after {
+  font-family: var(--font-display);
+  font-size: 240px;
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+}
+.variant-clx-d-editorial .clxd-side.after .slot-value-after .slot-unit {
+  font-size: 80px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-accent);
+}
+.variant-clx-d-editorial .clxd-side .slot-label {
+  font-family: var(--font-zh-display);
+  font-size: 15px;
+  color: var(--color-text-muted);
+  max-width: 280px;
+  line-height: 1.5;
+}
+.variant-clx-d-editorial .clxd-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.variant-clx-d-editorial .clxd-arrow .arrow-mark {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 64px;
+  color: var(--color-accent);
+  line-height: 1;
+}
+.variant-clx-d-editorial .clxd-arrow .delta {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-accent);
+  letter-spacing: -0.02em;
+}
+.variant-clx-d-editorial .clxd-arrow .delta-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-muted);
+}
+.variant-clx-d-editorial .clxd-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-faint);
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+
+/* ============================================================
+   §8 · SUPPORT variant (S-A · magazine data feature · α 重构)
+   从"图表左+点右"改为"大字论断顶 + 图表占满下 + 边缘垂直标注"
+   ============================================================ */
+.variant-s-a-editorial {
+  display: grid;
+  grid-template-columns: 56px 1fr 56px;
+  grid-template-rows: 1fr;
+}
+.variant-s-a-editorial .s-edge-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+  border-right: 1px solid var(--color-border);
+}
+.variant-s-a-editorial .s-edge-label.right {
+  border-right: none;
+  border-left: 1px solid var(--color-border);
+  color: var(--color-text-faint);
+}
+.variant-s-a-editorial .s-body {
+  padding: 40px 56px;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 24px;
+}
+.variant-s-a-editorial .s-eyebrow-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-muted);
+}
+.variant-s-a-editorial .s-eyebrow-row .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-s-a-editorial .slot-title {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+  color: var(--color-text-primary);
+  max-width: 900px;
+  border-bottom: 2px solid var(--color-text-primary);
+  padding-bottom: 24px;
+}
+.variant-s-a-editorial .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-s-a-editorial .s-figure-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 48px;
+  align-items: stretch;
+}
+.variant-s-a-editorial .slot-chart {
+  background: var(--color-surface);
+  padding: 24px 32px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-left: 4px solid var(--color-accent);
+}
+.variant-s-a-editorial .slot-chart .chart-mock {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  height: 180px;
+  padding-bottom: 12px;
+}
+.variant-s-a-editorial .slot-chart .bar {
+  flex: 1;
+  background: var(--color-text-primary);
+  opacity: 0.25;
+}
+.variant-s-a-editorial .slot-chart .bar.active {
+  background: var(--color-accent);
+  opacity: 1;
+}
+.variant-s-a-editorial .slot-chart .chart-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-muted);
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+.variant-s-a-editorial .slot-chart .chart-labels .active {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+.variant-s-a-editorial .slot-chart-caption {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--color-text-faint);
+  margin-top: 16px;
+}
+.variant-s-a-editorial .slot-points {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 4px;
+}
+.variant-s-a-editorial .slot-points .point {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+.variant-s-a-editorial .slot-points .point:last-child {
+  border-bottom: none;
+}
+.variant-s-a-editorial .slot-points .point .num {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+  margin-bottom: 4px;
+  display: block;
+}
+.variant-s-a-editorial .slot-points .point .text {
+  font-family: var(--font-zh-display);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--color-text-primary);
+}
+.variant-s-a-editorial .slot-points .point .text strong {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+
+/* ---- S-B · Three-column points · 三栏要点(无图表, 纯论点编辑感) ---- */
+.variant-s-b-editorial .sb-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 32px;
+}
+.variant-s-b-editorial .sb-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-s-b-editorial .sb-header .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+}
+.variant-s-b-editorial .sb-header .slot-title {
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+  max-width: 1000px;
+}
+.variant-s-b-editorial .sb-header .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-s-b-editorial .sb-points {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 32px;
+  align-items: stretch;
+}
+.variant-s-b-editorial .sb-points .col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-right: 24px;
+  border-right: 1px solid var(--color-border);
+}
+.variant-s-b-editorial .sb-points .col:last-child {
+  border-right: none;
+}
+.variant-s-b-editorial .sb-points .col .col-num {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+  font-variation-settings: "opsz" 96;
+  line-height: 0.95;
+}
+.variant-s-b-editorial .sb-points .col .col-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+}
+.variant-s-b-editorial .sb-points .col .slot-point-title {
+  font-family: var(--font-zh-display);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+}
+.variant-s-b-editorial .sb-points .col .slot-point-desc {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+.variant-s-b-editorial .sb-points .col .slot-point-data {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  font-variation-settings: "opsz" 96;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+}
+.variant-s-b-editorial .sb-points .col .slot-point-data .unit {
+  font-size: 0.6em;
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-s-b-editorial .sb-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-faint);
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+
+/* ---- S-C · Single full chart + caption · 单图表满版 + 大字 caption ---- */
+.variant-s-c-editorial .sc-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 24px;
+}
+.variant-s-c-editorial .sc-header {
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-s-c-editorial .sc-header .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+.variant-s-c-editorial .sc-header .slot-title {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+}
+.variant-s-c-editorial .sc-header .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-s-c-editorial .sc-chart {
+  background: var(--color-surface);
+  padding: 24px 32px;
+  border-left: 4px solid var(--color-accent);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.variant-s-c-editorial .sc-chart .chart-mock {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  height: 230px;
+}
+.variant-s-c-editorial .sc-chart .bar {
+  flex: 1;
+  background: var(--color-text-primary);
+  opacity: 0.25;
+  position: relative;
+}
+.variant-s-c-editorial .sc-chart .bar.active {
+  background: var(--color-accent);
+  opacity: 1;
+}
+.variant-s-c-editorial .sc-chart .bar .bar-val {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+.variant-s-c-editorial .sc-chart .bar.active .bar-val {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+.variant-s-c-editorial .sc-chart .chart-labels {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-muted);
+}
+.variant-s-c-editorial .sc-chart .chart-labels .active {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+.variant-s-c-editorial .sc-chart .chart-caption {
+  font-family: var(--font-zh-display);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border);
+}
+.variant-s-c-editorial .sc-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-faint);
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+
+/* ---- S-F · Three quoted sources · 三联引用 + 来源条 ---- */
+.variant-s-f-editorial .sf-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 24px;
+}
+.variant-s-f-editorial .sf-header {
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-s-f-editorial .sf-header .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+.variant-s-f-editorial .sf-header .slot-title {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+}
+.variant-s-f-editorial .sf-header .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-s-f-editorial .sf-quotes {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 32px;
+}
+.variant-s-f-editorial .sf-quotes .col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 24px;
+  border-right: 1px solid var(--color-border);
+}
+.variant-s-f-editorial .sf-quotes .col:last-child {
+  border-right: none;
+}
+.variant-s-f-editorial .sf-quotes .col .qmark {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 64px;
+  color: var(--color-accent);
+  line-height: 0.4;
+  margin-bottom: 8px;
+}
+.variant-s-f-editorial .sf-quotes .col .quote-text {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+.variant-s-f-editorial .sf-quotes .col .quote-text em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-s-f-editorial .sf-quotes .col .source {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+.variant-s-f-editorial .sf-quotes .col .source strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+.variant-s-f-editorial .sf-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-faint);
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+
+/* ============================================================
+   §9 · COMPARISON variant (CMP-C · magazine diptych · α 重构)
+   从"双轴对比+分割线"改为"双联色块拼贴 + 巨型对比关键词 + 中间 BEFORE/AFTER 切口"
+   ============================================================ */
+.variant-cmp-c-editorial {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+}
+.variant-cmp-c-editorial .cmp-side {
+  padding: 40px 56px 56px 56px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.variant-cmp-c-editorial .cmp-side.before {
+  background: var(--color-surface);
+}
+.variant-cmp-c-editorial .cmp-side.after {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+.variant-cmp-c-editorial .cmp-side .cmp-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  font-weight: 600;
+}
+.variant-cmp-c-editorial .cmp-side.before .cmp-tag {
+  color: var(--color-accent);
+}
+.variant-cmp-c-editorial .cmp-side.after .cmp-tag {
+  color: var(--color-bg);
+  opacity: 0.7;
+}
+.variant-cmp-c-editorial .cmp-side .cmp-keyword {
+  font-family: var(--font-display);
+  font-size: 130px;
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144;
+  margin-top: 24px;
+}
+.variant-cmp-c-editorial .cmp-side.before .cmp-keyword {
+  color: var(--color-text-primary);
+}
+.variant-cmp-c-editorial .cmp-side.after .cmp-keyword {
+  color: var(--color-bg);
+}
+.variant-cmp-c-editorial .cmp-side .cmp-keyword em {
+  font-style: italic;
+  font-weight: 400;
+}
+.variant-cmp-c-editorial .cmp-side.before .cmp-keyword em {
+  color: var(--color-accent);
+}
+.variant-cmp-c-editorial .cmp-side.after .cmp-keyword em {
+  color: var(--color-bg);
+  opacity: 0.7;
+}
+.variant-cmp-c-editorial .cmp-side .cmp-era {
+  font-family: var(--font-zh-display);
+  font-size: 24px;
+  font-weight: 600;
+  margin-top: 16px;
+  line-height: 1.3;
+}
+.variant-cmp-c-editorial .cmp-side .cmp-points {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid currentColor;
+  opacity: 0.85;
+}
+.variant-cmp-c-editorial .cmp-side .cmp-points .point {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  gap: 10px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.variant-cmp-c-editorial .cmp-side .cmp-points .point .arrow {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+.variant-cmp-c-editorial .cmp-side .cmp-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  opacity: 0.55;
+  text-transform: uppercase;
+  margin-top: 20px;
+}
+
+
+/* ---- CMP-A · Primary vs Secondary · 主次对比(主大次小) ---- */
+.variant-cmp-a-editorial .cmpa-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 32px;
+}
+.variant-cmp-a-editorial .cmpa-header {
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-cmp-a-editorial .cmpa-header .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  margin-bottom: 12px;
+}
+.variant-cmp-a-editorial .cmpa-header .slot-title {
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+}
+.variant-cmp-a-editorial .cmpa-header .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-cmp-a-editorial .cmpa-body {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 48px;
+  align-items: stretch;
+}
+.variant-cmp-a-editorial .cmpa-primary {
+  padding: 32px;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.variant-cmp-a-editorial .cmpa-primary .tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  font-weight: 600;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.variant-cmp-a-editorial .cmpa-primary .slot-primary-name {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variation-settings: "opsz" 96;
+}
+.variant-cmp-a-editorial .cmpa-primary .slot-primary-desc {
+  font-family: var(--font-zh-display);
+  font-size: 16px;
+  line-height: 1.55;
+  opacity: 0.95;
+}
+.variant-cmp-a-editorial .cmpa-primary .data-row {
+  display: flex;
+  gap: 32px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.3);
+  margin-top: auto;
+}
+.variant-cmp-a-editorial .cmpa-primary .data-row .item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.variant-cmp-a-editorial .cmpa-primary .data-row .item .label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  opacity: 0.7;
+}
+.variant-cmp-a-editorial .cmpa-primary .data-row .item .val {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.variant-cmp-a-editorial .cmpa-secondary {
+  padding: 24px;
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid var(--color-border);
+}
+.variant-cmp-a-editorial .cmpa-secondary .tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.variant-cmp-a-editorial .cmpa-secondary .slot-secondary-name {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 96;
+  color: var(--color-text-primary);
+}
+.variant-cmp-a-editorial .cmpa-secondary .slot-secondary-desc {
+  font-family: var(--font-zh-display);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+.variant-cmp-a-editorial .cmpa-secondary .data-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+
+/* ============================================================
+   §10 · INSIGHT variant (INS-A · the pure quote)
+   ============================================================ */
+.variant-ins-a-editorial .ins-pad {
+  position: absolute;
+  inset: 0;
+  padding: 80px 120px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+.variant-ins-a-editorial .ins-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-faint);
+}
+.variant-ins-a-editorial .ins-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-ins-a-editorial .ins-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+.variant-ins-a-editorial .ins-quote-mark {
+  font-family: var(--font-display);
+  font-size: 200px;
+  font-weight: 400;
+  font-style: italic;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-accent);
+  line-height: 0.5;
+  margin-bottom: 16px;
+}
+.variant-ins-a-editorial .slot-quote {
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+  max-width: 900px;
+}
+.variant-ins-a-editorial .slot-quote em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+}
+.variant-ins-a-editorial .ins-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.variant-ins-a-editorial .slot-attribution {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+
+/* ---- INS-B · Quote with attribution panel · 引语 + 人物署名卡 ---- */
+.variant-ins-b-editorial .insb-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 56px;
+  align-items: stretch;
+}
+.variant-ins-b-editorial .insb-quote-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px 0;
+}
+.variant-ins-b-editorial .insb-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+}
+.variant-ins-b-editorial .insb-quote-mark {
+  font-family: var(--font-display);
+  font-size: 120px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-accent);
+  line-height: 0.5;
+  margin-bottom: -8px;
+}
+.variant-ins-b-editorial .slot-quote {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+}
+.variant-ins-b-editorial .slot-quote em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+}
+.variant-ins-b-editorial .insb-byline {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-faint);
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+.variant-ins-b-editorial .insb-author-col {
+  background: var(--color-surface);
+  padding: 56px 32px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-left: 4px solid var(--color-accent);
+}
+.variant-ins-b-editorial .insb-author-col .author-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+}
+.variant-ins-b-editorial .insb-author-col .slot-author-name {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variation-settings: "opsz" 96;
+  color: var(--color-text-primary);
+}
+.variant-ins-b-editorial .insb-author-col .slot-author-title {
+  font-family: var(--font-zh-display);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+.variant-ins-b-editorial .insb-author-col .author-meta {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-faint);
+  line-height: 1.7;
+}
+.variant-ins-b-editorial .insb-author-col .author-meta strong {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+
+/* ============================================================
+   §11 · GALLERY variant (H1 · magazine full-bleed feature · α 重构)
+   从"左图右文 50/50"改为"全幅图占满 + 标题大字覆盖在图上 + 杂志 chrome"
+   ============================================================ */
+.variant-h1-editorial {
+  background: var(--ground-dark);
+  color: #F0E8D8;
+}
+.variant-h1-editorial .h1-image {
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 35%, rgba(0,0,0,0.85) 100%),
+    radial-gradient(ellipse at 30% 70%, rgba(200, 54, 43, 0.3), transparent 60%),
+    radial-gradient(ellipse at 80% 30%, rgba(233, 181, 39, 0.12), transparent 60%),
+    linear-gradient(135deg, var(--ink-700), var(--ground-dark));
+}
+.variant-h1-editorial .h1-image-grain {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0.6;
+}
+.variant-h1-editorial .h1-top-bar {
+  position: absolute;
+  top: 32px;
+  left: 56px;
+  right: 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--accent-yellow);
+  z-index: 3;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(240,232,216,0.2);
+}
+.variant-h1-editorial .h1-top-bar .right {
+  color: rgba(240,232,216,0.55);
+}
+.variant-h1-editorial .h1-photo-credit {
+  position: absolute;
+  top: 50%;
+  left: 56px;
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: left center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  color: rgba(240,232,216,0.45);
+  z-index: 3;
+  white-space: nowrap;
+}
+.variant-h1-editorial .h1-caption-block {
+  position: absolute;
+  bottom: 56px;
+  left: 56px;
+  right: 56px;
+  z-index: 3;
+}
+.variant-h1-editorial .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--accent-yellow);
+  display: block;
+  margin-bottom: 16px;
+}
+.variant-h1-editorial .slot-title {
+  font-family: var(--font-display);
+  font-size: 88px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-variation-settings: "opsz" 144;
+  color: #F0E8D8;
+  margin-bottom: 16px;
+  max-width: 950px;
+}
+.variant-h1-editorial .slot-title em {
+  font-style: italic;
+  color: var(--accent-yellow);
+  font-weight: 400;
+}
+.variant-h1-editorial .h1-caption-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 48px;
+  align-items: end;
+  padding-top: 16px;
+  border-top: 1px solid rgba(240,232,216,0.2);
+}
+.variant-h1-editorial .slot-caption {
+  font-family: var(--font-zh-display);
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(240,232,216,0.8);
+  max-width: 720px;
+}
+.variant-h1-editorial .slot-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: rgba(240,232,216,0.5);
+  text-align: right;
+  line-height: 1.7;
+}
+
+
+/* ---- Shared placeholder for gallery variants ---- */
+.gal-pic {
+  position: relative;
+  background: 
+    radial-gradient(ellipse at 30% 70%, rgba(200, 54, 43, 0.18), transparent 60%),
+    radial-gradient(ellipse at 70% 30%, rgba(233, 181, 39, 0.10), transparent 60%),
+    linear-gradient(135deg, var(--ink-700), var(--ground-dark));
+  overflow: hidden;
+}
+.gal-pic.warm {
+  background: 
+    radial-gradient(ellipse at 25% 75%, rgba(233, 181, 39, 0.22), transparent 65%),
+    radial-gradient(ellipse at 70% 30%, rgba(200, 54, 43, 0.18), transparent 50%),
+    linear-gradient(135deg, #6B3F2F, #2A211C);
+}
+.gal-pic.cool {
+  background: 
+    radial-gradient(ellipse at 40% 60%, rgba(27, 61, 143, 0.30), transparent 60%),
+    radial-gradient(ellipse at 80% 40%, rgba(200, 54, 43, 0.12), transparent 60%),
+    linear-gradient(135deg, #2A3850, #1A1410);
+}
+.gal-pic.green {
+  background:
+    radial-gradient(ellipse at 30% 70%, rgba(140, 160, 70, 0.30), transparent 65%),
+    radial-gradient(ellipse at 75% 30%, rgba(233, 181, 39, 0.10), transparent 60%),
+    linear-gradient(135deg, #3E4A2A, #1E1B17);
+}
+.gal-pic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 3px 3px;
+  opacity: 0.6;
+}
+.gal-pic .pic-caption {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.7);
+  z-index: 2;
+}
+
+
+/* ---- H2 · Diptych (双图对照) ---- */
+.variant-h2-editorial .h2-pad {
+  position: absolute;
+  inset: 0;
+  padding: 40px 56px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 18px;
+}
+.variant-h2-editorial .h2-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-h2-editorial .h2-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-h2-editorial .h2-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.variant-h2-editorial .h2-grid .gal-pic { height: 100%; min-height: 0; }
+.variant-h2-editorial .h2-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.variant-h2-editorial .h2-bottom .h2-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.variant-h2-editorial .h2-bottom .h2-caption .tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-accent);
+}
+.variant-h2-editorial .h2-bottom .h2-caption .text {
+  font-family: var(--font-zh-display);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+
+/* ---- H3 · Three image grid (三图网格) ---- */
+.variant-h3-editorial .h3-pad {
+  position: absolute;
+  inset: 0;
+  padding: 40px 56px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 18px;
+}
+.variant-h3-editorial .h3-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-h3-editorial .h3-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-h3-editorial .h3-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+}
+.variant-h3-editorial .h3-grid .gal-pic.main {
+  grid-row: 1 / 3;
+}
+.variant-h3-editorial .h3-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--color-text-muted);
+}
+.variant-h3-editorial .h3-bottom .lede {
+  font-family: var(--font-zh-display);
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-text-primary);
+  max-width: 720px;
+  letter-spacing: 0;
+}
+
+
+/* ---- H4 · Four image grid (四图网格, 2x2 等大) ---- */
+.variant-h4-editorial .h4-pad {
+  position: absolute;
+  inset: 0;
+  padding: 40px 56px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 18px;
+}
+.variant-h4-editorial .h4-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-h4-editorial .h4-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-h4-editorial .h4-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+}
+.variant-h4-editorial .h4-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--color-text-muted);
+}
+
+
+/* ---- H5 · Five image asymmetric grid (五图非对称) ---- */
+.variant-h5-editorial .h5-pad {
+  position: absolute;
+  inset: 0;
+  padding: 40px 56px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 18px;
+}
+.variant-h5-editorial .h5-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-h5-editorial .h5-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-h5-editorial .h5-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+}
+.variant-h5-editorial .h5-grid .gal-pic.main {
+  grid-row: 1 / 3;
+}
+.variant-h5-editorial .h5-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--color-text-muted);
+}
+
+
+/* ---- GC-A · Contact sheet · 6 image grid (3x2) ---- */
+.variant-gc-a-editorial .gca-pad {
+  position: absolute;
+  inset: 0;
+  padding: 40px 56px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 14px;
+}
+.variant-gc-a-editorial .gca-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-gc-a-editorial .gca-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-gc-a-editorial .gca-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+}
+.variant-gc-a-editorial .gca-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--color-text-faint);
+}
+
+
+/* ---- GC-B · Picture + numbered captions (图+编号说明列) ---- */
+.variant-gc-b-editorial .gcb-pad {
+  position: absolute;
+  inset: 0;
+  padding: 40px 56px;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 32px;
+}
+.variant-gc-b-editorial .gcb-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.variant-gc-b-editorial .gcb-left .gal-pic { flex: 1; }
+.variant-gc-b-editorial .gcb-left .pic-meta {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--color-text-faint);
+}
+.variant-gc-b-editorial .gcb-right {
+  display: flex;
+  flex-direction: column;
+  padding-left: 24px;
+  border-left: 1px solid var(--color-border);
+  min-height: 0;
+}
+.variant-gc-b-editorial .gcb-right .gcb-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  flex: 0 0 auto;
+  margin-bottom: 12px;
+}
+.variant-gc-b-editorial .gcb-right .gcb-title {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+  flex: 0 0 auto;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-gc-b-editorial .gcb-right .gcb-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+/* GC-B 自适应 N 个 caption — --rows 默认 4, 范围 3-6
+   每个 cap 用 flex: 1 + align-items: center 均布并垂直居中 */
+.variant-gc-b-editorial {
+  --rows: 4;
+}
+.variant-gc-b-editorial .gcb-cap {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 12px;
+  border-bottom: 1px solid var(--color-border);
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+  padding: 4px 0;
+}
+.variant-gc-b-editorial .gcb-cap:last-of-type {
+  border-bottom: none;
+}
+.variant-gc-b-editorial .gcb-cap .num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(16px, calc(28px - var(--rows) * 1px), 22px);
+  color: var(--color-accent);
+  line-height: 1;
+}
+.variant-gc-b-editorial .gcb-cap .body {
+  font-family: var(--font-zh-display);
+  font-size: clamp(12px, calc(18px - var(--rows) * 0.7px), 14px);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+
+/* ---- GC-C · Side-by-side magazine spread (主图+副图条) ---- */
+.variant-gc-c-editorial .gcc-pad {
+  position: absolute;
+  inset: 0;
+  padding: 40px 56px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 16px;
+}
+.variant-gc-c-editorial .gcc-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-gc-c-editorial .gcc-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-gc-c-editorial .gcc-grid {
+  display: grid;
+  grid-template-rows: 2fr 1fr;
+  gap: 12px;
+}
+.variant-gc-c-editorial .gcc-sub {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+.variant-gc-c-editorial .gcc-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--color-text-muted);
+}
+
+
+/* ---- GC-D · 8-image dense contact sheet (4x2 紧凑) ---- */
+.variant-gc-d-editorial .gcd-pad {
+  position: absolute;
+  inset: 0;
+  padding: 40px 56px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 12px;
+}
+.variant-gc-d-editorial .gcd-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-gc-d-editorial .gcd-top .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-gc-d-editorial .gcd-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+}
+.variant-gc-d-editorial .gcd-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--color-text-faint);
+}
+
+
+/* ============================================================
+   §12 · TIMELINE variant (TL-A · horizontal base)
+   ============================================================ */
+.variant-tl-a-editorial .tl-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+.variant-tl-a-editorial .tl-header {
+  flex: 0 0 auto;
+}
+.variant-tl-a-editorial .tl-header .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--color-accent);
+  margin-bottom: 12px;
+}
+.variant-tl-a-editorial .tl-header .slot-title {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+}
+.variant-tl-a-editorial .tl-header .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+/* TL-A 自适应 N 个时间点 — --cols 默认 4, 范围 3-6 */
+.variant-tl-a-editorial {
+  --cols: 4;
+}
+.variant-tl-a-editorial .tl-axis {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  gap: 0;
+  margin: auto 0;
+  width: 100%;
+}
+.variant-tl-a-editorial .tl-axis::before {
+  content: "";
+  position: absolute;
+  top: 36px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-text-primary);
+}
+.variant-tl-a-editorial .tl-point {
+  position: relative;
+  padding-top: 64px;
+  padding-right: clamp(8px, calc(40px - var(--cols) * 3px), 24px);
+}
+.variant-tl-a-editorial .tl-point::before {
+  content: "";
+  position: absolute;
+  top: 28px;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  background: var(--color-bg);
+  border: 3px solid var(--color-accent);
+  border-radius: 50%;
+}
+.variant-tl-a-editorial .tl-point .slot-year {
+  font-family: var(--font-display);
+  font-size: clamp(28px, calc(60px - var(--cols) * 4px), 44px);
+  font-weight: 700;
+  font-variation-settings: "opsz" 96;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 12px;
+  color: var(--color-accent);
+}
+.variant-tl-a-editorial .tl-point .slot-event-title {
+  font-family: var(--font-zh-display);
+  font-size: clamp(14px, calc(26px - var(--cols) * 2px), 18px);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+.variant-tl-a-editorial .tl-point .slot-event-desc {
+  font-family: var(--font-body);
+  font-size: clamp(11px, calc(17px - var(--cols) * 1px), 13px);
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+
+/* ============================================================
+   §13 · PROCESS variant (PRC-A · linear flow)
+   ============================================================ */
+.variant-prc-a-editorial .prc-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 48px;
+}
+.variant-prc-a-editorial .prc-header .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--color-accent);
+  margin-bottom: 12px;
+}
+.variant-prc-a-editorial .prc-header .slot-title {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+}
+.variant-prc-a-editorial .prc-header .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+/* PRC-A 自适应 N 步 — --cols 默认 3, 范围 3-5 */
+.variant-prc-a-editorial {
+  --cols: 3;
+}
+.variant-prc-a-editorial .prc-flow {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  min-height: 0;
+}
+.variant-prc-a-editorial .prc-step {
+  flex: 1;
+  padding: clamp(20px, calc(40px - var(--cols) * 4px), 28px);
+  background: var(--color-surface);
+  border: var(--hairline);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, calc(18px - var(--cols) * 1px), 14px);
+  min-height: 0;
+  position: relative;
+}
+.variant-prc-a-editorial .prc-step .step-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-accent);
+  font-weight: 600;
+}
+.variant-prc-a-editorial .prc-step .slot-step-title {
+  font-family: var(--font-display);
+  font-size: clamp(22px, calc(40px - var(--cols) * 3px), 30px);
+  font-weight: 700;
+  line-height: 1.15;
+  font-variation-settings: "opsz" 96;
+}
+.variant-prc-a-editorial .prc-step .slot-step-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+/* 大数字编号 - 装饰性,自动占据剩余空间填充空白 */
+.variant-prc-a-editorial .prc-step .step-big-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(120px, calc(200px - var(--cols) * 10px), 170px);
+  font-weight: 400;
+  line-height: 0.85;
+  color: var(--color-accent);
+  opacity: 0.18;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144;
+  user-select: none;
+  margin: auto 0;        /* 自动占据剩余 flex 空间 */
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+.variant-prc-a-editorial .prc-step .slot-step-desc {
+  font-family: var(--font-body);
+  font-size: clamp(12px, calc(17px - var(--cols) * 1px), 14px);
+  line-height: 1.65;
+  color: var(--color-text-muted);
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+.variant-prc-a-editorial .prc-step .slot-step-desc strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+.variant-prc-a-editorial .prc-arrow {
+  flex: 0 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 24px;
+  color: var(--color-accent);
+}
+
+
+/* ---- TL-B · Dual-axis timeline · 双轴时间轴(上事件 / 下数据) ---- */
+.variant-tl-b-editorial .tlb-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 32px;
+}
+.variant-tl-b-editorial .tlb-header {
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-tl-b-editorial .tlb-header .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+.variant-tl-b-editorial .tlb-header .slot-title {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+}
+.variant-tl-b-editorial .tlb-header .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-tl-b-editorial .tlb-grid {
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  gap: 0;
+}
+.variant-tl-b-editorial .tlb-row-top {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+  align-items: end;
+  padding-bottom: 16px;
+}
+.variant-tl-b-editorial .tlb-row-top .event {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.variant-tl-b-editorial .tlb-row-top .event-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: var(--color-accent);
+}
+.variant-tl-b-editorial .tlb-row-top .event-title {
+  font-family: var(--font-zh-display);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+.variant-tl-b-editorial .tlb-axis {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+  padding: 16px 0;
+  border-top: 2px solid var(--color-text-primary);
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-tl-b-editorial .tlb-axis .year {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-style: italic;
+  font-weight: 700;
+  font-variation-settings: "opsz" 96;
+  letter-spacing: -0.02em;
+  color: var(--color-accent);
+  line-height: 0.95;
+}
+.variant-tl-b-editorial .tlb-row-bottom {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+  padding-top: 16px;
+}
+.variant-tl-b-editorial .tlb-row-bottom .metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.variant-tl-b-editorial .tlb-row-bottom .metric-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-muted);
+}
+.variant-tl-b-editorial .tlb-row-bottom .metric-val {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 96;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+.variant-tl-b-editorial .tlb-row-bottom .metric-val .unit {
+  font-size: 0.6em;
+  color: var(--color-accent);
+  font-style: italic;
+  font-weight: 400;
+}
+
+
+
+/* ============================================================
+   §14 · FRAMEWORK variant (FRW-A · magazine quad-collage · α 重构)
+   从"2x2 矩阵 + 坐标轴"改为"四联色块拼贴 + 大字象限标题 + 一个 accent 突出象限"
+   ============================================================ */
+.variant-frw-a-editorial {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 0;
+}
+.variant-frw-a-editorial .frw-top {
+  padding: 28px 56px 14px 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px solid var(--color-text-primary);
+  background: var(--color-bg);
+}
+.variant-frw-a-editorial .frw-top-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.variant-frw-a-editorial .frw-top .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+}
+.variant-frw-a-editorial .frw-top .slot-title {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+}
+.variant-frw-a-editorial .frw-top .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-frw-a-editorial .frw-top .frw-axis-info {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-muted);
+  text-align: right;
+  line-height: 1.7;
+}
+.variant-frw-a-editorial .frw-top .frw-axis-info strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+.variant-frw-a-editorial .frw-quad-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+.variant-frw-a-editorial .quadrant {
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--color-bg);
+  min-height: 0;
+  overflow: hidden;
+}
+.variant-frw-a-editorial .quadrant:nth-child(1) {
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+.variant-frw-a-editorial .quadrant:nth-child(2).highlight {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border-bottom: 1px solid var(--color-text-primary);
+}
+.variant-frw-a-editorial .quadrant:nth-child(3) {
+  background: var(--color-bg);
+  border-right: 1px solid var(--color-border);
+}
+.variant-frw-a-editorial .quadrant:nth-child(4) {
+  background: var(--color-surface);
+}
+.variant-frw-a-editorial .quadrant .quad-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.variant-frw-a-editorial .quadrant .quad-num {
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+}
+.variant-frw-a-editorial .quadrant.highlight .quad-num {
+  color: var(--color-bg);
+}
+.variant-frw-a-editorial .quadrant .slot-quadrant-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-align: right;
+}
+.variant-frw-a-editorial .quadrant.highlight .slot-quadrant-label {
+  color: var(--color-bg);
+}
+.variant-frw-a-editorial .quadrant .quad-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+.variant-frw-a-editorial .quadrant .slot-quadrant-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variation-settings: "opsz" 96;
+}
+.variant-frw-a-editorial .quadrant .slot-quadrant-desc {
+  font-family: var(--font-zh-display);
+  font-size: 14px;
+  line-height: 1.55;
+  opacity: 0.85;
+}
+.variant-frw-a-editorial .quadrant.highlight .quad-star {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-style: italic;
+  font-weight: 400;
+  margin-top: 8px;
+}
+/* 中心叠加轴标记 */
+.variant-frw-a-editorial .frw-axis-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 56px;
+  height: 56px;
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  z-index: 5;
+}
+
+
+/* ---- FRW-D · Layered framework · 分层框架(横向层级列表) ---- */
+.variant-frw-d-editorial .frwd-pad {
+  position: absolute;
+  inset: 0;
+  padding: 48px 80px 32px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 24px;
+}
+.variant-frw-d-editorial .frwd-header {
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-frw-d-editorial .frwd-header .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+.variant-frw-d-editorial .frwd-header .slot-title {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+}
+.variant-frw-d-editorial .frwd-header .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+/* FRW-D 自适应 N 层 — --rows 默认 4, 范围 3-6
+   layer 用自然高度,layers 用 space-between 撒分剩余空间(像 CLO-A) */
+.variant-frw-d-editorial {
+  --rows: 4;
+}
+.variant-frw-d-editorial .frwd-layers {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 0;
+}
+.variant-frw-d-editorial .frwd-layer {
+  display: grid;
+  grid-template-columns: clamp(70px, calc(110px - var(--rows) * 5px), 90px) 1fr 1fr;
+  gap: clamp(16px, calc(40px - var(--rows) * 4px), 24px);
+  padding: clamp(10px, calc(28px - var(--rows) * 2.5px), 18px) 0;
+  border-bottom: 1px solid var(--color-border);
+  align-items: baseline;
+  flex: 0 0 auto;
+}
+.variant-frw-d-editorial .frwd-layer:last-child {
+  border-bottom: none;
+}
+.variant-frw-d-editorial .frwd-layer.highlight {
+  background: var(--color-surface);
+  padding: clamp(10px, calc(28px - var(--rows) * 2.5px), 18px) 16px;
+  border-left: 4px solid var(--color-accent);
+  border-bottom: 1px solid var(--color-border);
+  margin: 0 -16px;
+  grid-template-columns: clamp(54px, calc(94px - var(--rows) * 5px), 74px) 1fr 1fr;
+}
+.variant-frw-d-editorial .frwd-layer .layer-tag {
+  font-family: var(--font-display);
+  font-size: clamp(22px, calc(46px - var(--rows) * 3px), 34px);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+  font-variation-settings: "opsz" 96;
+  line-height: 1;
+}
+.variant-frw-d-editorial .frwd-layer .layer-name {
+  font-family: var(--font-zh-display);
+  font-size: clamp(17px, calc(36px - var(--rows) * 3px), 24px);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+.variant-frw-d-editorial .frwd-layer .layer-name .en {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.78em;
+  color: var(--color-accent);
+  font-weight: 400;
+  margin-left: 8px;
+}
+.variant-frw-d-editorial .frwd-layer .layer-desc {
+  font-family: var(--font-body);
+  font-size: clamp(12px, calc(20px - var(--rows) * 1.5px), 14px);
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+
+/* ---- CMP-D · Data table comparison · 数据表对比(多维度多对手) ---- */
+.variant-cmp-d-editorial .cmpd-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 24px;
+}
+.variant-cmp-d-editorial .cmpd-header {
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-cmp-d-editorial .cmpd-header .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+.variant-cmp-d-editorial .cmpd-header .slot-title {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+}
+.variant-cmp-d-editorial .cmpd-header .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-cmp-d-editorial {
+  /* --rows 是数据行数(不含表头),2-8 之间;默认 4 */
+  --rows: 4;
+}
+.variant-cmp-d-editorial .cmpd-table {
+  display: grid;
+  grid-template-columns: 1.2fr repeat(4, 1fr);
+  gap: 0;
+}
+.variant-cmp-d-editorial .cmpd-table .cell {
+  padding: clamp(8px, calc(22px - var(--rows) * 1.4px), 14px) 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+.variant-cmp-d-editorial .cmpd-table .cell.header {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--color-text-primary);
+  padding-bottom: 12px;
+}
+.variant-cmp-d-editorial .cmpd-table .cell.header.featured {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+.variant-cmp-d-editorial .cmpd-table .cell.row-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  padding-left: 0;
+}
+.variant-cmp-d-editorial .cmpd-table .cell.value {
+  font-family: var(--font-display);
+  font-size: clamp(15px, calc(34px - var(--rows) * 1.5px), 22px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 96;
+  color: var(--color-text-primary);
+}
+.variant-cmp-d-editorial .cmpd-table .cell.value.featured {
+  color: var(--color-accent);
+  background: var(--color-surface);
+}
+.variant-cmp-d-editorial .cmpd-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-faint);
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+
+/* ---- INS-C · Number-anchored insight · 数字 + 引语小卡 ---- */
+.variant-ins-c-editorial .insc-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 56px;
+  align-items: center;
+}
+.variant-ins-c-editorial .insc-num-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: right;
+  align-items: flex-end;
+}
+.variant-ins-c-editorial .insc-num-side .insc-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+}
+.variant-ins-c-editorial .insc-num {
+  font-family: var(--font-display);
+  font-size: 180px;
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-accent);
+}
+.variant-ins-c-editorial .insc-num .unit {
+  font-size: 0.4em;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-text-primary);
+}
+.variant-ins-c-editorial .insc-num-side .insc-num-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-muted);
+  max-width: 280px;
+}
+.variant-ins-c-editorial .insc-quote-side {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-left: 32px;
+  border-left: 2px solid var(--color-text-primary);
+}
+.variant-ins-c-editorial .insc-quote-side .insc-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+}
+.variant-ins-c-editorial .slot-quote {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+}
+.variant-ins-c-editorial .slot-quote em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+}
+.variant-ins-c-editorial .slot-attribution {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--color-text-faint);
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+
+/* ---- INS-D · Two quotes diptych · 双引语并列 ---- */
+.variant-ins-d-editorial .insd-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 24px;
+}
+.variant-ins-d-editorial .insd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+}
+.variant-ins-d-editorial .insd-header .slot-eyebrow {
+  color: var(--color-accent);
+}
+.variant-ins-d-editorial .insd-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  min-height: 0;
+}
+.variant-ins-d-editorial .insd-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 24px;
+}
+.variant-ins-d-editorial .insd-col .insd-col-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+}
+.variant-ins-d-editorial .insd-col .insd-quote-mark {
+  font-family: var(--font-display);
+  font-size: 80px;
+  font-style: italic;
+  color: var(--color-accent);
+  line-height: 0.4;
+  margin-bottom: -4px;
+}
+.variant-ins-d-editorial .slot-quote {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-text-primary);
+}
+.variant-ins-d-editorial .slot-quote em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+}
+.variant-ins-d-editorial .slot-attribution {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-muted);
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+  line-height: 1.7;
+  margin-top: auto;
+}
+.variant-ins-d-editorial .slot-attribution strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+.variant-ins-d-editorial .insd-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-faint);
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+
+/* ============================================================
+   §15 · CLOSING variant (CLO-A · magazine END page · α 重构)
+   从"编号结论列表"改为"巨型 END 标记 + 三结论卡片陈列"
+   --rows 在下面 clo-right 块统一定义
+   ============================================================ */
+.variant-clo-a-editorial .clo-left {
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+  padding: 56px 40px 40px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+.variant-clo-a-editorial .clo-left .clo-end-mark {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.variant-clo-a-editorial .clo-left .clo-end-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+}
+.variant-clo-a-editorial .clo-left .clo-end-text {
+  font-family: var(--font-display);
+  font-size: 130px;
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  font-variation-settings: "opsz" 144;
+  color: var(--color-bg);
+  margin-top: 4px;
+}
+.variant-clo-a-editorial .clo-left .clo-end-text em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+  display: block;
+  font-family: var(--font-zh-display);
+  font-size: 0.32em;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-top: 20px;
+}
+.variant-clo-a-editorial .clo-left .slot-title {
+  font-family: var(--font-zh-display);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: rgba(245, 239, 227, 0.85);
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(245,239,227,0.2);
+}
+.variant-clo-a-editorial .clo-left .clo-issue-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: rgba(245,239,227,0.55);
+  line-height: 1.9;
+  padding-top: 16px;
+  border-top: 1px solid rgba(245,239,227,0.2);
+}
+.variant-clo-a-editorial .clo-left .clo-issue-meta strong {
+  color: var(--color-accent);
+}
+.variant-clo-a-editorial {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  /* --rows 是结论卡片数(默认 3, 范围 3-6) */
+  --rows: 3;
+}
+.variant-clo-a-editorial .clo-right {
+  padding: 40px 56px 40px 56px;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  overflow: hidden;
+  min-height: 0;
+}
+.variant-clo-a-editorial .clo-right .clo-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--color-text-primary);
+  flex: 0 0 auto;
+  margin-bottom: 8px;
+}
+.variant-clo-a-editorial .clo-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(4px, calc(16px - var(--rows) * 1.5px), 8px);
+  border-bottom: 1px solid var(--color-border);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: clamp(8px, calc(28px - var(--rows) * 3px), 16px) 0;
+}
+.variant-clo-a-editorial .clo-card:last-of-type {
+  border-bottom: none;
+}
+.variant-clo-a-editorial .clo-card .clo-card-tag {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.variant-clo-a-editorial .clo-card .num {
+  font-family: var(--font-display);
+  font-size: clamp(20px, calc(40px - var(--rows) * 2.5px), 28px);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
+  font-variation-settings: "opsz" 96;
+  line-height: 1;
+}
+.variant-clo-a-editorial .clo-card .label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+.variant-clo-a-editorial .clo-card .slot-conclusion {
+  font-family: var(--font-zh-display);
+  font-size: clamp(14px, calc(34px - var(--rows) * 2.8px), 22px);
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.variant-clo-a-editorial .clo-card .slot-conclusion em {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-clo-a-editorial .clo-card .slot-conclusion-desc {
+  font-family: var(--font-body);
+  font-size: clamp(11px, calc(18px - var(--rows) * 0.9px), 13px);
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+
+/* ---- CLO-D · Acknowledgements / Methodology · 致谢与方法论 ---- */
+.variant-clo-d-editorial .clod-pad {
+  position: absolute;
+  inset: 0;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 24px;
+}
+.variant-clo-d-editorial .clod-header {
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.variant-clo-d-editorial .clod-header .slot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+.variant-clo-d-editorial .clod-header .slot-title {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+}
+.variant-clo-d-editorial .clod-header .slot-title em {
+  font-style: italic;
+  color: var(--color-accent);
+  font-weight: 400;
+}
+.variant-clo-d-editorial .clod-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+.variant-clo-d-editorial .clod-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.variant-clo-d-editorial .clod-col .col-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+.variant-clo-d-editorial .clod-col .item-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--color-border);
+  align-items: baseline;
+}
+.variant-clo-d-editorial .clod-col .item-row:last-child {
+  border-bottom: none;
+}
+.variant-clo-d-editorial .clod-col .item-row .key {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+.variant-clo-d-editorial .clod-col .item-row .val {
+  font-family: var(--font-zh-display);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-primary);
+}
+.variant-clo-d-editorial .clod-col .item-row .val.serif-en {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--color-accent);
+  font-size: 14px;
+  font-weight: 500;
+}
+.variant-clo-d-editorial .clod-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-faint);
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+
+/* ---- CLO-E · Next issue teaser · 下期预告 ---- */
+.variant-clo-e-editorial {
+  background: var(--ground-dark);
+  color: #F0E8D8;
+}
+.variant-clo-e-editorial .cloe-bg-grain {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0.5;
+}
+.variant-clo-e-editorial .cloe-pad {
+  position: absolute;
+  inset: 0;
+  padding: 40px 80px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 20px;
+  z-index: 2;
+}
+.variant-clo-e-editorial .cloe-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--accent-yellow);
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(240,232,216,0.2);
+}
+.variant-clo-e-editorial .cloe-top .right {
+  color: rgba(240,232,216,0.55);
+}
+.variant-clo-e-editorial .cloe-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  min-height: 0;
+  overflow: hidden;
+}
+.variant-clo-e-editorial .cloe-tease {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 16px;
+  letter-spacing: 0.2em;
+  color: var(--accent-yellow);
+  text-transform: uppercase;
+  margin-bottom: -8px;
+}
+.variant-clo-e-editorial .slot-next-title {
+  font-family: var(--font-display);
+  font-size: 96px;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 144;
+  color: #F0E8D8;
+}
+.variant-clo-e-editorial .slot-next-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent-yellow);
+}
+.variant-clo-e-editorial .slot-next-lede {
+  font-family: var(--font-zh-display);
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(240,232,216,0.78);
+  max-width: 700px;
+  padding-left: 16px;
+  border-left: 3px solid var(--accent-yellow);
+}
+.variant-clo-e-editorial .cloe-meta-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(240,232,216,0.2);
+}
+.variant-clo-e-editorial .cloe-meta-row .item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.variant-clo-e-editorial .cloe-meta-row .item .label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: rgba(240,232,216,0.5);
+}
+.variant-clo-e-editorial .cloe-meta-row .item .val {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--accent-yellow);
+}
+.variant-clo-e-editorial .cloe-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: rgba(240,232,216,0.5);
+  padding-top: 14px;
+  border-top: 1px solid rgba(240,232,216,0.2);
+}
+
+
+/* ============================================================
+   §16 · THEME SWITCHER · 浮动皮肤切换器
+   ============================================================ */
+.theme-switcher {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 9999;
+  font-family: var(--font-mono);
+}
+.theme-switcher-toggle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: #1A1410;
+  color: #F0E8D8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.theme-switcher-toggle:hover {
+  transform: scale(1.06);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.theme-switcher-toggle svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+}
+.theme-switcher-panel {
+  position: absolute;
+  bottom: 56px;
+  right: 0;
+  width: 300px;
+  padding: 8px;
+  background: #1A1410;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+}
+.theme-switcher.open .theme-switcher-panel {
+  display: flex;
+}
+.theme-switcher-header {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(240,232,216,0.55);
+  padding: 8px 10px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 4px;
+}
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: background 0.12s ease, border-color 0.12s ease;
+  text-align: left;
+  width: 100%;
+  color: #F0E8D8;
+}
+.theme-option:hover {
+  background: rgba(255,255,255,0.05);
+}
+.theme-option.active {
+  border-color: rgba(233,181,39,0.6);
+  background: rgba(233,181,39,0.08);
+}
+.theme-option-swatches {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.theme-option-swatch {
+  width: 12px;
+  height: 22px;
+  border-radius: 1px;
+}
+.theme-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.theme-option-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.theme-option-desc {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: rgba(240,232,216,0.55);
+}
+.theme-option-check {
+  font-size: 14px;
+  color: var(--accent-yellow);
+  font-weight: 600;
+  opacity: 0;
+  flex-shrink: 0;
+}
+.theme-option.active .theme-option-check {
+  opacity: 1;
+}
+
+/* Dev tag toggle row */
+.dev-tag-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 12px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.dev-tag-toggle-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: rgba(240,232,216,0.7);
+  text-transform: uppercase;
+}
+.dev-tag-toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.dev-tag-toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.dev-tag-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  transition: 0.2s;
+}
+.dev-tag-toggle-slider::before {
+  content: "";
+  position: absolute;
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+.dev-tag-toggle-switch input:checked + .dev-tag-toggle-slider {
+  background: var(--accent-yellow);
+}
+.dev-tag-toggle-switch input:checked + .dev-tag-toggle-slider::before {
+  transform: translateX(16px);
+}
+
+@media print {
+  .theme-switcher { display: none !important; }
+}
+
+</style>
+</head>
+<body>
+
+
+<!-- ============================================================
+     SECTION 1 · COVER · 3 Variants (COV-A/B/C)
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 1 · Cover · 封面页 · 3 Variants</div>
+  <div class="section-header-line"></div>
+</div>
+
+<!-- COV-A · Magazine full-bleed type (α 重构 · 全屏巨字铺满) -->
+<div class="nav-label">COV-A · Magazine Full-bleed Type · 全屏巨字铺满 (α 重构)</div>
+<div class="slide variant-cov-a-editorial">
+  <div class="cov-bg"></div>
+  <div class="cov-bg-grain"></div>
+  <div class="cov-top-bar">
+    <span class="slot-issue">— EDITORIAL · ISSUE №04 · MAR 2026</span>
+    <span class="right">— ANNUAL OUTLOOK · 行业年度 · 128 PAGES</span>
+  </div>
+  <div class="cov-hero">
+    <h1 class="slot-title-en">The<br><em>Pivot</em>.</h1>
+  </div>
+  <div class="cov-bottom-bar">
+    <p class="slot-title-zh">中国新能源汽车出海的拐点时刻 — 一份为产业从业者准备的年度观察。规模拐点之后,叙事才刚开始。</p>
+    <div class="cov-meta-block">
+      <div><strong>BY</strong> EDITORIAL DESK</div>
+      <div>MAR / 2026</div>
+      <div class="dev-tag">COV-A · EDITORIAL</div>
+    </div>
+  </div>
+</div>
+
+<!-- COV-B · Ceremonial centered -->
+<div class="nav-label">COV-B · Ceremonial Centered · 居中大标题(海报感)</div>
+<div class="slide variant-cov-b-editorial">
+  <div class="cov-top-bar">
+    <span class="slot-issue">ISSUE №04 · MAR 2026</span>
+    <span class="slot-publication">EDITORIAL · 编辑出品</span>
+  </div>
+  <div class="cov-pad">
+    <div class="slot-eyebrow">— THE 2026 EDITION</div>
+    <h1 class="slot-title-en">The <em>Pivot</em><br>Moment.</h1>
+    <div class="cov-divider"></div>
+    <p class="slot-title-zh">中国新能源汽车出海拐点时刻<br>一份产业年度观察</p>
+  </div>
+  <div class="cov-bottom-bar">
+    <span>BY EDITORIAL DESK</span>
+    <span>128 PAGES · 42 FIGURES</span>
+  </div>
+</div>
+
+<!-- COV-C · Split layout -->
+<div class="nav-label">COV-C · Split Cover · 左右分栏(编辑风)</div>
+<div class="slide variant-cov-c-editorial">
+  <div class="cov-grid">
+    <div class="cov-left">
+      <div>
+        <div class="slot-eyebrow">— FEATURE · MAR 2026</div>
+      </div>
+      <div>
+        <h1 class="slot-title-en">The <em>Pivot</em>.</h1>
+      </div>
+      <div class="cov-meta-stack">
+        <div class="row"><span class="key">ISSUE</span><span class="val">№04 · V1.0</span></div>
+        <div class="row"><span class="key">PAGES</span><span class="val">128</span></div>
+        <div class="row"><span class="key">FIGURES</span><span class="val">42</span></div>
+        <div class="row"><span class="key">PUBLISHED</span><span class="val">MAR / 26</span></div>
+      </div>
+    </div>
+    <div class="cov-right">
+      <p class="slot-title-zh">中国新能源汽车出海的拐点时刻 — 一份关于产业拐点与未来十年的年度观察。</p>
+      <div class="cov-feature-card">
+        <div class="fc-tag">— IN THIS ISSUE · 本期专题</div>
+        <div class="fc-row">
+          <span class="fc-key">FEATURE</span>
+          <span class="fc-val serif-en">The Pivot Moment.</span>
+        </div>
+        <div class="fc-row">
+          <span class="fc-key">SECTIONS</span>
+          <span class="fc-val">现状 / 拐点信号 / 路径对比 / 十年判断 / 方法论</span>
+        </div>
+        <div class="fc-row">
+          <span class="fc-key">READ TIME</span>
+          <span class="fc-val">42 minutes · 长读</span>
+        </div>
+        <div class="fc-row">
+          <span class="fc-key">CONTRIBUTORS</span>
+          <span class="fc-val">Editorial Desk · 12 位行业专家</span>
+        </div>
+      </div>
+      <p class="cov-pull-quote slot-pull-quote">"规模拐点不是终点,而是叙事的开始。"</p>
+    </div>
+  </div>
+  <div class="slide-index dev-tag">COV-C · EDITORIAL</div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 2 · CHAPTER BREAK · 1 Variant (CB-A)
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 2 · Chapter Break · 章节过渡 · 1 of 3</div>
+  <div class="section-header-line"></div>
+</div>
+
+<!-- CB-A · Number + bold chapter title -->
+<div class="nav-label">CB-A · Numbered Chapter · 巨型章节号 + 标题</div>
+<div class="slide variant-cb-a-editorial">
+  <div class="cb-pad">
+    <div class="cb-top">
+      <span class="slot-eyebrow">PART 02 · 部分</span>
+      <span>EDITORIAL №04</span>
+    </div>
+    <div class="cb-center">
+      <div class="slot-chapter-num">02</div>
+      <h2 class="slot-chapter-title">为什么<em>拐点</em>已至。</h2>
+    </div>
+    <div class="cb-bottom">
+      <p class="slot-chapter-lede">三个市场信号同时出现 — 出口规模超过本土传统强国、本地化生产从口号变成事实、海外品牌价值开始独立于本土。</p>
+      <span>PG. 24-48</span>
+    </div>
+  </div>
+</div>
+
+<!-- CB-D · Full-bleed chapter name (全幅大字 chapter 名) -->
+<div class="nav-label">CB-D · Full-bleed Chapter · 全幅大字 chapter 名(米色底)</div>
+<div class="slide variant-cb-d-editorial">
+  <div class="cbd-pad">
+    <div class="cbd-top">
+      <span class="slot-eyebrow">— PART 03 · 部分</span>
+      <span>EDITORIAL №04 · PG. 50</span>
+    </div>
+    <div class="cbd-center">
+      <h2 class="slot-chapter-title">不同<br><em>路径</em>。</h2>
+    </div>
+    <div class="cbd-bottom">
+      <p class="slot-chapter-lede">五种典型路径选择,五种命运 — 看不同车企如何走出价格战的螺旋。</p>
+      <span class="dev-tag">CB-D · EDITORIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- CB-E · Dark poster chapter (暗色海报章节) -->
+<div class="nav-label">CB-E · Dark Poster · 暗色海报章节(深色底 + 巨型章节号)</div>
+<div class="slide variant-cb-e-editorial">
+  <div class="cbe-bg-grain"></div>
+  <div class="cbe-pad">
+    <div class="cbe-top">
+      <span>— PART 04 · 部分</span>
+      <span class="right">EDITORIAL №04 · PG. 80</span>
+    </div>
+    <div class="cbe-center">
+      <span class="cbe-part-mark">Chapter</span>
+      <div class="slot-chapter-num">04</div>
+      <h2 class="slot-chapter-title">未来十年的<em>判断</em>。</h2>
+    </div>
+    <div class="cbe-bottom">
+      <span>13 FIGURES · 30 PAGES</span>
+      <span class="dev-tag">CB-E · EDITORIAL</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 3 · OUTLINE · 1 Variant (OUT-A)
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 3 · Outline · 目录页 · 1 of 2</div>
+  <div class="section-header-line"></div>
+</div>
+
+<!-- OUT-A · Numbered editorial list -->
+<div class="nav-label">OUT-A · Numbered List · 编号目录</div>
+<div class="slide variant-out-a-editorial" style="--rows: 5;">
+  <div class="out-left">
+    <div class="out-left-top">
+      <div class="slot-eyebrow">— TABLE OF CONTENTS</div>
+      <h2 class="slot-title">In<br><em>This</em><br>Issue.</h2>
+    </div>
+    <div class="out-left-meta">
+      <strong>ISSUE</strong> №04 · V1.0<br>
+      <strong>PUBLISHED</strong> MAR / 2026<br>
+      <strong>PAGES</strong> 128<br>
+      <strong>FIGURES</strong> 42<br>
+      <span class="dev-tag"><strong>OUT-A</strong> · EDITORIAL</span>
+    </div>
+  </div>
+  <div class="out-right">
+    <div class="out-row">
+      <span class="num">01</span>
+      <span class="slot-chapter-title">现状 — 出口数据全景</span>
+      <span class="slot-chapter-desc">PG. 04-22<br>8 FIGURES</span>
+    </div>
+    <div class="out-row">
+      <span class="num">02</span>
+      <span class="slot-chapter-title">拐点的三个信号</span>
+      <span class="slot-chapter-desc">PG. 24-48<br>12 FIGURES</span>
+    </div>
+    <div class="out-row">
+      <span class="num">03</span>
+      <span class="slot-chapter-title">不同路径的对比</span>
+      <span class="slot-chapter-desc">PG. 50-78<br>9 FIGURES</span>
+    </div>
+    <div class="out-row">
+      <span class="num">04</span>
+      <span class="slot-chapter-title">未来十年的判断</span>
+      <span class="slot-chapter-desc">PG. 80-110<br>13 FIGURES</span>
+    </div>
+    <div class="out-row">
+      <span class="num">05</span>
+      <span class="slot-chapter-title">致谢与方法论</span>
+      <span class="slot-chapter-desc">PG. 112-128</span>
+    </div>
+  </div>
+</div>
+
+<!-- OUT-B · Grid index (跨页 grid 索引) -->
+<div class="nav-label">OUT-B · Grid Index · 跨页 2 列编号卡片(适合更多章节)</div>
+<div class="slide variant-out-b-editorial" style="--rows: 6; --row-count: 3;">
+  <div class="outb-pad">
+    <div class="outb-header">
+      <div>
+        <div class="slot-eyebrow">— SECTIONS · 章节索引</div>
+        <h2 class="slot-title">六个<em>章节</em>。</h2>
+      </div>
+      <div class="outb-meta">
+        ISSUE №04<br>
+        128 PAGES<br>
+        42 FIGURES
+      </div>
+    </div>
+    <div class="outb-grid">
+      <div class="outb-card">
+        <span class="num">01</span>
+        <div class="body">
+          <h4 class="slot-chapter-title">现状 — 出口数据全景</h4>
+          <span class="meta">PG. 04-22 · 8 FIGURES</span>
+        </div>
+      </div>
+      <div class="outb-card">
+        <span class="num">02</span>
+        <div class="body">
+          <h4 class="slot-chapter-title">拐点的三个信号</h4>
+          <span class="meta">PG. 24-48 · 12 FIGURES</span>
+        </div>
+      </div>
+      <div class="outb-card">
+        <span class="num">03</span>
+        <div class="body">
+          <h4 class="slot-chapter-title">不同路径的对比</h4>
+          <span class="meta">PG. 50-78 · 9 FIGURES</span>
+        </div>
+      </div>
+      <div class="outb-card">
+        <span class="num">04</span>
+        <div class="body">
+          <h4 class="slot-chapter-title">未来十年的判断</h4>
+          <span class="meta">PG. 80-110 · 13 FIGURES</span>
+        </div>
+      </div>
+      <div class="outb-card">
+        <span class="num">05</span>
+        <div class="body">
+          <h4 class="slot-chapter-title">致谢与方法论</h4>
+          <span class="meta">PG. 112-126</span>
+        </div>
+      </div>
+      <div class="outb-card">
+        <span class="num">06</span>
+        <div class="body">
+          <h4 class="slot-chapter-title">附录与数据源</h4>
+          <span class="meta">PG. 128 · APPENDIX</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 4 · CLIMAX · 3 Variants (CLX-A · CLX-Q · CLX-X)
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 4 · Climax · 高潮页 · 3 of 4 · (CLX-A new layout + CLX-Q/X EDITORIAL-ONLY)</div>
+  <div class="section-header-line"></div>
+</div>
+
+<!-- CLX-A · Ceremonial spread (居中跨页, R2 实装) -->
+<div class="nav-label">CLX-A · Ceremonial Spread · 杂志跨页(居中仪式感)</div>
+<div class="slide variant-clx-a-editorial">
+  <div class="clx-pad">
+    <div class="clx-top">
+      <span class="slot-eyebrow">— ISSUE №04 · MAR 2026</span>
+      <span>EDITORIAL · KEY FIGURE</span>
+      <span>PG. 28-29 · SPREAD</span>
+    </div>
+    <div class="clx-center">
+      <div class="slot-value">175<span class="slot-unit">万</span></div>
+      <div class="clx-divider"></div>
+      <p class="slot-caption">中国 NEV 出海规模<em>拐点</em>已至 — 这是 2025 年最重要的产业<em>事实</em>。</p>
+    </div>
+    <div class="clx-bottom">
+      <span>SOURCE · CHINA AUTO INDUSTRY ASSOC.</span>
+      <div class="data-row">
+        <div class="item"><span class="label">YOY</span><span class="val">+78%</span></div>
+        <div class="item"><span class="label">SHARE</span><span class="val">67%</span></div>
+        <div class="item"><span class="label">UNITS</span><span class="val">175M</span></div>
+      </div>
+      <span>CHAPTER 02 / 06</span>
+    </div>
+  </div>
+</div>
+
+<!-- CLX-Q · Number ↔ Pull-quote dialogue (EDITORIAL ONLY) -->
+<div class="nav-label">CLX-Q · Number ↔ Pull-quote · 数字与引语对话(Editorial 独有)</div>
+<div class="slide variant-clx-q-editorial">
+  <div class="clxq-grid">
+    <div class="clxq-left">
+      <div class="clxq-top">— THE DATA POINT · 2024</div>
+      <span class="slot-value">175<span class="slot-unit">万</span></span>
+      <div class="clxq-rule"></div>
+      <div class="clxq-left-bottom">
+        <span>FIG. 02</span>
+        <span>CHAPTER 02</span>
+        <span>PG. 28</span>
+      </div>
+    </div>
+    <div class="clxq-right">
+      <span class="clxq-eyebrow">— PULL QUOTE</span>
+      <div class="clxq-quote-mark">"</div>
+      <p class="slot-pull-quote">中国 NEV 出海规模拐点已至 — 这是 2025 年最重要的<em>产业事实</em>。</p>
+      <div class="clxq-attribution">— EDITORIAL №04 · 2026</div>
+      <div class="clxq-side-data">
+        <span>YOY GROWTH</span>
+        <span class="v">+78%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLX-X · Claim → Evidence stacked (EDITORIAL ONLY) -->
+<div class="nav-label">CLX-X · Claim → Evidence · 论点→证据上下分割(Editorial 独有)</div>
+<div class="slide variant-clx-x-editorial">
+  <div class="clxx-grid">
+    <div class="clxx-top">
+      <div class="clxx-eyebrow">— THE CLAIM · 论点</div>
+      <h2 class="slot-claim">中国 NEV 出海规模<em>拐点已至</em> — 这是 2025 年最重要的产业<em>事实</em>。</h2>
+      <div class="clxx-top-meta">
+        <span>EDITORIAL №04 · CHAPTER 02</span>
+        <span>FIG. 02</span>
+      </div>
+    </div>
+    <div class="clxx-bottom">
+      <div class="clxx-num-row">
+        <span class="slot-value">175<span class="slot-unit">万</span></span>
+      </div>
+      <div class="clxx-data-strip">
+        <div class="item">
+          <span class="label">2024 EXPORT</span>
+          <span class="val">175<span class="em">万</span></span>
+        </div>
+        <div class="item">
+          <span class="label">YOY GROWTH</span>
+          <span class="val">+78<span class="em">%</span></span>
+        </div>
+        <div class="item">
+          <span class="label">MARKET SHARE</span>
+          <span class="val">67<span class="em">%</span></span>
+        </div>
+      </div>
+      <div class="clxx-bottom-chrome">SOURCE · CAIA · PG. 28</div>
+    </div>
+  </div>
+</div>
+
+<!-- CLX-B · Number + expanded paragraph (数字+解释段落) -->
+<div class="nav-label">CLX-B · Number + Explanation · 数字+解释段落(数字左,文字右)</div>
+<div class="slide variant-clx-b-editorial">
+  <div class="clxb-pad">
+    <div class="clxb-top">
+      <span class="slot-eyebrow">— FIG. 04 · MARKET SHARE</span>
+      <span>SOURCE · INTERNAL ANALYSIS · 2024</span>
+    </div>
+    <div class="clxb-body">
+      <div class="clxb-num-block">
+        <div class="slot-value">40.9<span class="slot-unit">%</span></div>
+        <div class="slot-label">— MARKET SHARE · Q4 2024</div>
+      </div>
+      <div class="clxb-text-block">
+        <h3 class="slot-headline">市场占有率<em>过去 12 个月</em>增长 12.3 个百分点。</h3>
+        <p class="slot-description">这个增长速度比我们最乐观的预测还要高出 40%。在全球新能源汽车市场,这是过去十年罕见的"复合扩张"——即同时实现市场份额翻倍和单车均价提升。</p>
+      </div>
+    </div>
+    <div class="clxb-bottom">
+      <span>CHAPTER 02 · PG. 36</span>
+      <span class="dev-tag">CLX-B · EDITORIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- CLX-C · Number + trend line (数字 + 折线趋势) -->
+<div class="nav-label">CLX-C · Number + Trend · 数字 + 折线趋势</div>
+<div class="slide variant-clx-c-editorial">
+  <div class="clxc-pad">
+    <div class="clxc-top">
+      <span class="slot-eyebrow">— FIG. 05 · YOY TREND</span>
+      <span>SOURCE · CHINA AUTO INDUSTRY ASSOC.</span>
+    </div>
+    <div class="clxc-body">
+      <div class="clxc-num-block">
+        <div class="slot-value">+78<span class="slot-unit">%</span></div>
+        <div class="slot-label">— YOY GROWTH · 2024</div>
+        <p class="slot-trend">连续四年加速 — 增速本身,也在增速。2021 年同比 +18%,2024 年同比 +78%。</p>
+      </div>
+      <div>
+        <div class="clxc-chart">
+          <svg viewBox="0 0 600 280" preserveAspectRatio="none">
+            <polyline points="0,250 150,200 300,140 450,80 600,20"
+                      fill="none" stroke="var(--color-accent)" stroke-width="3" />
+            <circle cx="0" cy="250" r="6" fill="var(--color-text-primary)" opacity="0.5" />
+            <circle cx="150" cy="200" r="6" fill="var(--color-text-primary)" opacity="0.5" />
+            <circle cx="300" cy="140" r="6" fill="var(--color-text-primary)" opacity="0.5" />
+            <circle cx="450" cy="80" r="6" fill="var(--color-text-primary)" opacity="0.5" />
+            <circle cx="600" cy="20" r="9" fill="var(--color-accent)" />
+          </svg>
+        </div>
+        <div class="clxc-chart-labels">
+          <span>2020</span>
+          <span>2021</span>
+          <span>2022</span>
+          <span>2023</span>
+          <span class="active">2024</span>
+        </div>
+      </div>
+    </div>
+    <div class="clxc-bottom">
+      <span>CHAPTER 02 · PG. 38</span>
+      <span class="dev-tag">CLX-C · EDITORIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- CLX-D · Before/After dual number (双数字对比) -->
+<div class="nav-label">CLX-D · Before/After · 双数字对比(对比张力)</div>
+<div class="slide variant-clx-d-editorial">
+  <div class="clxd-pad">
+    <div class="clxd-top">
+      <span class="slot-eyebrow">— FIG. 06 · BEFORE / AFTER</span>
+      <span>2020 → 2024 · 5 YEAR DELTA</span>
+    </div>
+    <div class="clxd-body">
+      <div class="clxd-side before">
+        <span class="tag">— 2020</span>
+        <div class="slot-value-before">22<span class="slot-unit">万</span></div>
+        <p class="slot-label">出海规模 / 政策驱动时代</p>
+      </div>
+      <div class="clxd-arrow">
+        <span class="arrow-mark">→</span>
+        <span class="delta">×7.9</span>
+        <span class="delta-label">— 5 YEAR · GROWTH</span>
+      </div>
+      <div class="clxd-side after">
+        <span class="tag">— 2024 ★</span>
+        <div class="slot-value-after">175<span class="slot-unit">万</span></div>
+        <p class="slot-label">出海规模 / 价值拐点时代</p>
+      </div>
+    </div>
+    <div class="clxd-bottom">
+      <span>SOURCE · CAIA · 2024</span>
+      <span class="dev-tag">CLX-D · EDITORIAL · PG. 40</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 5 · SUPPORT · 1 Variant (S-A)
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 5 · Support · 支持页 · 1 of 4</div>
+  <div class="section-header-line"></div>
+</div>
+
+<!-- S-A · Magazine data feature (α 重构) -->
+<div class="nav-label">S-A · Magazine Data Feature · 大字论断 + 图表占满下 (α 重构)</div>
+<div class="slide variant-s-a-editorial">
+  <div class="s-edge-label">— FIG. 03 · YEARLY GROWTH ↑</div>
+  <div class="s-body">
+    <div class="s-eyebrow-row">
+      <span class="slot-eyebrow">— THE EVIDENCE · 证据 03</span>
+      <span class="slot-page-num">PG. 32 · CHAPTER 02</span>
+    </div>
+    <h3 class="slot-title">连续四年<em>翻倍</em>增长 — 数据指向同一个事实。</h3>
+    <div class="s-figure-row">
+      <div class="slot-chart">
+        <div class="chart-mock">
+          <div class="bar" style="height: 18%"></div>
+          <div class="bar" style="height: 32%"></div>
+          <div class="bar" style="height: 55%"></div>
+          <div class="bar active" style="height: 88%"></div>
+        </div>
+        <div class="chart-labels">
+          <span>2021</span>
+          <span>2022</span>
+          <span>2023</span>
+          <span class="active">2024</span>
+        </div>
+        <div class="slot-chart-caption">
+          DATA · CHINA AUTO INDUSTRY · 单位 / 万辆 · 95% CI
+        </div>
+      </div>
+      <div class="slot-points">
+        <div class="point">
+          <span class="num">01 / Market</span>
+          <span class="text"><strong>从政策驱动到市场驱动</strong> — 2024 自然销量首次超过政策补贴销量。</span>
+        </div>
+        <div class="point">
+          <span class="num">02 / Value</span>
+          <span class="text"><strong>从规模到价值</strong> — 出口均价上升 23%,品牌溢价开始独立于本土。</span>
+        </div>
+        <div class="point">
+          <span class="num">03 / Geography</span>
+          <span class="text"><strong>从单市场到多市场</strong> — 欧/东南亚/中东同步增长,集中度下降。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="s-edge-label right dev-tag">S-A · EDITORIAL ↓</div>
+</div>
+
+<!-- S-B · Three-column points (三栏要点+数据) -->
+<div class="nav-label">S-B · Three-column Points · 三栏纯论点(无图表,编辑感)</div>
+<div class="slide variant-s-b-editorial">
+  <div class="sb-pad">
+    <div class="sb-header">
+      <div class="slot-eyebrow">— THE EVIDENCE · 三个支撑论据</div>
+      <h3 class="slot-title">为什么<em>拐点</em>不是偶然 — 三个结构性原因。</h3>
+    </div>
+    <div class="sb-points">
+      <div class="col">
+        <span class="col-num">01</span>
+        <span class="col-tag">— SUPPLY CHAIN · 供应链</span>
+        <h4 class="slot-point-title">本土供应链<br>已全球领先</h4>
+        <p class="slot-point-desc">动力电池 / 电驱 / 电控三大件 — 中国厂商占全球 70% 以上产能。这不是政策能改变的事实。</p>
+        <div class="slot-point-data">70<span class="unit">%+</span></div>
+      </div>
+      <div class="col">
+        <span class="col-num">02</span>
+        <span class="col-tag">— BRAND VALUE · 品牌</span>
+        <h4 class="slot-point-title">品牌溢价首次<br>独立于本土</h4>
+        <p class="slot-point-desc">海外单车均价突破国内 23%。出海不再是处理本土过剩,而是品牌叙事独立。</p>
+        <div class="slot-point-data">+23<span class="unit">%</span></div>
+      </div>
+      <div class="col">
+        <span class="col-num">03</span>
+        <span class="col-tag">— GEOGRAPHY · 地理</span>
+        <h4 class="slot-point-title">市场分散到<br>四大区</h4>
+        <p class="slot-point-desc">欧洲 / 东南亚 / 中东 / 拉美 同步增长,单一市场集中度从 60% 降到 28%。</p>
+        <div class="slot-point-data">4<span class="unit">大区</span></div>
+      </div>
+    </div>
+    <div class="sb-bottom">
+      <span>CHAPTER 02 · PG. 40</span>
+      <span class="dev-tag">S-B · EDITORIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- S-C · Single full chart + caption (单图表 + 大字 caption) -->
+<div class="nav-label">S-C · Single Chart · 单图表满版 + 大字 caption</div>
+<div class="slide variant-s-c-editorial">
+  <div class="sc-pad">
+    <div class="sc-header">
+      <div class="slot-eyebrow">— FIG. 07 · EXPORT BY REGION</div>
+      <h3 class="slot-title">欧洲依然是最大单一<em>市场</em>。</h3>
+    </div>
+    <div class="sc-chart">
+      <div class="chart-mock">
+        <div class="bar active" style="height: 100%"><span class="bar-val">76万</span></div>
+        <div class="bar" style="height: 65%"><span class="bar-val">48万</span></div>
+        <div class="bar" style="height: 42%"><span class="bar-val">32万</span></div>
+        <div class="bar" style="height: 28%"><span class="bar-val">19万</span></div>
+        <div class="bar" style="height: 14%"><span class="bar-val">10万</span></div>
+      </div>
+      <div class="chart-labels">
+        <span class="active">欧洲</span>
+        <span>东南亚</span>
+        <span>中东</span>
+        <span>拉美</span>
+        <span>非洲</span>
+      </div>
+      <p class="chart-caption">尽管多市场化加速,欧洲仍占 2024 出口总量的 43%—— 但集中度已从 2020 年的 68% 显著下降。</p>
+    </div>
+    <div class="sc-bottom">
+      <span>SOURCE · GLOBAL TRADE INSIGHTS · 2024</span>
+      <span class="dev-tag">S-C · EDITORIAL · PG. 42</span>
+    </div>
+  </div>
+</div>
+
+<!-- S-F · Three quoted sources (三联引用 + 来源条) -->
+<div class="nav-label">S-F · Three Sources · 三联引用 + 来源说明(论据)</div>
+<div class="slide variant-s-f-editorial">
+  <div class="sf-pad">
+    <div class="sf-header">
+      <div class="slot-eyebrow">— THE SOURCES · 三方独立佐证</div>
+      <h3 class="slot-title">不是<em>单一</em>观点 — 三方独立佐证。</h3>
+    </div>
+    <div class="sf-quotes">
+      <div class="col">
+        <div class="qmark">"</div>
+        <p class="quote-text">中国 NEV 的<em>规模</em>已经不可逆转,接下来是质量竞争。</p>
+        <div class="source">
+          <strong>BloombergNEF</strong><br>
+          ELECTRIC VEHICLE OUTLOOK<br>
+          2024 ANNUAL REPORT
+        </div>
+      </div>
+      <div class="col">
+        <div class="qmark">"</div>
+        <p class="quote-text">出海第三阶段的关键 — <em>本地化</em>建厂的速度决定终局。</p>
+        <div class="source">
+          <strong>McKinsey & Company</strong><br>
+          CHINA AUTO 2030<br>
+          OUTLOOK · 2024.Q4
+        </div>
+      </div>
+      <div class="col">
+        <div class="qmark">"</div>
+        <p class="quote-text">价格不再是中国车企的<em>唯一</em>优势 — 这是叙事转折。</p>
+        <div class="source">
+          <strong>Financial Times</strong><br>
+          OPINION COLUMN<br>
+          2025.01 · 长读专题
+        </div>
+      </div>
+    </div>
+    <div class="sf-bottom">
+      <span>CHAPTER 02 · 三方独立来源</span>
+      <span class="dev-tag">S-F · EDITORIAL · PG. 44</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 6 · COMPARISON · 1 Variant (CMP-C)
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 6 · Comparison · 对比页 · 1 of 3</div>
+  <div class="section-header-line"></div>
+</div>
+
+<!-- CMP-C · Magazine diptych (α 重构 · 双联色块拼贴) -->
+<div class="nav-label">CMP-C · Magazine Diptych · 双联色块拼贴 + 巨型对比关键词 (α 重构)</div>
+<div class="slide variant-cmp-c-editorial">
+  <div class="cmp-side before">
+    <div class="cmp-tag">— BEFORE · 2020-2022</div>
+    <h4 class="cmp-keyword"><em>规模</em></h4>
+    <p class="cmp-era">规模扩张时代</p>
+    <div class="cmp-points">
+      <div class="point"><span class="arrow">→</span><span>低价竞争 + 政策补贴</span></div>
+      <div class="point"><span class="arrow">→</span><span>欧洲 60% 集中度</span></div>
+      <div class="point"><span class="arrow">→</span><span>品牌依赖本土</span></div>
+    </div>
+    <div class="cmp-meta">CHAPTER 03 · PG. 56</div>
+  </div>
+  <div class="cmp-side after">
+    <div class="cmp-tag">— AFTER · 2023-2025</div>
+    <h4 class="cmp-keyword"><em>价值</em></h4>
+    <p class="cmp-era">价值深耕时代</p>
+    <div class="cmp-points">
+      <div class="point"><span class="arrow">→</span><span>溢价提升 +23%</span></div>
+      <div class="point"><span class="arrow">→</span><span>市场分散到 4 大区</span></div>
+      <div class="point"><span class="arrow">→</span><span>本地品牌独立运营</span></div>
+    </div>
+    <div class="cmp-meta dev-tag">CMP-C · EDITORIAL</div>
+  </div>
+</div>
+
+<!-- CMP-A · Primary vs Secondary (主次对比 主大次小) -->
+<div class="nav-label">CMP-A · Primary vs Secondary · 主次对比(主体红块大, 对比项小卡)</div>
+<div class="slide variant-cmp-a-editorial">
+  <div class="cmpa-pad">
+    <div class="cmpa-header">
+      <div class="slot-eyebrow">— FIG. 09 · COMPETITIVE COMPARISON</div>
+      <h3 class="slot-title">中国品牌 vs <em>德系传统巨头</em>。</h3>
+    </div>
+    <div class="cmpa-body">
+      <div class="cmpa-primary">
+        <div>
+          <span class="tag">— PRIMARY · 我方</span>
+          <h4 class="slot-primary-name">中国 NEV</h4>
+        </div>
+        <p class="slot-primary-desc">175 万出口规模 / 70% 全球电池产能 / 平均车价 ¥18 万 — 用十年时间从政策驱动到市场驱动,出海规模超过本土传统强国。</p>
+        <div class="data-row">
+          <div class="item"><span class="label">EXPORT</span><span class="val">175万</span></div>
+          <div class="item"><span class="label">GROWTH</span><span class="val">+78%</span></div>
+          <div class="item"><span class="label">SHARE</span><span class="val">67%</span></div>
+        </div>
+      </div>
+      <div class="cmpa-secondary">
+        <div>
+          <span class="tag">— SECONDARY · 对手</span>
+          <h4 class="slot-secondary-name">德系巨头</h4>
+        </div>
+        <p class="slot-secondary-desc">120 万出口规模 / 平均车价 ¥35 万 / 但年增速仅 +12%,品牌溢价已封顶。</p>
+        <div class="data-row">
+          <div>EXPORT · 120万</div>
+          <div>GROWTH · +12%</div>
+          <div>SHARE · 22%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CMP-D · Data table comparison (数据表多维对比) -->
+<div class="nav-label">CMP-D · Data Table · 数据表对比(多维度多对手 + 我方高亮)</div>
+<div class="slide variant-cmp-d-editorial" style="--rows: 4;">
+  <div class="cmpd-pad">
+    <div class="cmpd-header">
+      <div class="slot-eyebrow">— FIG. 10 · MULTI-METRIC BENCHMARK</div>
+      <h3 class="slot-title">出海四强 · 四维度<em>对比</em>。</h3>
+    </div>
+    <div class="cmpd-table">
+      <div class="cell header">指标 / METRIC</div>
+      <div class="cell header featured">中国 NEV</div>
+      <div class="cell header">德系巨头</div>
+      <div class="cell header">日系</div>
+      <div class="cell header">美系</div>
+
+      <div class="cell row-label">出口规模</div>
+      <div class="cell value featured">175<span style="font-size:0.6em;color:var(--color-text-primary);font-style:italic;">万</span></div>
+      <div class="cell value">120万</div>
+      <div class="cell value">98万</div>
+      <div class="cell value">62万</div>
+
+      <div class="cell row-label">年增速</div>
+      <div class="cell value featured">+78%</div>
+      <div class="cell value">+12%</div>
+      <div class="cell value">+5%</div>
+      <div class="cell value">+28%</div>
+
+      <div class="cell row-label">均价 / RMB</div>
+      <div class="cell value featured">¥18万</div>
+      <div class="cell value">¥35万</div>
+      <div class="cell value">¥22万</div>
+      <div class="cell value">¥42万</div>
+
+      <div class="cell row-label">本地化率</div>
+      <div class="cell value featured">42%</div>
+      <div class="cell value">88%</div>
+      <div class="cell value">76%</div>
+      <div class="cell value">35%</div>
+    </div>
+    <div class="cmpd-bottom">
+      <span>SOURCE · GLOBAL AUTO INSIGHTS · 2024</span>
+      <span class="dev-tag">CMP-D · EDITORIAL · PG. 60</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 7 · INSIGHT · 1 Variant (INS-A)
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 7 · Insight · 洞察页 · 1 of 4</div>
+  <div class="section-header-line"></div>
+</div>
+
+<!-- INS-A · Pure quote -->
+<div class="nav-label">INS-A · Pure Quote · 单句金句(满版)</div>
+<div class="slide variant-ins-a-editorial">
+  <div class="ins-pad">
+    <div class="ins-top">
+      <span class="slot-eyebrow">— THE INSIGHT</span>
+      <span>CHAPTER 04 · PG. 82</span>
+    </div>
+    <div class="ins-center">
+      <div class="ins-quote-mark">"</div>
+      <p class="slot-quote">规模拐点不是<em>终点</em>,<br>而是叙事的<em>开始</em>。</p>
+    </div>
+    <div class="ins-bottom">
+      <span class="slot-attribution">— EDITORIAL · 2026</span>
+      <span>FIG. 14</span>
+    </div>
+  </div>
+</div>
+
+<!-- INS-B · Quote + Author Panel (引语+人物署名卡) -->
+<div class="nav-label">INS-B · Quote + Author · 引语主区 + 右侧人物署名卡</div>
+<div class="slide variant-ins-b-editorial">
+  <div class="insb-pad">
+    <div class="insb-quote-col">
+      <span class="insb-eyebrow">— FROM THE FIELD · 现场访谈</span>
+      <div class="insb-quote-mark">"</div>
+      <p class="slot-quote">我们用十年时间证明了一件事 — 中国电动车的故事,可以<em>不靠价格</em>来讲。</p>
+      <div class="insb-byline">— EDITORIAL №04 · CHAPTER 03 · INTERVIEW 02</div>
+    </div>
+    <div class="insb-author-col">
+      <span class="author-tag">— SPEAKER · 受访者</span>
+      <h4 class="slot-author-name">王传福</h4>
+      <p class="slot-author-title">比亚迪集团董事长<br>访谈于深圳总部 · 2025.03</p>
+      <div class="author-meta">
+        <strong>YEARS</strong> 30+ IN INDUSTRY<br>
+        <strong>FOUNDED</strong> 1995<br>
+        <span class="dev-tag">INS-B · EDITORIAL · PG. 68</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INS-C · Number-anchored insight (数字 + 引语) -->
+<div class="nav-label">INS-C · Number-anchored · 巨型数字锚 + 右侧引语小卡</div>
+<div class="slide variant-ins-c-editorial">
+  <div class="insc-pad">
+    <div class="insc-num-side">
+      <span class="insc-tag">— THE NUMBER · 数字</span>
+      <div class="insc-num">3.5<span class="unit">×</span></div>
+      <p class="insc-num-label">中国 NEV 出海规模增速 / 全球平均的 3.5 倍</p>
+    </div>
+    <div class="insc-quote-side">
+      <span class="insc-eyebrow">— THE INSIGHT · 洞察</span>
+      <p class="slot-quote">在汽车出海这件事上,我们已经从"<em>跟随者</em>"变成了"<em>定义者</em>" — 这是过去 30 年没有过的姿态。</p>
+      <div class="slot-attribution">— EDITORIAL №04 · CHAPTER 04 · PG. 88</div>
+    </div>
+  </div>
+</div>
+
+<!-- INS-D · Two quotes diptych (双引语并列) -->
+<div class="nav-label">INS-D · Two Quotes · 双引语并列(对话感)</div>
+<div class="slide variant-ins-d-editorial">
+  <div class="insd-pad">
+    <div class="insd-header">
+      <span class="slot-eyebrow">— THE DIALOGUE · 对话</span>
+      <span>CHAPTER 04 · INTERVIEWS</span>
+    </div>
+    <div class="insd-body">
+      <div class="insd-col">
+        <span class="insd-col-tag">— SPEAKER 01 · 行业内</span>
+        <div class="insd-quote-mark">"</div>
+        <p class="slot-quote">中国车企的优势不在<em>价格</em>,而在迭代速度 — 我们用 12 个月做完一代,德国人需要 36 个月。</p>
+        <div class="slot-attribution">
+          <strong>李斌</strong> · 蔚来汽车 CEO<br>访谈于上海 · 2025.02
+        </div>
+      </div>
+      <div class="insd-col">
+        <span class="insd-col-tag">— SPEAKER 02 · 行业外</span>
+        <div class="insd-quote-mark">"</div>
+        <p class="slot-quote">真正可怕的不是<em>价格</em>,而是中国品牌开始拥有<em>故事</em> — 这是 30 年来欧美没遇到过的对手。</p>
+        <div class="slot-attribution">
+          <strong>Herbert Diess</strong> · 前大众 CEO<br>访谈于慕尼黑 · 2025.04
+        </div>
+      </div>
+    </div>
+    <div class="insd-bottom">
+      <span>EDITORIAL №04 · DUAL INTERVIEW</span>
+      <span class="dev-tag">INS-D · EDITORIAL · PG. 90</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 8 · GALLERY · 1 Variant (H1)
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 8 · Gallery · 图片页 · 1 of 10</div>
+  <div class="section-header-line"></div>
+</div>
+
+<!-- H1 · Magazine full-bleed feature (α 重构) -->
+<div class="nav-label">H1 · Full-bleed Feature · 全幅图 + 大字 caption 覆盖 (α 重构)</div>
+<div class="slide variant-h1-editorial">
+  <div class="h1-image"></div>
+  <div class="h1-image-grain"></div>
+  <div class="h1-top-bar">
+    <span>— PORTRAIT · CHAPTER 03 · ON LOCATION</span>
+    <span class="right">EDITORIAL №04 · FIG. 11</span>
+  </div>
+  <div class="h1-photo-credit">— PHOTO BY EDITORIAL DESK / OSLO 2024</div>
+  <div class="h1-caption-block">
+    <span class="slot-eyebrow">— THE PORTRAIT · 现场</span>
+    <h3 class="slot-title">本地化<em>不再</em>是<br>口号。</h3>
+    <div class="h1-caption-row">
+      <p class="slot-caption">挪威 Oslo 港 · 中国新能源车的本地化生产工厂已在 2024 年正式投产,单月产能 8000 辆。这是规模出海第一次真正在本地生根。</p>
+      <div class="slot-meta">
+        OSLO · 2024<br>
+        FIG. 11<br>
+        <span class="dev-tag">H1 · EDITORIAL</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- H2 · Diptych (双图对照) -->
+<div class="nav-label">H2 · Diptych · 双图对照(左旧/右新)</div>
+<div class="slide variant-h2-editorial">
+  <div class="h2-pad">
+    <div class="h2-top">
+      <span class="slot-eyebrow">— DIPTYCH · 五年前 vs 现在</span>
+      <span>EDITORIAL №04 · FIG. 12</span>
+    </div>
+    <div class="h2-grid">
+      <div class="gal-pic"><span class="pic-caption">2019 · OEM 代工厂</span></div>
+      <div class="gal-pic warm"><span class="pic-caption">2024 · 本地化品牌店</span></div>
+    </div>
+    <div class="h2-bottom">
+      <div class="h2-caption">
+        <span class="tag">— LEFT · 2019</span>
+        <span class="text">汉堡港码头的传统装船作业,代工出货为主,品牌不可见。</span>
+      </div>
+      <div class="h2-caption">
+        <span class="tag">— RIGHT · 2024</span>
+        <span class="text">柏林市中心比亚迪旗舰店开业,展车与试驾,独立品牌叙事。</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- H3 · Three image grid (三图网格 主+二) -->
+<div class="nav-label">H3 · Three Image Grid · 三图网格(主图大 + 两个副图)</div>
+<div class="slide variant-h3-editorial">
+  <div class="h3-pad">
+    <div class="h3-top">
+      <span class="slot-eyebrow">— PORTFOLIO · 三市场扫描</span>
+      <span>EDITORIAL №04 · FIG. 13</span>
+    </div>
+    <div class="h3-grid">
+      <div class="gal-pic main warm"><span class="pic-caption">挪威 Oslo · 旗舰店</span></div>
+      <div class="gal-pic cool"><span class="pic-caption">泰国曼谷 · 4S 网络</span></div>
+      <div class="gal-pic green"><span class="pic-caption">巴西圣保罗 · 装配线</span></div>
+    </div>
+    <div class="h3-bottom">
+      <p class="lede">三个市场,三种本地化路径 — 欧洲做品牌、东南亚做渠道、拉美做生产。</p>
+      <span class="dev-tag">H3 · EDITORIAL · PG. 70</span>
+    </div>
+  </div>
+</div>
+
+<!-- H4 · Four image grid (四图网格 2x2 等大) -->
+<div class="nav-label">H4 · Four Image Grid · 四图网格 2x2 等大</div>
+<div class="slide variant-h4-editorial">
+  <div class="h4-pad">
+    <div class="h4-top">
+      <span class="slot-eyebrow">— MOSAIC · 四大区印象</span>
+      <span>EDITORIAL №04 · FIG. 14</span>
+    </div>
+    <div class="h4-grid">
+      <div class="gal-pic"><span class="pic-caption">EU · Oslo</span></div>
+      <div class="gal-pic warm"><span class="pic-caption">SEA · Bangkok</span></div>
+      <div class="gal-pic cool"><span class="pic-caption">MEA · Dubai</span></div>
+      <div class="gal-pic green"><span class="pic-caption">LATAM · São Paulo</span></div>
+    </div>
+    <div class="h4-bottom">
+      <span>四张照片 · 来自全球 4 个时区 · 拍摄于 2024.Q4</span>
+      <span class="dev-tag">H4 · EDITORIAL · PG. 72</span>
+    </div>
+  </div>
+</div>
+
+<!-- H5 · Five image asymmetric (五图非对称) -->
+<div class="nav-label">H5 · Five Image Asymmetric · 五图非对称(1 主 + 4 副)</div>
+<div class="slide variant-h5-editorial">
+  <div class="h5-pad">
+    <div class="h5-top">
+      <span class="slot-eyebrow">— FEATURE GALLERY · 现场扫描</span>
+      <span>EDITORIAL №04 · FIG. 15</span>
+    </div>
+    <div class="h5-grid">
+      <div class="gal-pic main warm"><span class="pic-caption">柏林 · 旗舰店开业</span></div>
+      <div class="gal-pic"><span class="pic-caption">交付车间</span></div>
+      <div class="gal-pic cool"><span class="pic-caption">本地团队</span></div>
+      <div class="gal-pic green"><span class="pic-caption">用户接待</span></div>
+      <div class="gal-pic"><span class="pic-caption">展车细节</span></div>
+    </div>
+    <div class="h5-bottom">
+      <span>柏林 · 2024.10 · 现场记录</span>
+      <span class="dev-tag">H5 · EDITORIAL · PG. 74</span>
+    </div>
+  </div>
+</div>
+
+<!-- GC-A · Contact sheet 3x2 (联系单 6 图) -->
+<div class="nav-label">GC-A · Contact Sheet · 联系单 6 图 (3x2)</div>
+<div class="slide variant-gc-a-editorial">
+  <div class="gca-pad">
+    <div class="gca-top">
+      <span class="slot-eyebrow">— CONTACT SHEET · 联系单</span>
+      <span>FRAME 01 — 06 · CHAPTER 03</span>
+    </div>
+    <div class="gca-grid">
+      <div class="gal-pic"><span class="pic-caption">01 · ARRIVAL</span></div>
+      <div class="gal-pic warm"><span class="pic-caption">02 · ASSEMBLY</span></div>
+      <div class="gal-pic cool"><span class="pic-caption">03 · BRAND</span></div>
+      <div class="gal-pic green"><span class="pic-caption">04 · DEALER</span></div>
+      <div class="gal-pic"><span class="pic-caption">05 · DELIVERY</span></div>
+      <div class="gal-pic warm"><span class="pic-caption">06 · CUSTOMER</span></div>
+    </div>
+    <div class="gca-bottom">
+      <span>EDITORIAL №04 · ROLL 03</span>
+      <span class="dev-tag">GC-A · 6 FRAMES · PG. 76</span>
+    </div>
+  </div>
+</div>
+
+<!-- GC-B · Picture + numbered captions (图+编号说明列) -->
+<div class="nav-label">GC-B · Picture + Captions · 图 + 编号说明列</div>
+<div class="slide variant-gc-b-editorial" style="--rows: 4;">
+  <div class="gcb-pad">
+    <div class="gcb-left">
+      <div class="gal-pic warm"><span class="pic-caption">柏林旗舰店 · 2024.10</span></div>
+      <div class="pic-meta">FIG. 16 · BERLIN · PHOTO BY EDITORIAL DESK</div>
+    </div>
+    <div class="gcb-right">
+      <span class="gcb-eyebrow">— PICTURE STORY · 图说</span>
+      <h3 class="gcb-title">本地化叙事的<em>三个细节</em>。</h3>
+      <div class="gcb-cap">
+        <span class="num">01</span>
+        <span class="body">店内陈设以本地艺术家作品为主,而非把中国元素简单复制。</span>
+      </div>
+      <div class="gcb-cap">
+        <span class="num">02</span>
+        <span class="body">销售顾问全部本地招募,平均行业经验 8 年以上。</span>
+      </div>
+      <div class="gcb-cap">
+        <span class="num">03</span>
+        <span class="body">车辆配置专门为欧洲市场调整 — 不再是国内车型简单换标。</span>
+      </div>
+      <div class="gcb-cap">
+        <span class="num">04</span>
+        <span class="body">售后体系绕开中国总部,直接由本地团队管理。</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GC-C · Magazine spread (主+副条) -->
+<div class="nav-label">GC-C · Magazine Spread · 主图大 + 副图条(3 张)</div>
+<div class="slide variant-gc-c-editorial">
+  <div class="gcc-pad">
+    <div class="gcc-top">
+      <span class="slot-eyebrow">— SPREAD · 现场跨页</span>
+      <span>FEATURE PHOTO STORY · PG. 78-79</span>
+    </div>
+    <div class="gcc-grid">
+      <div class="gal-pic cool"><span class="pic-caption">主图 · 大众柏林总部 vs 比亚迪柏林旗舰</span></div>
+      <div class="gcc-sub">
+        <div class="gal-pic warm"><span class="pic-caption">细节 · 店内陈设</span></div>
+        <div class="gal-pic"><span class="pic-caption">细节 · 试驾区</span></div>
+        <div class="gal-pic green"><span class="pic-caption">细节 · 用户休息区</span></div>
+      </div>
+    </div>
+    <div class="gcc-bottom">
+      <span>BERLIN · 2024.10 · 4 PHOTOS</span>
+      <span class="dev-tag">GC-C · EDITORIAL · PG. 78</span>
+    </div>
+  </div>
+</div>
+
+<!-- GC-D · Dense contact sheet 4x2 -->
+<div class="nav-label">GC-D · Dense Contact Sheet · 8 图紧凑 (4x2)</div>
+<div class="slide variant-gc-d-editorial">
+  <div class="gcd-pad">
+    <div class="gcd-top">
+      <span class="slot-eyebrow">— PROOF SHEET · 8 张样片</span>
+      <span>EDITORIAL №04 · ROLL 04</span>
+    </div>
+    <div class="gcd-grid">
+      <div class="gal-pic"><span class="pic-caption">01</span></div>
+      <div class="gal-pic warm"><span class="pic-caption">02</span></div>
+      <div class="gal-pic cool"><span class="pic-caption">03</span></div>
+      <div class="gal-pic green"><span class="pic-caption">04</span></div>
+      <div class="gal-pic warm"><span class="pic-caption">05</span></div>
+      <div class="gal-pic"><span class="pic-caption">06</span></div>
+      <div class="gal-pic green"><span class="pic-caption">07</span></div>
+      <div class="gal-pic cool"><span class="pic-caption">08</span></div>
+    </div>
+    <div class="gcd-bottom">
+      <span>8 FRAMES · 4 LOCATIONS · 2024</span>
+      <span class="dev-tag">GC-D · EDITORIAL · PG. 80</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 9 · TIMELINE · 1 Variant (TL-A)
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 9 · Timeline · 时间轴 · 1 of 2</div>
+  <div class="section-header-line"></div>
+</div>
+
+<!-- TL-A · Horizontal base -->
+<div class="nav-label">TL-A · Horizontal · 横向基础时间轴</div>
+<div class="slide variant-tl-a-editorial" style="--cols: 4;">
+  <div class="tl-pad">
+    <div class="tl-header">
+      <div class="slot-eyebrow">— TIMELINE · 行业演进</div>
+      <h3 class="slot-title">十年<em>四个阶段</em>。</h3>
+    </div>
+    <div class="tl-axis">
+      <div class="tl-point">
+        <div class="slot-year">2015</div>
+        <div class="slot-event-title">政策启动</div>
+        <p class="slot-event-desc">补贴驱动 / 国内市场起步 / 比亚迪、宁德时代等供应链初步形成。</p>
+      </div>
+      <div class="tl-point">
+        <div class="slot-year">2019</div>
+        <div class="slot-event-title">规模化爆发</div>
+        <p class="slot-event-desc">特斯拉上海工厂 / 国内市场年销破百万 / 本土品牌进入海外测试期。</p>
+      </div>
+      <div class="tl-point">
+        <div class="slot-year">2022</div>
+        <div class="slot-event-title">出海起势</div>
+        <p class="slot-event-desc">欧洲市场首次过万 / 单车均价突破 / 国内品牌开始独立运营海外。</p>
+      </div>
+      <div class="tl-point">
+        <div class="slot-year">2024</div>
+        <div class="slot-event-title">价值拐点</div>
+        <p class="slot-event-desc">175 万出口 / +78% 增长 / 本地化生产正式落地 / 品牌溢价独立。</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index dev-tag">TL-A · EDITORIAL</div>
+</div>
+
+<!-- TL-B · Dual-axis timeline (上事件 + 下数据指标) -->
+<div class="nav-label">TL-B · Dual-axis · 双轴时间轴(上事件+轴+下数据)</div>
+<div class="slide variant-tl-b-editorial">
+  <div class="tlb-pad">
+    <div class="tlb-header">
+      <div class="slot-eyebrow">— TIMELINE · 行业演进 + 关键指标</div>
+      <h3 class="slot-title">十年 · <em>事件</em>与<em>数据</em>。</h3>
+    </div>
+    <div class="tlb-grid">
+      <div class="tlb-row-top">
+        <div class="event">
+          <span class="event-tag">EVENT</span>
+          <span class="event-title">政策启动</span>
+        </div>
+        <div class="event">
+          <span class="event-tag">EVENT</span>
+          <span class="event-title">特斯拉上海</span>
+        </div>
+        <div class="event">
+          <span class="event-tag">EVENT</span>
+          <span class="event-title">本土百万</span>
+        </div>
+        <div class="event">
+          <span class="event-tag">EVENT</span>
+          <span class="event-title">欧洲过万</span>
+        </div>
+        <div class="event">
+          <span class="event-tag">EVENT</span>
+          <span class="event-title">价值拐点</span>
+        </div>
+      </div>
+      <div class="tlb-axis">
+        <span class="year">2015</span>
+        <span class="year">2019</span>
+        <span class="year">2021</span>
+        <span class="year">2022</span>
+        <span class="year">2024</span>
+      </div>
+      <div class="tlb-row-bottom">
+        <div class="metric">
+          <span class="metric-label">EXPORT</span>
+          <span class="metric-val">3<span class="unit">万</span></span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">EXPORT</span>
+          <span class="metric-val">28<span class="unit">万</span></span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">EXPORT</span>
+          <span class="metric-val">52<span class="unit">万</span></span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">EXPORT</span>
+          <span class="metric-val">98<span class="unit">万</span></span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">EXPORT</span>
+          <span class="metric-val">175<span class="unit">万</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 10 · PROCESS · 1 Variant (PRC-A)
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 10 · Process · 流程页 · 1 of 2</div>
+  <div class="section-header-line"></div>
+</div>
+
+<!-- PRC-A · Linear flow -->
+<div class="nav-label">PRC-A · Linear Flow · 线性流程(3 步)</div>
+<div class="slide variant-prc-a-editorial" style="--cols: 3;">
+  <div class="prc-pad">
+    <div class="prc-header">
+      <div class="slot-eyebrow">— FRAMEWORK · 价值链路</div>
+      <h3 class="slot-title">从<em>出口</em>到<em>本地化</em>到<em>品牌</em>。</h3>
+    </div>
+    <div class="prc-flow">
+      <div class="prc-step">
+        <span class="step-num">STAGE 01</span>
+        <h4 class="slot-step-title"><em>出口</em>起步</h4>
+        <div class="step-big-num">01</div>
+        <p class="slot-step-desc">单一目的地、<strong>价格驱动</strong>。利润依赖本土补贴,品牌资产留在中国。</p>
+      </div>
+      <div class="prc-arrow">→</div>
+      <div class="prc-step">
+        <span class="step-num">STAGE 02</span>
+        <h4 class="slot-step-title"><em>本地化</em>生产</h4>
+        <div class="step-big-num">02</div>
+        <p class="slot-step-desc">多市场布局、<strong>独立运营</strong>。海外工厂落地,本地团队开始建立。</p>
+      </div>
+      <div class="prc-arrow">→</div>
+      <div class="prc-step">
+        <span class="step-num">STAGE 03</span>
+        <h4 class="slot-step-title"><em>品牌</em>深耕</h4>
+        <div class="step-big-num">03</div>
+        <p class="slot-step-desc"><strong>品牌溢价独立</strong>。完成从"中国出口"到"全球品牌"的认知跃迁。</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-index dev-tag">PRC-A · EDITORIAL</div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 11 · FRAMEWORK · 1 Variant (FRW-A)
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 11 · Framework · 框架页 · 1 of 2</div>
+  <div class="section-header-line"></div>
+</div>
+
+<!-- FRW-A · 2x2 matrix -->
+<div class="nav-label">FRW-A · 2x2 Matrix · 2x2 矩阵</div>
+<div class="slide variant-frw-a-editorial">
+  <div class="frw-top">
+    <div class="frw-top-left">
+      <div class="slot-eyebrow">— FRAMEWORK · 战略象限</div>
+      <h3 class="slot-title">中国车企的<em>四个选择</em>。</h3>
+    </div>
+    <div class="frw-axis-info">
+      <strong>Y AXIS</strong> · 品牌溢价 HIGH ↑ / LOW ↓<br>
+      <strong>X AXIS</strong> · 全球化程度 LOW ← / HIGH →<br>
+      <span class="dev-tag">FRW-A · EDITORIAL · PG. 92</span>
+    </div>
+  </div>
+  <div class="frw-quad-grid">
+    <div class="quadrant">
+      <div class="quad-top">
+        <span class="quad-num">Q1</span>
+        <span class="slot-quadrant-label">— 利基策略</span>
+      </div>
+      <div class="quad-body">
+        <h4 class="slot-quadrant-title">高品牌 + 单市场</h4>
+        <p class="slot-quadrant-desc">深耕一个市场,以品牌为王。代表 Lotus / 蔚来。</p>
+      </div>
+    </div>
+    <div class="quadrant highlight">
+      <div class="quad-top">
+        <span class="quad-num">Q2</span>
+        <span class="slot-quadrant-label">— 拐点机会 ★</span>
+      </div>
+      <div class="quad-body">
+        <h4 class="slot-quadrant-title">高品牌 + 全球化</h4>
+        <p class="slot-quadrant-desc">真正的"中国 Tesla" — 全球品牌溢价 + 规模化。</p>
+      </div>
+    </div>
+    <div class="quadrant">
+      <div class="quad-top">
+        <span class="quad-num">Q3</span>
+        <span class="slot-quadrant-label">— 内卷困境</span>
+      </div>
+      <div class="quad-body">
+        <h4 class="slot-quadrant-title">低品牌 + 单市场</h4>
+        <p class="slot-quadrant-desc">本土价格战 / 利润压缩 / 难以出海。</p>
+      </div>
+    </div>
+    <div class="quadrant">
+      <div class="quad-top">
+        <span class="quad-num">Q4</span>
+        <span class="slot-quadrant-label">— 量价博弈</span>
+      </div>
+      <div class="quad-body">
+        <h4 class="slot-quadrant-title">低品牌 + 全球化</h4>
+        <p class="slot-quadrant-desc">规模出海但低价 / 品牌资产积累慢 / 长期路径不清。</p>
+      </div>
+    </div>
+    <div class="frw-axis-center">×</div>
+  </div>
+</div>
+
+<!-- FRW-D · Layered framework (分层框架, 横向层级列表) -->
+<div class="nav-label">FRW-D · Layered Framework · 分层框架(政策→供应链→品牌→用户)</div>
+<div class="slide variant-frw-d-editorial" style="--rows: 4;">
+  <div class="frwd-pad">
+    <div class="frwd-header">
+      <div class="slot-eyebrow">— FRAMEWORK · 四层结构</div>
+      <h3 class="slot-title">出海能力的<em>四层结构</em>。</h3>
+    </div>
+    <div class="frwd-layers">
+      <div class="frwd-layer">
+        <span class="layer-tag">01</span>
+        <div class="layer-name">政策层 <span class="en">Policy</span></div>
+        <p class="layer-desc">国家战略 / 出口补贴 / 出口管制 — 决定出海"能不能做"的前提。</p>
+      </div>
+      <div class="frwd-layer highlight">
+        <span class="layer-tag">02</span>
+        <div class="layer-name">供应链层 <span class="en">Supply Chain</span></div>
+        <p class="layer-desc">动力电池 / 电驱 / 电控三大件全球领先 — 中国 NEV 出海最深的护城河。</p>
+      </div>
+      <div class="frwd-layer">
+        <span class="layer-tag">03</span>
+        <div class="layer-name">品牌层 <span class="en">Brand</span></div>
+        <p class="layer-desc">海外品牌资产 / 本地团队建设 — 从 OEM 到独立运营的关键过渡。</p>
+      </div>
+      <div class="frwd-layer">
+        <span class="layer-tag">04</span>
+        <div class="layer-name">用户层 <span class="en">Consumer</span></div>
+        <p class="layer-desc">海外用户认知转变 / 复购率提升 — 出海是否"真正立住"的最终检验。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 12 · CLOSING · 1 Variant (CLO-A)
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 12 · Closing · 结尾页 · 1 of 3</div>
+  <div class="section-header-line"></div>
+</div>
+
+<!-- CLO-A · Conclusion list -->
+<div class="nav-label">CLO-A · Conclusions · 结论列表</div>
+<div class="slide variant-clo-a-editorial" style="--rows: 3;">
+  <div class="clo-left">
+    <div class="clo-end-mark">
+      <span class="clo-end-tag">— THE END · 终</span>
+      <span class="clo-end-text">END.<em>三个判断。</em></span>
+    </div>
+    <p class="slot-title">十年路径已经清晰 — 接下来要做的不是预测,是选择。</p>
+    <div class="clo-issue-meta">
+      <strong>ISSUE</strong> №04 · MAR 2026<br>
+      <strong>NEXT</strong> JUN 2026<br>
+      <span class="dev-tag">CLO-A · EDITORIAL · END</span>
+    </div>
+  </div>
+  <div class="clo-right">
+    <div class="clo-eyebrow">— IN CONCLUSION · 本期结论</div>
+    <div class="clo-card">
+      <div class="clo-card-tag">
+        <span class="num">01</span>
+        <span class="label">— THE PIVOT</span>
+      </div>
+      <h4 class="slot-conclusion">拐点<em>已至</em>。</h4>
+      <p class="slot-conclusion-desc">2024 年 175 万出口规模标志着中国 NEV 出海进入价值阶段。</p>
+    </div>
+    <div class="clo-card">
+      <div class="clo-card-tag">
+        <span class="num">02</span>
+        <span class="label">— THE WINDOW</span>
+      </div>
+      <h4 class="slot-conclusion">本地化是<em>赢家通吃</em>。</h4>
+      <p class="slot-conclusion-desc">未来三年是建本地团队、本地品牌、本地工厂的窗口期。</p>
+    </div>
+    <div class="clo-card">
+      <div class="clo-card-tag">
+        <span class="num">03</span>
+        <span class="label">— THE NEXT</span>
+      </div>
+      <h4 class="slot-conclusion">下一代品牌从<em>溢价</em>开始。</h4>
+      <p class="slot-conclusion-desc">不是价格战,是品牌叙事独立于本土。</p>
+    </div>
+  </div>
+</div>
+
+<!-- CLO-D · Acknowledgements / Methodology (致谢与方法论) -->
+<div class="nav-label">CLO-D · Acknowledgements · 致谢与方法论(双栏 contributors / methodology)</div>
+<div class="slide variant-clo-d-editorial">
+  <div class="clod-pad">
+    <div class="clod-header">
+      <div class="slot-eyebrow">— COLOPHON · 致谢与方法论</div>
+      <h3 class="slot-title">致谢 & <em>方法论</em>。</h3>
+    </div>
+    <div class="clod-body">
+      <div class="clod-col">
+        <div class="col-tag">— CONTRIBUTORS · 撰稿人</div>
+        <div class="item-row">
+          <span class="key">EDITOR</span>
+          <span class="val serif-en">Editorial Desk</span>
+        </div>
+        <div class="item-row">
+          <span class="key">REPORTERS</span>
+          <span class="val">12 位行业记者 / Berlin · Oslo · Bangkok · São Paulo</span>
+        </div>
+        <div class="item-row">
+          <span class="key">PHOTOGRAPHY</span>
+          <span class="val serif-en">8 photographers · in-house team</span>
+        </div>
+        <div class="item-row">
+          <span class="key">DESIGN</span>
+          <span class="val serif-en">Editorial Studio</span>
+        </div>
+        <div class="item-row">
+          <span class="key">FACT-CHECK</span>
+          <span class="val">3 位独立顾问 · 42 处数据验证</span>
+        </div>
+      </div>
+      <div class="clod-col">
+        <div class="col-tag">— METHODOLOGY · 方法论</div>
+        <div class="item-row">
+          <span class="key">DATA</span>
+          <span class="val">CAIA / BloombergNEF / 海关总署 — 三方交叉验证</span>
+        </div>
+        <div class="item-row">
+          <span class="key">INTERVIEWS</span>
+          <span class="val">18 场深度访谈 · 6 个月时间窗口</span>
+        </div>
+        <div class="item-row">
+          <span class="key">SAMPLING</span>
+          <span class="val">42 个一线车企样本 / 12 个海外市场</span>
+        </div>
+        <div class="item-row">
+          <span class="key">CUTOFF</span>
+          <span class="val">数据截止日 · 2024.12.31</span>
+        </div>
+        <div class="item-row">
+          <span class="key">LIMITS</span>
+          <span class="val">本报告聚焦中国 NEV,未覆盖商用车 & 二手车出口</span>
+        </div>
+      </div>
+    </div>
+    <div class="clod-bottom">
+      <span>ISSUE №04 · COLOPHON</span>
+      <span class="dev-tag">CLO-D · EDITORIAL · PG. 124</span>
+    </div>
+  </div>
+</div>
+
+<!-- CLO-E · Next issue teaser (下期预告) -->
+<div class="nav-label">CLO-E · Next Issue · 下期预告(深底, 大字 + 黄色 accent)</div>
+<div class="slide variant-clo-e-editorial">
+  <div class="cloe-bg-grain"></div>
+  <div class="cloe-pad">
+    <div class="cloe-top">
+      <span>— NEXT ISSUE · №05 · JUN 2026</span>
+      <span class="right">PREVIEW · 预告</span>
+    </div>
+    <div class="cloe-body">
+      <span class="cloe-tease">Coming next · 下期</span>
+      <h2 class="slot-next-title">The <em>Localization</em><br>Decade.</h2>
+      <p class="slot-next-lede">从规模到价值,从价值到本地化 — 下一个十年,真正的本地化叙事是什么样?三个城市、十二位 CEO、一份现场记录。</p>
+      <div class="cloe-meta-row">
+        <div class="item">
+          <span class="label">ISSUE</span>
+          <span class="val">№05</span>
+        </div>
+        <div class="item">
+          <span class="label">PUBLISH</span>
+          <span class="val">JUN/26</span>
+        </div>
+        <div class="item">
+          <span class="label">PAGES</span>
+          <span class="val">140</span>
+        </div>
+        <div class="item">
+          <span class="label">INTERVIEWS</span>
+          <span class="val">12</span>
+        </div>
+      </div>
+    </div>
+    <div class="cloe-bottom">
+      <span>SUBSCRIBE · EDITORIAL@</span>
+      <span class="dev-tag">CLO-E · EDITORIAL · PG. 128</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     §17 · THEME SWITCHER (浮动皮肤切换器 UI)
+     ============================================================ -->
+<div class="theme-switcher" id="themeSwitcher">
+  <button class="theme-switcher-toggle" id="themeToggle" aria-label="切换皮肤">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
+  </button>
+  <div class="theme-switcher-panel" id="themePanel">
+    <div class="theme-switcher-header">EDITORIAL · 子皮肤 · 实时切换</div>
+    
+    <button class="theme-option" data-theme="editorial-paper">
+      <div class="theme-option-swatches">
+        <div class="theme-option-swatch" style="background:#F5EFE3"></div>
+        <div class="theme-option-swatch" style="background:#1A1410"></div>
+        <div class="theme-option-swatch" style="background:#C8362B"></div>
+      </div>
+      <div class="theme-option-text">
+        <span class="theme-option-name">PAPER</span>
+        <span class="theme-option-desc">米色暖底 + 红 accent · 默认</span>
+      </div>
+      <span class="theme-option-check">✓</span>
+    </button>
+    
+    <button class="theme-option" data-theme="editorial-mono">
+      <div class="theme-option-swatches">
+        <div class="theme-option-swatch" style="background:#1E1B17"></div>
+        <div class="theme-option-swatch" style="background:#F0E8D8"></div>
+        <div class="theme-option-swatch" style="background:#E9B527"></div>
+      </div>
+      <div class="theme-option-text">
+        <span class="theme-option-name">MONO</span>
+        <span class="theme-option-desc">深色底 + 黄 accent · 暗色</span>
+      </div>
+      <span class="theme-option-check">✓</span>
+    </button>
+    
+    <button class="theme-option" data-theme="editorial-poster">
+      <div class="theme-option-swatches">
+        <div class="theme-option-swatch" style="background:#FFFFFF"></div>
+        <div class="theme-option-swatch" style="background:#000000"></div>
+        <div class="theme-option-swatch" style="background:#1B3D8F"></div>
+      </div>
+      <div class="theme-option-text">
+        <span class="theme-option-name">POSTER</span>
+        <span class="theme-option-desc">纯白 + 蓝 accent · 强对比</span>
+      </div>
+      <span class="theme-option-check">✓</span>
+    </button>
+    
+    <div class="dev-tag-toggle-row">
+      <span class="dev-tag-toggle-label">显示 DEV 标签</span>
+      <label class="dev-tag-toggle-switch">
+        <input type="checkbox" id="devTagToggle" checked />
+        <span class="dev-tag-toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'editorial-skeleton-theme';
+  const html = document.documentElement;
+  const switcher = document.getElementById('themeSwitcher');
+  const toggle = document.getElementById('themeToggle');
+  const panel = document.getElementById('themePanel');
+  const options = panel.querySelectorAll('.theme-option');
+  
+  // Restore saved theme
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    html.setAttribute('data-theme', saved);
+  }
+  
+  function syncActive(){
+    const current = html.getAttribute('data-theme') || 'editorial-paper';
+    options.forEach(o => {
+      o.classList.toggle('active', o.dataset.theme === current);
+    });
+  }
+  syncActive();
+  
+  toggle.addEventListener('click', e => {
+    e.stopPropagation();
+    switcher.classList.toggle('open');
+  });
+  
+  options.forEach(o => {
+    o.addEventListener('click', () => {
+      const theme = o.dataset.theme;
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem(STORAGE_KEY, theme);
+      syncActive();
+    });
+  });
+  
+  document.addEventListener('click', e => {
+    if (!switcher.contains(e.target)) {
+      switcher.classList.remove('open');
+    }
+  });
+  
+  // Dev tag toggle
+  const DEV_TAG_KEY = 'editorial-skeleton-show-dev-tags';
+  const devTagToggle = document.getElementById('devTagToggle');
+  function applyDevTagState(show) {
+    html.classList.toggle('hide-dev-tags', !show);
+    devTagToggle.checked = show;
+  }
+  // Priority: 1) saved localStorage, 2) initial HTML class, 3) default true
+  const savedDevTags = localStorage.getItem(DEV_TAG_KEY);
+  let initialShow;
+  if (savedDevTags !== null) {
+    initialShow = savedDevTags === 'true';
+  } else {
+    // No saved state: respect initial HTML class
+    initialShow = !html.classList.contains('hide-dev-tags');
+  }
+  applyDevTagState(initialShow);
+  devTagToggle.addEventListener('change', () => {
+    localStorage.setItem(DEV_TAG_KEY, devTagToggle.checked ? 'true' : 'false');
+    applyDevTagState(devTagToggle.checked);
+  });
+})();
+</script>
+
+</body>
+</html>

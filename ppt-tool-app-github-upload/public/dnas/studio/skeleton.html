@@ -1,0 +1,5004 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="studio-black">
+<head>
+<meta charset="utf-8">
+<title>Studio DNA · Full Skeleton · 40 Variants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   §1 · STUDIO DNA · DESIGN TOKENS
+   ============================================================ */
+:root,
+[data-theme="studio-black"] {
+  /* Background */
+  --bg-deep:     #0A0A0A;
+  --bg-surface:  #141414;
+  --bg-elevated: #1F1F1F;
+  --bg-ink:      #050505;
+  
+  /* Accent · 荧光黄工业感 */
+  --accent:      #D9FF00;
+  --accent-deep: #B8D900;
+  --accent-soft: #E8FF6B;
+  --accent-faint: rgba(217, 255, 0, 0.15);
+  --accent-line: rgba(217, 255, 0, 0.4);
+  
+  /* Text */
+  --text-primary: #FFFFFF;
+  --text-body:    #C8C8C8;
+  --text-muted:   #888888;
+  --text-faint:   #555555;
+  --text-accent:  #D9FF00;
+  --text-invert:  #000000;
+  
+  /* Border */
+  --border-faint:   rgba(255,255,255,0.08);
+  --border-strong:  rgba(255,255,255,0.18);
+  --border-accent:  var(--accent);
+  
+  /* Fonts */
+  --font-display: 'Inter Tight', 'Helvetica Neue', system-ui, sans-serif;
+  --font-body:    'Inter Tight', 'Noto Sans SC', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+  --font-zh:      'Noto Sans SC', sans-serif;
+  
+  /* Radius · 几无圆角 */
+  --r-sm:  0px;
+  --r-md:  2px;
+  --r-lg:  4px;
+}
+
+/* 子皮肤 1 · 灰底印刷 (适合实体作品集印刷) */
+[data-theme="studio-mono"] {
+  --bg-deep:     #E8E8E8;
+  --bg-surface:  #FFFFFF;
+  --bg-elevated: #F4F4F4;
+  --bg-ink:      #DEDEDE;
+  --accent:      #1A1A1A;
+  --accent-deep: #000000;
+  --accent-soft: #444444;
+  --accent-faint: rgba(0,0,0,0.06);
+  --accent-line: rgba(0,0,0,0.3);
+  --text-primary: #0A0A0A;
+  --text-body:    #2A2A2A;
+  --text-muted:   #666666;
+  --text-faint:   #999999;
+  --text-accent:  #1A1A1A;
+  --text-invert:  #FFFFFF;
+  --border-faint:   rgba(0,0,0,0.08);
+  --border-strong:  rgba(0,0,0,0.18);
+  --border-accent:  var(--accent);
+}
+
+/* 子皮肤 2 · 品红 magenta (时尚/潮流) */
+[data-theme="studio-mag"] {
+  --accent:      #FF2D8B;
+  --accent-deep: #D6005F;
+  --accent-soft: #FF6BAA;
+  --accent-faint: rgba(255, 45, 139, 0.15);
+  --accent-line: rgba(255, 45, 139, 0.4);
+  --text-accent:  #FF2D8B;
+  --border-accent: var(--accent);
+}
+
+
+/* ============================================================
+   §2 · GLOBAL RESET
+   ============================================================ */
+* { box-sizing: border-box; }
+h1,h2,h3,h4,h5,h6,p,ul,ol { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+body {
+  margin: 0; padding: 40px 0;
+  background: var(--bg-ink);
+  font-family: var(--font-body);
+  color: var(--text-primary);
+}
+.slide {
+  width: 1280px; height: 720px;
+  margin: 0 auto 32px auto;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  position: relative;
+  overflow: hidden;
+}
+.nav-label {
+  width: 1280px;
+  margin: 0 auto 8px auto;
+  padding: 8px 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  text-transform: uppercase;
+  border-top: 1px solid var(--border-faint);
+  border-bottom: 1px solid var(--border-faint);
+}
+.section-header {
+  width: 1280px;
+  margin: 32px auto 16px auto;
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.section-header-line {
+  flex: 1;
+  height: 1px;
+  background: var(--accent);
+}
+.section-header-text {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.20em;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.section-header.sub {
+  margin: 16px auto 8px auto;
+  padding: 6px 0;
+  border-top: 1px dashed var(--border-faint);
+}
+
+
+/* ============================================================
+   §3 · SHARED PRIMITIVES (跨 variant 共享)
+   ============================================================ */
+
+/* CRT 网格背景 */
+.studio-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(217, 255, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 255, 0, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Corner 工业角标 */
+.corner-tl, .corner-tr, .corner-bl, .corner-br {
+  position: absolute; width: 18px; height: 18px;
+  border-color: var(--accent);
+  z-index: 4;
+  pointer-events: none;
+}
+.corner-tl { top: 24px; left: 24px; border-top: 2px solid; border-left: 2px solid; }
+.corner-tr { top: 24px; right: 24px; border-top: 2px solid; border-right: 2px solid; }
+.corner-bl { bottom: 24px; left: 24px; border-bottom: 2px solid; border-left: 2px solid; }
+.corner-br { bottom: 24px; right: 24px; border-bottom: 2px solid; border-right: 2px solid; }
+
+/* 顶部 frame 横线 */
+.studio-top {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--accent);
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.20em;
+  text-transform: uppercase; color: var(--accent);
+}
+
+/* 底部 footer */
+.studio-bottom {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.16em;
+  color: var(--text-faint);
+}
+
+/* Number tag · 工业感数字标签 */
+.number-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 600;
+  color: var(--accent); letter-spacing: 0.10em;
+  background: rgba(217,255,0,0.08);
+  border: 1px solid var(--accent);
+  padding: 4px 10px;
+}
+
+/* Pill */
+.pill {
+  display: inline-flex; align-items: center;
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 0;
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  color: var(--text-muted);
+}
+.pill.accent {
+  background: var(--accent);
+  color: var(--text-invert);
+  border-color: var(--accent);
+}
+.pill.outline-accent {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Photo / Studio figure placeholder */
+.studio-figure {
+  background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 50%, #1A1A1A 100%);
+  position: relative;
+  overflow: hidden;
+}
+.studio-figure::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(217, 255, 0, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 255, 0, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.studio-figure::after {
+  content: "[ IMAGE ]";
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.20em;
+  color: rgba(217, 255, 0, 0.4);
+  font-weight: 600;
+}
+.studio-figure.f-yellow {
+  background: linear-gradient(135deg, #B8D900 0%, #D9FF00 50%, #E8FF6B 100%);
+}
+.studio-figure.f-yellow::after { color: rgba(0,0,0,0.4); }
+.studio-figure.f-mid    { background: linear-gradient(135deg, #2A2A2A 0%, #4A4A4A 100%); }
+.studio-figure.f-dark   { background: linear-gradient(135deg, #050505 0%, #1A1A1A 100%); }
+.studio-figure.f-warm   { background: linear-gradient(135deg, #2A2520 0%, #4A3F35 100%); }
+.studio-figure.f-white  {
+  background: linear-gradient(135deg, #E8E8E8 0%, #FFFFFF 100%);
+}
+.studio-figure.f-white::after { color: rgba(0,0,0,0.4); }
+
+/* Dev-tag (开发期可见,生产隐藏) */
+.dev-tag {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+.hide-dev-tags .dev-tag { display: none !important; }
+
+
+/* ============================================================
+   §4 · COV-A · 工作室年报封面
+   ============================================================ */
+.variant-cov-a-studio {
+  padding: 56px 64px 48px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 24px;
+}
+.variant-cov-a-studio .cov-mid {
+  display: flex; flex-direction: column;
+  justify-content: center;
+  position: relative; z-index: 2;
+}
+.variant-cov-a-studio .cov-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 24px;
+}
+.variant-cov-a-studio .cov-eyebrow::before {
+  content: ""; display: inline-block;
+  width: 32px; height: 1px;
+  background: var(--accent);
+  vertical-align: middle; margin-right: 16px;
+}
+.variant-cov-a-studio .slot-title {
+  font-family: var(--font-display);
+  font-size: 120px; font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  color: var(--text-primary);
+}
+.variant-cov-a-studio .slot-title em {
+  color: var(--accent);
+  font-style: italic;
+}
+.variant-cov-a-studio .slot-subtitle {
+  margin-top: 24px;
+  font-family: var(--font-body);
+  font-size: 16px; font-weight: 400;
+  line-height: 1.55;
+  color: var(--text-body);
+  max-width: 680px;
+}
+.variant-cov-a-studio .cov-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  position: relative; z-index: 2;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-accent);
+}
+.variant-cov-a-studio .meta-cell {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.variant-cov-a-studio .meta-label {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--text-muted);
+}
+.variant-cov-a-studio .meta-value {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-cov-a-studio .meta-value.accent { color: var(--accent); }
+
+
+/* ============================================================
+   §5 · COV-B · Issue 编号封面
+   ============================================================ */
+.variant-cov-b-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 32px;
+}
+.variant-cov-b-studio .cov-body {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 64px;
+  align-items: center;
+  position: relative; z-index: 2;
+}
+.variant-cov-b-studio .cov-num-block {
+  display: flex; flex-direction: column;
+}
+.variant-cov-b-studio .cov-num-label {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 16px;
+}
+.variant-cov-b-studio .slot-issue-num {
+  font-family: var(--font-display);
+  font-size: 280px; font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  color: var(--accent);
+}
+.variant-cov-b-studio .slot-issue-num .hash {
+  font-style: italic;
+  opacity: 0.6;
+}
+.variant-cov-b-studio .cov-text-block {
+  display: flex; flex-direction: column;
+  gap: 20px;
+  padding-left: 36px;
+  border-left: 2px solid var(--accent);
+}
+.variant-cov-b-studio .cov-tag {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.20em;
+  text-transform: uppercase; color: var(--accent);
+}
+.variant-cov-b-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 56px; font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-cov-b-studio .slot-title em {
+  color: var(--accent);
+  font-style: italic;
+}
+.variant-cov-b-studio .slot-subtitle {
+  font-family: var(--font-body);
+  font-size: 16px; line-height: 1.65;
+  color: var(--text-body);
+  max-width: 480px;
+}
+.variant-cov-b-studio .slot-subtitle strong {
+  color: var(--text-primary); font-weight: 600;
+}
+
+
+/* ============================================================
+   §6 · COV-C · 极简单图封面 (1 张满版图 + 大字压图)
+   ============================================================ */
+.variant-cov-c-studio {
+  padding: 0;
+  position: relative;
+}
+.variant-cov-c-studio .cov-c-bg {
+  position: absolute; inset: 0;
+  z-index: 1;
+}
+.variant-cov-c-studio .cov-c-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(10,10,10,0.4) 0%, rgba(10,10,10,0.85) 100%);
+  z-index: 2;
+}
+.variant-cov-c-studio .cov-c-top {
+  position: absolute;
+  top: 32px; left: 56px; right: 56px;
+  z-index: 4;
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--accent);
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.20em;
+  text-transform: uppercase; color: var(--accent);
+}
+.variant-cov-c-studio .cov-c-body {
+  position: absolute;
+  bottom: 80px; left: 56px;
+  z-index: 4;
+  max-width: 1000px;
+}
+.variant-cov-c-studio .cov-c-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 20px;
+}
+.variant-cov-c-studio .slot-title {
+  font-family: var(--font-display);
+  font-size: 120px; font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+}
+.variant-cov-c-studio .slot-title em {
+  color: var(--accent);
+  font-style: italic;
+}
+.variant-cov-c-studio .slot-subtitle {
+  margin-top: 28px;
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--text-body);
+  max-width: 600px;
+  padding-top: 16px;
+  border-top: 1px solid var(--accent);
+}
+.variant-cov-c-studio .cov-c-bottom {
+  position: absolute;
+  bottom: 24px; left: 56px; right: 56px;
+  z-index: 4;
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.16em;
+  color: var(--text-faint);
+}
+
+
+/* ============================================================
+   §7 · CB-A · 巨型数字章节扉页 (260px 荧光数字)
+   ============================================================ */
+.variant-cb-a-studio {
+  padding: 64px;
+  display: grid;
+  grid-template-columns: 1.2fr 1.5fr;
+  gap: 64px;
+  align-items: center;
+}
+.variant-cb-a-studio .cb-num-block {
+  position: relative; z-index: 2;
+}
+.variant-cb-a-studio .cb-num-label {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 16px;
+}
+.variant-cb-a-studio .slot-chapter-num {
+  font-family: var(--font-display);
+  font-size: 260px; font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -0.06em;
+  color: var(--accent);
+}
+.variant-cb-a-studio .cb-text-block {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column;
+  gap: 20px;
+  padding-left: 36px;
+  border-left: 2px solid var(--accent);
+}
+.variant-cb-a-studio .cb-tag {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.20em;
+  text-transform: uppercase; color: var(--accent);
+}
+.variant-cb-a-studio .slot-chapter-title {
+  font-family: var(--font-zh);
+  font-size: 56px; font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-cb-a-studio .slot-chapter-title em {
+  color: var(--accent);
+  font-style: italic;
+}
+.variant-cb-a-studio .slot-chapter-abstract {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-body);
+  max-width: 560px;
+}
+.variant-cb-a-studio .slot-chapter-abstract strong {
+  color: var(--text-primary); font-weight: 600;
+}
+
+
+/* ============================================================
+   §8 · CB-D · 引语式章节 (大字引语 + 章节大纲)
+   ============================================================ */
+.variant-cb-d-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 32px;
+}
+.variant-cb-d-studio .cb-d-body {
+  position: relative; z-index: 2;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 40px;
+  align-content: center;
+}
+.variant-cb-d-studio .cb-tag {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 8px;
+}
+.variant-cb-d-studio .cb-tag::before {
+  content: "→ ";
+  color: var(--accent);
+}
+.variant-cb-d-studio .slot-quote {
+  font-family: var(--font-display);
+  font-size: 72px; font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -0.035em;
+  color: var(--text-primary);
+}
+.variant-cb-d-studio .slot-quote em {
+  color: var(--accent);
+  font-style: italic;
+}
+.variant-cb-d-studio .quote-attr {
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  font-size: 13px; letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+.variant-cb-d-studio .quote-attr strong {
+  color: var(--accent); font-weight: 600;
+}
+.variant-cb-d-studio .cb-outline {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-accent);
+}
+.variant-cb-d-studio .outline-item {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.variant-cb-d-studio .outline-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.20em;
+  color: var(--accent);
+  font-weight: 700;
+}
+.variant-cb-d-studio .outline-text {
+  font-family: var(--font-zh);
+  font-size: 15px; font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+
+/* ============================================================
+   §9 · CB-E · 章节预告 (4 个子主题预览)
+   ============================================================ */
+.variant-cb-e-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 24px;
+}
+.variant-cb-e-studio .cb-e-header {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: end;
+}
+.variant-cb-e-studio .cb-tag {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-cb-e-studio .slot-chapter-title {
+  font-family: var(--font-zh);
+  font-size: 44px; font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-cb-e-studio .slot-chapter-title em {
+  color: var(--accent);
+  font-style: italic;
+}
+.variant-cb-e-studio .cb-e-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-align: right;
+}
+.variant-cb-e-studio .cb-e-meta strong {
+  color: var(--accent); font-weight: 700;
+}
+.variant-cb-e-studio .cb-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-cb-e-studio .cb-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-faint);
+  padding: 24px 22px;
+  display: flex; flex-direction: column;
+  gap: 12px;
+  min-height: 280px;
+  position: relative;
+}
+.variant-cb-e-studio .cb-card.featured {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.variant-cb-e-studio .cb-card .card-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  font-weight: 700;
+}
+.variant-cb-e-studio .cb-card.featured .card-num { color: var(--text-invert); }
+.variant-cb-e-studio .cb-card .card-title {
+  font-family: var(--font-zh);
+  font-size: 20px; font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.variant-cb-e-studio .cb-card.featured .card-title { color: var(--text-invert); }
+.variant-cb-e-studio .cb-card .card-text {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-body);
+  margin-top: auto;
+}
+.variant-cb-e-studio .cb-card.featured .card-text { color: var(--text-invert); }
+.variant-cb-e-studio .cb-card .card-text strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.variant-cb-e-studio .cb-card.featured .card-text strong { color: var(--text-invert); }
+
+
+/* ============================================================
+   §10 · OUT-A · 项目索引 (列出本期所有 case 编号 + 名称 + 页码)
+   ============================================================ */
+.variant-out-a-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 24px;
+  --rows: 8;
+}
+.variant-out-a-studio .out-header {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: end;
+}
+.variant-out-a-studio .out-tag {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-out-a-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 48px; font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-out-a-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-out-a-studio .out-summary {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em;
+  color: var(--text-muted);
+  text-align: right;
+}
+.variant-out-a-studio .out-summary strong { color: var(--accent); font-weight: 700; }
+.variant-out-a-studio .out-list {
+  display: flex; flex-direction: column;
+  gap: clamp(6px, calc(14px - var(--rows) * 0.8px), 10px);
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-out-a-studio .out-row {
+  display: grid;
+  grid-template-columns: 80px 1.5fr 2fr 80px;
+  gap: 24px;
+  align-items: baseline;
+  padding: clamp(8px, calc(18px - var(--rows) * 1px), 14px) 0;
+  border-bottom: 1px solid var(--border-faint);
+}
+.variant-out-a-studio .out-row.featured {
+  border-bottom-color: var(--accent);
+}
+.variant-out-a-studio .out-num {
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.20em;
+  color: var(--accent); font-weight: 700;
+}
+.variant-out-a-studio .out-row.featured .out-num::before { content: "★ "; }
+.variant-out-a-studio .out-name {
+  font-family: var(--font-zh);
+  font-size: 18px; font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.variant-out-a-studio .out-meta {
+  font-family: var(--font-body);
+  font-size: 13px; color: var(--text-muted);
+}
+.variant-out-a-studio .out-page {
+  font-family: var(--font-mono);
+  font-size: 12px; color: var(--text-muted);
+  text-align: right;
+  letter-spacing: 0.12em;
+}
+.variant-out-a-studio .out-row.featured .out-name { color: var(--accent); }
+
+
+/* ============================================================
+   §11 · OUT-B · 24 cases 网格预览 (6×4 缩略 + 编号)
+   ============================================================ */
+.variant-out-b-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 20px;
+}
+.variant-out-b-studio .out-header {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: end;
+}
+.variant-out-b-studio .out-tag {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-out-b-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 40px; font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-out-b-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-out-b-studio .out-summary {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em;
+  color: var(--text-muted);
+  text-align: right;
+}
+.variant-out-b-studio .grid-cases {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 8px;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-out-b-studio .case-thumb {
+  position: relative;
+  min-height: 100px;
+}
+.variant-out-b-studio .case-thumb .thumb-num {
+  position: absolute;
+  top: 6px; left: 8px;
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+  z-index: 3;
+}
+.variant-out-b-studio .case-thumb.featured .thumb-num {
+  color: var(--text-invert);
+}
+.variant-out-b-studio .case-thumb .thumb-name {
+  position: absolute;
+  bottom: 6px; left: 8px; right: 8px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-faint);
+  z-index: 3;
+  letter-spacing: 0.08em;
+}
+
+
+/* ============================================================
+   §12 · CLX-A · 大数字 + context (93% retention)
+   ============================================================ */
+.variant-clx-a-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 32px;
+}
+.variant-clx-a-studio .clx-body {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 56px;
+  align-items: center;
+  position: relative; z-index: 2;
+}
+.variant-clx-a-studio .num-block {
+  display: flex; flex-direction: column; gap: 16px;
+}
+.variant-clx-a-studio .num-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+}
+.variant-clx-a-studio .num-eyebrow::before { content: "→ "; }
+.variant-clx-a-studio .slot-big-num {
+  font-family: var(--font-display);
+  font-size: 240px; font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -0.05em;
+  color: var(--accent);
+}
+.variant-clx-a-studio .slot-big-num sub {
+  font-family: var(--font-display);
+  font-size: 0.20em; font-weight: 800;
+  vertical-align: super;
+  color: var(--text-body); letter-spacing: 0;
+}
+.variant-clx-a-studio .slot-explain {
+  font-family: var(--font-zh);
+  font-size: 17px; font-weight: 500;
+  line-height: 1.65;
+  color: var(--text-body);
+  max-width: 520px;
+}
+.variant-clx-a-studio .slot-explain strong { color: var(--text-primary); }
+.variant-clx-a-studio .slot-explain em { color: var(--accent); font-style: italic; }
+.variant-clx-a-studio .context-block {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-accent);
+  padding: 28px 28px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.variant-clx-a-studio .context-label {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--accent);
+}
+.variant-clx-a-studio .context-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed var(--border-faint);
+}
+.variant-clx-a-studio .context-stat {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.variant-clx-a-studio .stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--text-muted);
+}
+.variant-clx-a-studio .stat-value {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-clx-a-studio .stat-value.accent { color: var(--accent); }
+.variant-clx-a-studio .context-note {
+  font-family: var(--font-body);
+  font-size: 13px; line-height: 1.6;
+  color: var(--text-muted);
+}
+
+
+/* ============================================================
+   §13 · CLX-D · Before/After 双数字对比
+   ============================================================ */
+.variant-clx-d-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 28px;
+}
+.variant-clx-d-studio .clx-header {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: end;
+}
+.variant-clx-d-studio .clx-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-clx-d-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 36px; font-weight: 900;
+  line-height: 1.1;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+.variant-clx-d-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-clx-d-studio .slot-title .sep {
+  font-style: normal;
+  color: var(--text-primary);
+  margin: 0 0.12em;
+  font-weight: 900;
+  display: inline-block;
+}
+.variant-clx-d-studio .delta-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 24px;
+  align-items: center;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-clx-d-studio .delta-cell {
+  padding: 32px 28px;
+  border: 1px solid var(--border-faint);
+  display: flex; flex-direction: column; gap: 14px;
+  background: var(--bg-surface);
+}
+.variant-clx-d-studio .delta-cell.before {
+  opacity: 0.7;
+}
+.variant-clx-d-studio .delta-cell.after {
+  border-color: var(--accent);
+  background: var(--accent-faint);
+}
+.variant-clx-d-studio .delta-tag {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.20em;
+  color: var(--text-muted);
+}
+.variant-clx-d-studio .delta-cell.after .delta-tag { color: var(--accent); }
+.variant-clx-d-studio .delta-value {
+  font-family: var(--font-display);
+  font-size: 96px; font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--text-muted);
+}
+.variant-clx-d-studio .delta-value .unit {
+  font-family: var(--font-display);
+  font-size: 0.28em; font-weight: 800;
+  letter-spacing: 0;
+}
+.variant-clx-d-studio .delta-cell.after .delta-value { color: var(--accent); }
+.variant-clx-d-studio .delta-desc {
+  font-family: var(--font-body);
+  font-size: 13px; line-height: 1.6;
+  color: var(--text-body);
+  padding-top: 12px;
+  border-top: 1px solid var(--border-faint);
+}
+.variant-clx-d-studio .delta-desc strong { color: var(--text-primary); }
+.variant-clx-d-studio .delta-arrow {
+  font-family: var(--font-display);
+  font-size: 56px; font-weight: 900;
+  color: var(--accent);
+  text-align: center;
+}
+
+
+/* ============================================================
+   §14 · CLX-Q · 反方观点对照 (主流 vs 我们)
+   ============================================================ */
+.variant-clx-q-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 28px;
+}
+.variant-clx-q-studio .clx-header {
+  position: relative; z-index: 2;
+}
+.variant-clx-q-studio .clx-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-clx-q-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 40px; font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-clx-q-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-clx-q-studio .views {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-clx-q-studio .view {
+  padding: 32px 28px;
+  border: 1px solid var(--border-faint);
+  background: var(--bg-surface);
+  display: flex; flex-direction: column; gap: 16px;
+  min-height: 320px;
+}
+.variant-clx-q-studio .view.ours {
+  background: var(--accent);
+  border-color: var(--accent);
+  position: relative;
+}
+.variant-clx-q-studio .view-tag {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.20em;
+  color: var(--text-muted);
+}
+.variant-clx-q-studio .view.ours .view-tag {
+  color: var(--text-invert);
+}
+.variant-clx-q-studio .view.ours .view-tag::before {
+  content: "★ ";
+}
+.variant-clx-q-studio .view-statement {
+  font-family: var(--font-zh);
+  font-size: 26px; font-weight: 900;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.variant-clx-q-studio .view.ours .view-statement { color: var(--text-invert); }
+.variant-clx-q-studio .view-statement em { color: var(--accent); font-style: italic; }
+.variant-clx-q-studio .view.ours .view-statement em {
+  color: var(--text-invert);
+  border-bottom: 3px solid rgba(0,0,0,0.4);
+  font-style: italic;
+}
+.variant-clx-q-studio .view-detail {
+  font-family: var(--font-body);
+  font-size: 14px; line-height: 1.7;
+  color: var(--text-body);
+  padding-top: 14px;
+  border-top: 1px solid var(--border-faint);
+  margin-top: auto;
+}
+.variant-clx-q-studio .view.ours .view-detail {
+  color: var(--text-invert);
+  border-top-color: rgba(0,0,0,0.2);
+}
+.variant-clx-q-studio .view-detail strong { color: var(--text-primary); }
+.variant-clx-q-studio .view.ours .view-detail strong { color: var(--text-invert); }
+
+
+/* ============================================================
+   §15 · S-A · 三个能力 (中间高亮)
+   ============================================================ */
+.variant-s-a-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 28px;
+}
+.variant-s-a-studio .s-header {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: end;
+}
+.variant-s-a-studio .s-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-s-a-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 44px; font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  max-width: 900px;
+}
+.variant-s-a-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-s-a-studio .s-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-s-a-studio .s-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-faint);
+  padding: 28px 26px;
+  display: flex; flex-direction: column;
+  gap: 14px;
+  min-height: 280px;
+  position: relative;
+}
+.variant-s-a-studio .s-card.featured {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.variant-s-a-studio .s-card .card-num {
+  font-family: var(--font-mono);
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+}
+.variant-s-a-studio .s-card.featured .card-num { color: var(--text-invert); }
+.variant-s-a-studio .s-card .card-title {
+  font-family: var(--font-zh);
+  font-size: 26px; font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.variant-s-a-studio .s-card.featured .card-title { color: var(--text-invert); }
+.variant-s-a-studio .s-card .card-text {
+  font-family: var(--font-body);
+  font-size: 13px; line-height: 1.6;
+  color: var(--text-body);
+}
+.variant-s-a-studio .s-card.featured .card-text { color: var(--text-invert); }
+.variant-s-a-studio .s-card .card-text strong { color: var(--text-primary); font-weight: 600; }
+.variant-s-a-studio .s-card.featured .card-text strong { color: var(--text-invert); }
+.variant-s-a-studio .s-card .card-meta {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-faint);
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+}
+.variant-s-a-studio .s-card.featured .card-meta {
+  color: var(--text-invert);
+  border-top-color: rgba(0,0,0,0.2);
+}
+
+
+/* ============================================================
+   §16 · S-B · 单一论点 + 三证据
+   ============================================================ */
+.variant-s-b-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 24px;
+}
+.variant-s-b-studio .s-header {
+  position: relative; z-index: 2;
+}
+.variant-s-b-studio .s-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-s-b-studio .slot-thesis {
+  font-family: var(--font-zh);
+  font-size: 52px; font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  max-width: 1000px;
+}
+.variant-s-b-studio .slot-thesis em { color: var(--accent); font-style: italic; }
+.variant-s-b-studio .evidence-list {
+  display: flex; flex-direction: column;
+  gap: 14px;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-s-b-studio .evidence-row {
+  display: grid;
+  grid-template-columns: 80px 80px 1fr;
+  gap: 24px;
+  align-items: center;
+  padding: 20px 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-faint);
+}
+.variant-s-b-studio .evidence-tag {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+}
+.variant-s-b-studio .evidence-value {
+  font-family: var(--font-display);
+  font-size: 32px; font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+}
+.variant-s-b-studio .evidence-text {
+  font-family: var(--font-body);
+  font-size: 14px; line-height: 1.65;
+  color: var(--text-body);
+}
+.variant-s-b-studio .evidence-text strong {
+  color: var(--text-primary); font-weight: 600;
+}
+
+
+/* ============================================================
+   §17 · S-C · 链式因果 (A→B→C→D)
+   ============================================================ */
+.variant-s-c-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 28px;
+}
+.variant-s-c-studio .s-header {
+  position: relative; z-index: 2;
+}
+.variant-s-c-studio .s-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-s-c-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 36px; font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-s-c-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-s-c-studio .chain {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  gap: 12px;
+  align-items: stretch;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-s-c-studio .chain-step {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-faint);
+  padding: 24px 22px;
+  display: flex; flex-direction: column;
+  gap: 12px;
+  min-height: 220px;
+}
+.variant-s-c-studio .chain-step.final {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.variant-s-c-studio .chain-step .step-num {
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+}
+.variant-s-c-studio .chain-step.final .step-num { color: var(--text-invert); }
+.variant-s-c-studio .chain-step .step-title {
+  font-family: var(--font-zh);
+  font-size: 19px; font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.variant-s-c-studio .chain-step.final .step-title { color: var(--text-invert); }
+.variant-s-c-studio .chain-step .step-text {
+  font-family: var(--font-body);
+  font-size: 12px; line-height: 1.6;
+  color: var(--text-body);
+  margin-top: auto;
+}
+.variant-s-c-studio .chain-step.final .step-text { color: var(--text-invert); }
+.variant-s-c-studio .chain-arrow {
+  font-family: var(--font-display);
+  font-size: 28px; font-weight: 900;
+  color: var(--accent);
+  display: flex; align-items: center;
+}
+
+
+/* ============================================================
+   §18 · CMP-A · 双联对比 (我们 vs 同行)
+   ============================================================ */
+.variant-cmp-a-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 24px;
+}
+.variant-cmp-a-studio .c-header {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: end;
+}
+.variant-cmp-a-studio .c-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-cmp-a-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 36px; font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-cmp-a-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-cmp-a-studio .pair-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-cmp-a-studio .pair-cell {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-faint);
+  padding: 28px 28px;
+  display: flex; flex-direction: column; gap: 16px;
+  min-height: 320px;
+}
+.variant-cmp-a-studio .pair-cell.subject {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.variant-cmp-a-studio .pair-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-faint);
+}
+.variant-cmp-a-studio .pair-cell.subject .pair-header {
+  border-bottom-color: rgba(0,0,0,0.2);
+}
+.variant-cmp-a-studio .pair-tag {
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+}
+.variant-cmp-a-studio .pair-cell.subject .pair-tag { color: var(--text-invert); }
+.variant-cmp-a-studio .pair-name {
+  font-family: var(--font-zh);
+  font-size: 22px; font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.variant-cmp-a-studio .pair-cell.subject .pair-name { color: var(--text-invert); }
+.variant-cmp-a-studio .pair-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.variant-cmp-a-studio .pair-metric {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.variant-cmp-a-studio .pair-metric .label {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.20em;
+  text-transform: uppercase; color: var(--text-muted);
+}
+.variant-cmp-a-studio .pair-cell.subject .pair-metric .label { color: rgba(0,0,0,0.6); }
+.variant-cmp-a-studio .pair-metric .value {
+  font-family: var(--font-display);
+  font-size: 26px; font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+}
+.variant-cmp-a-studio .pair-cell.subject .pair-metric .value { color: var(--text-invert); }
+.variant-cmp-a-studio .pair-narrative {
+  font-family: var(--font-body);
+  font-size: 13px; line-height: 1.65;
+  color: var(--text-body);
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-faint);
+}
+.variant-cmp-a-studio .pair-cell.subject .pair-narrative {
+  color: var(--text-invert);
+  border-top-color: rgba(0,0,0,0.2);
+}
+.variant-cmp-a-studio .pair-narrative strong { color: var(--text-primary); }
+.variant-cmp-a-studio .pair-cell.subject .pair-narrative strong { color: var(--text-invert); }
+
+
+/* ============================================================
+   §19 · CMP-D · 多维表格 (项目 × 维度)
+   ============================================================ */
+.variant-cmp-d-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 24px;
+  --rows: 5;
+}
+.variant-cmp-d-studio .c-header {
+  position: relative; z-index: 2;
+}
+.variant-cmp-d-studio .c-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-cmp-d-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 32px; font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-cmp-d-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-cmp-d-studio .cmp-table {
+  background: var(--bg-surface);
+  border: 1px solid var(--accent);
+  align-self: center;
+  position: relative; z-index: 2;
+  overflow: hidden;
+}
+.variant-cmp-d-studio .cmp-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+}
+.variant-cmp-d-studio .cmp-table thead th {
+  padding: 14px 18px;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+  text-align: left;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--accent);
+  background: var(--bg-elevated);
+}
+.variant-cmp-d-studio .cmp-table thead th.right { text-align: right; }
+.variant-cmp-d-studio .cmp-table thead th.center { text-align: center; }
+.variant-cmp-d-studio .cmp-table thead th.featured {
+  background: var(--accent);
+  color: var(--text-invert);
+}
+.variant-cmp-d-studio .cmp-table tbody td {
+  padding: clamp(12px, calc(20px - var(--rows) * 1px), 16px) 18px;
+  font-family: var(--font-zh);
+  font-size: 14px; font-weight: 500;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-faint);
+}
+.variant-cmp-d-studio .cmp-table tbody tr:last-child td { border-bottom: 0; }
+.variant-cmp-d-studio .cmp-table tbody td:first-child {
+  font-weight: 800;
+  font-family: var(--font-zh);
+}
+.variant-cmp-d-studio .cmp-table tbody td.center {
+  text-align: center;
+  color: var(--text-body);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.10em;
+}
+.variant-cmp-d-studio .cmp-table tbody td.featured {
+  background: var(--accent-faint);
+  color: var(--accent);
+  font-weight: 800;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.10em;
+}
+
+
+/* ============================================================
+   §20 · INS-A · 大字引语 (设计哲学)
+   ============================================================ */
+.variant-ins-a-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 32px;
+}
+.variant-ins-a-studio .ins-body {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column;
+  justify-content: center;
+}
+.variant-ins-a-studio .ins-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 32px;
+}
+.variant-ins-a-studio .ins-eyebrow::before {
+  content: ""; display: inline-block;
+  width: 32px; height: 1px;
+  background: var(--accent);
+  vertical-align: middle; margin-right: 16px;
+}
+.variant-ins-a-studio .slot-quote {
+  font-family: var(--font-display);
+  font-size: 96px; font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+}
+.variant-ins-a-studio .slot-quote em {
+  color: var(--accent);
+  font-style: italic;
+}
+.variant-ins-a-studio .ins-attribution {
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-accent);
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 32px;
+}
+.variant-ins-a-studio .attr-name {
+  font-family: var(--font-mono);
+  font-size: 13px; letter-spacing: 0.16em;
+  color: var(--text-muted);
+}
+.variant-ins-a-studio .attr-name strong { color: var(--accent); font-weight: 700; }
+.variant-ins-a-studio .attr-context {
+  font-family: var(--font-body);
+  font-size: 14px; line-height: 1.6;
+  color: var(--text-body);
+}
+.variant-ins-a-studio .attr-context strong { color: var(--text-primary); font-weight: 600; }
+
+
+/* ============================================================
+   §21 · INS-C · 反共识观点
+   ============================================================ */
+.variant-ins-c-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 28px;
+}
+.variant-ins-c-studio .ins-header {
+  position: relative; z-index: 2;
+}
+.variant-ins-c-studio .ins-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-ins-c-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 40px; font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-ins-c-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-ins-c-studio .opinion-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-ins-c-studio .opinion {
+  padding: 32px 28px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.variant-ins-c-studio .opinion.consensus {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-faint);
+  opacity: 0.6;
+  position: relative;
+}
+.variant-ins-c-studio .opinion.ours {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+}
+.variant-ins-c-studio .opinion-tag {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.20em;
+  color: var(--text-muted);
+}
+.variant-ins-c-studio .opinion.ours .opinion-tag { color: var(--text-invert); }
+.variant-ins-c-studio .opinion-text {
+  font-family: var(--font-zh);
+  font-size: 24px; font-weight: 900;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.variant-ins-c-studio .opinion.ours .opinion-text { color: var(--text-invert); }
+.variant-ins-c-studio .opinion-detail {
+  font-family: var(--font-body);
+  font-size: 13px; line-height: 1.65;
+  color: var(--text-body);
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-faint);
+}
+.variant-ins-c-studio .opinion.ours .opinion-detail {
+  color: var(--text-invert);
+  border-top-color: rgba(0,0,0,0.2);
+}
+.variant-ins-c-studio .opinion-detail strong { color: var(--text-primary); }
+.variant-ins-c-studio .opinion.ours .opinion-detail strong { color: var(--text-invert); }
+
+
+/* ============================================================
+   §22 · GALLERY 共享 shell
+   ============================================================ */
+.gallery-base {
+  padding: 48px 56px;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: 20px;
+}
+.gallery-base .g-tag {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 8px;
+  position: relative; z-index: 2;
+}
+.gallery-base .slot-caption {
+  font-family: var(--font-zh);
+  font-size: 30px; font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  position: relative; z-index: 2;
+}
+.gallery-base .slot-caption em { color: var(--accent); font-style: italic; }
+
+
+/* H1 · 全幅大图 + 工业 figure meta */
+.variant-h1-studio .h1-figure {
+  position: relative; z-index: 2;
+  width: 100%; height: 100%;
+  min-height: 380px;
+}
+.variant-h1-studio .h1-figure-meta {
+  position: absolute;
+  bottom: 20px; left: 24px; right: 24px;
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.16em;
+  z-index: 5;
+}
+.variant-h1-studio .h1-figure-meta strong {
+  color: var(--text-primary); font-weight: 700;
+}
+
+
+/* H3 · 主图 + 2 副图 */
+.variant-h3-studio .h3-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  position: relative; z-index: 2;
+}
+.variant-h3-studio .h3-main {
+  grid-row: span 2;
+  position: relative;
+}
+.variant-h3-studio .h3-sub {
+  position: relative;
+}
+.variant-h3-studio .h3-meta {
+  position: absolute;
+  bottom: 10px; left: 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.14em;
+  z-index: 5;
+}
+
+
+/* H4 · 2×2 四象限 */
+.variant-h4-studio .h4-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  position: relative; z-index: 2;
+}
+.variant-h4-studio .h4-cell {
+  position: relative;
+}
+.variant-h4-studio .h4-meta {
+  position: absolute;
+  bottom: 10px; left: 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.14em;
+  z-index: 5;
+}
+
+
+/* GC-A · 6 张项目缩略 (contact sheet) */
+.variant-gc-a-studio .gc-contact {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+  position: relative; z-index: 2;
+}
+.variant-gc-a-studio .gc-frame {
+  position: relative;
+  min-height: 180px;
+}
+.variant-gc-a-studio .gc-frame-info {
+  position: absolute;
+  bottom: 10px; left: 12px; right: 12px;
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  z-index: 5;
+}
+.variant-gc-a-studio .gc-frame-info strong { color: var(--text-primary); font-weight: 700; }
+
+
+/* GC-B · 1 图 + N 注释 ★ 自适应 N=4 */
+.variant-gc-b-studio {
+  --rows: 4;
+}
+.variant-gc-b-studio .gcb-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  position: relative; z-index: 2;
+}
+.variant-gc-b-studio .gcb-fig {
+  position: relative;
+  min-height: 380px;
+}
+.variant-gc-b-studio .gcb-caps {
+  display: flex; flex-direction: column;
+  gap: clamp(10px, calc(20px - var(--rows) * 1.5px), 16px);
+  justify-content: center;
+}
+.variant-gc-b-studio .gcb-cap {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  padding-bottom: clamp(8px, calc(16px - var(--rows) * 1px), 12px);
+  border-bottom: 1px solid var(--border-faint);
+}
+.variant-gc-b-studio .gcb-cap:last-child { border-bottom: 0; }
+.variant-gc-b-studio .gcb-num {
+  font-family: var(--font-mono);
+  font-size: 16px; font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.10em;
+}
+.variant-gc-b-studio .gcb-text {
+  font-family: var(--font-body);
+  font-size: 13px; line-height: 1.6;
+  color: var(--text-body);
+}
+.variant-gc-b-studio .gcb-text strong {
+  color: var(--text-primary); font-weight: 600;
+}
+
+
+/* ============================================================
+   §23 · CASE-A · 全屏 hero (整页项目大图 + 4 列 meta)
+   ============================================================ */
+.variant-case-a-studio {
+  padding: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+.variant-case-a-studio .case-top {
+  padding: 24px 40px;
+  display: flex; justify-content: space-between; align-items: baseline;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--accent);
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--accent);
+  position: relative; z-index: 3;
+}
+.variant-case-a-studio .case-top-tag {
+  display: flex; gap: 16px; align-items: baseline;
+}
+.variant-case-a-studio .case-top-tag .num {
+  font-weight: 700;
+}
+.variant-case-a-studio .case-top-name {
+  color: var(--text-primary);
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.variant-case-a-studio .case-hero {
+  position: relative;
+  width: 100%; height: 100%;
+}
+.variant-case-a-studio .case-hero-label {
+  position: absolute;
+  bottom: 32px; left: 40px;
+  font-family: var(--font-display);
+  font-size: 56px; font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  text-shadow: 0 4px 24px rgba(0,0,0,0.7);
+  z-index: 3;
+  max-width: 800px;
+}
+.variant-case-a-studio .case-hero-label em { color: var(--accent); font-style: italic; }
+.variant-case-a-studio .case-hero-label .sub {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 13px; font-weight: 500;
+  letter-spacing: 0.20em;
+  color: var(--text-primary);
+  margin-top: 16px;
+}
+.variant-case-a-studio .case-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  padding: 20px 40px;
+  background: var(--bg-deep);
+  border-top: 1px solid var(--accent);
+  position: relative; z-index: 3;
+}
+.variant-case-a-studio .meta-cell {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.variant-case-a-studio .meta-label {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--text-muted);
+}
+.variant-case-a-studio .meta-value {
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.variant-case-a-studio .meta-value.accent { color: var(--accent); }
+
+
+/* ============================================================
+   §24 · CASE-B · Before/After (改版对比)
+   ============================================================ */
+.variant-case-b-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 20px;
+}
+.variant-case-b-studio .case-header {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: end;
+}
+.variant-case-b-studio .case-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 10px;
+}
+.variant-case-b-studio .case-title {
+  font-family: var(--font-zh);
+  font-size: 32px; font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-case-b-studio .case-title em { color: var(--accent); font-style: italic; }
+.variant-case-b-studio .case-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.16em;
+  padding: 6px 12px;
+  background: var(--accent);
+  color: var(--text-invert);
+}
+.variant-case-b-studio .compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 16px;
+  position: relative; z-index: 2;
+}
+.variant-case-b-studio .compare-cell {
+  display: flex; flex-direction: column; gap: 10px;
+  position: relative;
+}
+.variant-case-b-studio .cell-fig {
+  flex: 1;
+  min-height: 360px;
+}
+.variant-case-b-studio .cell-tag {
+  position: absolute;
+  top: 12px; left: 12px;
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.20em;
+  padding: 6px 12px;
+  z-index: 3;
+}
+.variant-case-b-studio .compare-cell.before .cell-tag {
+  background: rgba(0,0,0,0.7);
+  color: var(--text-muted);
+  border: 1px solid var(--text-muted);
+}
+.variant-case-b-studio .compare-cell.after .cell-tag {
+  background: var(--accent);
+  color: var(--text-invert);
+}
+.variant-case-b-studio .cell-caption {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-body);
+  letter-spacing: 0.08em;
+  line-height: 1.55;
+}
+.variant-case-b-studio .cell-caption strong {
+  color: var(--accent); font-weight: 600;
+}
+
+
+/* ============================================================
+   §25 · CASE-C · Process (5 帧时间流)
+   ============================================================ */
+.variant-case-c-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 24px;
+}
+.variant-case-c-studio .case-header {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: end;
+}
+.variant-case-c-studio .case-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 10px;
+}
+.variant-case-c-studio .case-title {
+  font-family: var(--font-zh);
+  font-size: 32px; font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-case-c-studio .case-title em { color: var(--accent); font-style: italic; }
+.variant-case-c-studio .process-flow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-case-c-studio .process-step {
+  display: flex; flex-direction: column; gap: 10px;
+  position: relative;
+}
+.variant-case-c-studio .step-fig {
+  height: 240px;
+  position: relative;
+}
+.variant-case-c-studio .step-arrow {
+  position: absolute;
+  top: 50%; right: -14px;
+  transform: translateY(-50%);
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 900;
+  color: var(--accent);
+  z-index: 3;
+}
+.variant-case-c-studio .process-step:last-child .step-arrow { display: none; }
+.variant-case-c-studio .step-num {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.20em;
+  color: var(--accent);
+}
+.variant-case-c-studio .step-name {
+  font-family: var(--font-zh);
+  font-size: 15px; font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.variant-case-c-studio .step-detail {
+  font-family: var(--font-mono);
+  font-size: 10px; line-height: 1.6;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.variant-case-c-studio .process-step.final .step-name { color: var(--accent); }
+
+
+/* ============================================================
+   §26 · ART-A · TILT 倾斜照片墙 (Polaroid 角度)
+   ============================================================ */
+.variant-art-a-studio .stage {
+  position: absolute; inset: 0;
+  z-index: 1;
+}
+.variant-art-a-studio .tilt-photo {
+  position: absolute;
+  background: #FFF;
+  padding: 12px 12px 36px 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+}
+.variant-art-a-studio .tilt-photo .tilt-inner {
+  width: 240px; height: 240px;
+}
+.variant-art-a-studio .tilt-photo.t1 { top: 180px; left: 120px; transform: rotate(-6deg); z-index: 2; }
+.variant-art-a-studio .tilt-photo.t2 { top: 140px; left: 380px; transform: rotate(3deg); z-index: 3; }
+.variant-art-a-studio .tilt-photo.t3 { top: 240px; left: 620px; transform: rotate(-2deg); z-index: 2; }
+.variant-art-a-studio .tilt-photo.t4 { top: 200px; right: 100px; transform: rotate(4deg); z-index: 4; }
+.variant-art-a-studio .tilt-caption {
+  font-family: var(--font-mono);
+  font-size: 10px; color: #000;
+  text-align: center;
+  margin-top: 8px;
+  letter-spacing: 0.12em;
+}
+.variant-art-a-studio .art-header {
+  position: absolute;
+  bottom: 80px; left: 40px;
+  z-index: 5;
+  max-width: 700px;
+}
+.variant-art-a-studio .art-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-art-a-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 42px; font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-art-a-studio .slot-title em { color: var(--accent); font-style: italic; }
+
+
+/* ============================================================
+   §27 · ART-B · OVERLAP 错位叠加
+   ============================================================ */
+.variant-art-b-studio .ov-bg {
+  position: absolute;
+  top: 0; right: 0;
+  width: 60%; height: 100%;
+  z-index: 1;
+}
+.variant-art-b-studio .ov-front {
+  position: absolute;
+  bottom: 80px; left: 56px;
+  width: 320px; height: 380px;
+  z-index: 3;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+}
+.variant-art-b-studio .ov-small {
+  position: absolute;
+  bottom: 80px; right: 56px;
+  width: 200px; height: 200px;
+  z-index: 4;
+  border: 4px solid var(--accent);
+}
+.variant-art-b-studio .ov-text {
+  position: absolute;
+  top: 100px; left: 56px;
+  z-index: 5;
+  width: 480px;
+}
+.variant-art-b-studio .ov-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 16px;
+  display: inline-block;
+}
+.variant-art-b-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 56px; font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+.variant-art-b-studio .slot-title em { color: var(--accent); font-style: italic; }
+
+
+/* ============================================================
+   §28 · ART-C · BLEED 出血大图 + 大字 mix-blend
+   ============================================================ */
+.variant-art-c-studio .bleed-img {
+  position: absolute; inset: 0;
+  z-index: 1;
+}
+.variant-art-c-studio .bleed-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.7) 100%);
+  z-index: 2;
+}
+.variant-art-c-studio .bleed-title {
+  position: absolute;
+  bottom: 80px; left: 56px; right: 56px;
+  z-index: 4;
+}
+.variant-art-c-studio .slot-bigtype {
+  font-family: var(--font-display);
+  font-size: 200px; font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  color: var(--accent);
+  mix-blend-mode: difference;
+  filter: drop-shadow(0 0 24px rgba(0,0,0,0.5));
+}
+.variant-art-c-studio .bleed-sub {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-primary);
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  margin-top: 24px;
+  padding-top: 14px;
+  border-top: 1px solid var(--accent);
+  width: 480px;
+}
+.variant-art-c-studio .bleed-sub em { color: var(--accent); font-style: normal; }
+.variant-art-c-studio .bleed-tag {
+  position: absolute;
+  top: 56px; left: 56px;
+  z-index: 5;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.20em;
+  background: var(--accent);
+  color: var(--text-invert);
+  padding: 8px 14px;
+}
+
+
+/* ============================================================
+   §29 · ART-D · SCALE 极端尺寸对比
+   ============================================================ */
+.variant-art-d-studio {
+  padding: 56px 64px;
+}
+.variant-art-d-studio .scale-stage {
+  position: relative;
+  width: 100%; height: 100%;
+}
+.variant-art-d-studio .scale-big {
+  position: absolute;
+  top: 0; left: 0;
+  width: 600px; height: 100%;
+  z-index: 1;
+}
+.variant-art-d-studio .scale-small {
+  position: absolute;
+  top: 60%; left: 720px;
+  width: 80px; height: 80px;
+  z-index: 2;
+  border: 2px solid var(--accent);
+}
+.variant-art-d-studio .scale-text {
+  position: absolute;
+  top: 40px; right: 0;
+  width: 480px;
+  z-index: 3;
+}
+.variant-art-d-studio .scale-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 16px;
+}
+.variant-art-d-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 48px; font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-art-d-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-art-d-studio .scale-body {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-body);
+  margin-top: 24px;
+  max-width: 420px;
+}
+.variant-art-d-studio .scale-body strong { color: var(--text-primary); font-weight: 600; }
+.variant-art-d-studio .scale-relation {
+  position: absolute;
+  top: calc(60% + 100px);
+  left: 720px;
+  width: 200px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.10em;
+  z-index: 3;
+}
+.variant-art-d-studio .scale-relation strong { color: var(--accent); }
+
+
+/* ============================================================
+   §30 · ART-E · ZOOM 局部放大镜
+   ============================================================ */
+.variant-art-e-studio { padding: 0; }
+.variant-art-e-studio .zoom-main {
+  position: absolute;
+  top: 0; left: 0;
+  width: 70%; height: 100%;
+  z-index: 1;
+}
+.variant-art-e-studio .zoom-lens {
+  position: absolute;
+  top: 220px; left: 460px;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  z-index: 4;
+  border: 3px solid var(--accent);
+  box-shadow: 0 16px 60px rgba(0,0,0,0.8), 0 0 0 6px rgba(217,255,0,0.15);
+  overflow: hidden;
+}
+.variant-art-e-studio .zoom-lens .zoom-fig {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #D9FF00 0%, #B8D900 60%, #E8FF6B 100%);
+  position: relative;
+}
+.variant-art-e-studio .zoom-lens .zoom-fig::after {
+  content: "[ ZOOM ]";
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  font-family: var(--font-mono);
+  font-size: 14px; letter-spacing: 0.20em;
+  color: rgba(0,0,0,0.4);
+  font-weight: 700;
+}
+.variant-art-e-studio .zoom-line {
+  position: absolute;
+  top: 380px; left: 420px;
+  width: 80px; height: 2px;
+  background: var(--accent);
+  z-index: 3;
+  transform: rotate(45deg);
+}
+.variant-art-e-studio .zoom-info {
+  position: absolute;
+  top: 100px; right: 64px;
+  width: 320px;
+  z-index: 5;
+}
+.variant-art-e-studio .zoom-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.20em;
+  background: var(--accent);
+  color: var(--text-invert);
+  padding: 8px 12px;
+  margin-bottom: 24px;
+}
+.variant-art-e-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 42px; font-weight: 900;
+  line-height: 1.05;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+.variant-art-e-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-art-e-studio .zoom-spec {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--accent);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.variant-art-e-studio .zoom-spec-cell {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.variant-art-e-studio .zoom-spec-label {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.20em;
+  text-transform: uppercase; color: var(--text-muted);
+}
+.variant-art-e-studio .zoom-spec-value {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 800;
+  color: var(--text-primary);
+}
+.variant-art-e-studio .zoom-spec-value.accent { color: var(--accent); }
+
+
+/* ============================================================
+   §31 · ART-F · COLLAGE 拼贴风
+   ============================================================ */
+.variant-art-f-studio { padding: 0; }
+.variant-art-f-studio .col-stage {
+  position: relative;
+  width: 100%; height: 100%;
+}
+.variant-art-f-studio .col-photo {
+  position: absolute;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+}
+.variant-art-f-studio .col-photo.c1 { top: 80px; left: 56px; width: 300px; height: 220px; transform: rotate(-3deg); z-index: 2; }
+.variant-art-f-studio .col-photo.c2 { top: 60px; left: 400px; width: 220px; height: 300px; z-index: 3; }
+.variant-art-f-studio .col-photo.c3 { top: 220px; left: 180px; width: 260px; height: 180px; transform: rotate(2deg); z-index: 4; }
+.variant-art-f-studio .col-photo.c4 { top: 360px; right: 56px; width: 320px; height: 220px; transform: rotate(-2deg); z-index: 3; }
+.variant-art-f-studio .col-photo.c5 { top: 160px; right: 200px; width: 170px; height: 170px; z-index: 5; border: 3px solid var(--accent); }
+.variant-art-f-studio .col-photo.c6 { top: 340px; left: 400px; width: 140px; height: 140px; transform: rotate(5deg); z-index: 4; }
+.variant-art-f-studio .col-shape {
+  position: absolute;
+  z-index: 6;
+}
+.variant-art-f-studio .col-shape.triangle {
+  width: 0; height: 0;
+  border-left: 36px solid transparent;
+  border-right: 36px solid transparent;
+  border-bottom: 60px solid var(--accent);
+  top: 320px; left: 90px;
+  transform: rotate(15deg);
+}
+.variant-art-f-studio .col-shape.label-num {
+  font-family: var(--font-display);
+  font-size: 96px; font-weight: 900;
+  color: var(--accent);
+  letter-spacing: -0.04em;
+  top: 60px; right: 56px;
+  line-height: 0.9;
+}
+.variant-art-f-studio .col-text {
+  position: absolute;
+  bottom: 64px; left: 64px;
+  z-index: 7;
+  width: 380px;
+  background: var(--bg-deep);
+  padding: 16px 0;
+}
+.variant-art-f-studio .col-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 8px;
+}
+.variant-art-f-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 22px; font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.variant-art-f-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-art-f-studio .col-label-tag {
+  position: absolute;
+  z-index: 8;
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.16em;
+  padding: 4px 8px;
+  background: var(--accent);
+  color: var(--text-invert);
+}
+.variant-art-f-studio .col-label-tag.lab1 { top: 60px; left: 360px; transform: rotate(-3deg); }
+.variant-art-f-studio .col-label-tag.lab2 { bottom: 200px; right: 100px; transform: rotate(2deg); }
+
+
+/* ============================================================
+   §32 · TL-A · 工作室年表 (横向多节点 6 年)
+   ============================================================ */
+.variant-tl-a-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 32px;
+  --cols: 6;
+}
+.variant-tl-a-studio .tl-header {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: end;
+}
+.variant-tl-a-studio .tl-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-tl-a-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 40px; font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-tl-a-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-tl-a-studio .tl-axis {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  gap: 16px;
+  align-self: center;
+  position: relative;
+}
+.variant-tl-a-studio .tl-axis::before {
+  content: "";
+  position: absolute;
+  top: 24px; left: 0; right: 0;
+  height: 1px;
+  background: var(--accent);
+}
+.variant-tl-a-studio .tl-point {
+  display: flex; flex-direction: column;
+  position: relative;
+  padding-top: 56px;
+}
+.variant-tl-a-studio .tl-point::before {
+  content: "";
+  position: absolute;
+  top: 18px; left: 0;
+  width: 12px; height: 12px;
+  background: var(--bg-deep);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+}
+.variant-tl-a-studio .tl-point.active::before {
+  background: var(--accent);
+  width: 16px; height: 16px;
+  top: 16px;
+}
+.variant-tl-a-studio .tl-year {
+  font-family: var(--font-display);
+  font-size: 32px; font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-tl-a-studio .tl-point.active .tl-year { color: var(--accent); }
+.variant-tl-a-studio .tl-event {
+  font-family: var(--font-zh);
+  font-size: 14px; font-weight: 600;
+  margin-top: 6px;
+  color: var(--text-primary);
+}
+.variant-tl-a-studio .tl-detail {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  margin-top: 4px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   §33 · TL-B · 项目周期对照 (3 项目 × 时间轴)
+   ============================================================ */
+.variant-tl-b-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 28px;
+}
+.variant-tl-b-studio .tl-header {
+  position: relative; z-index: 2;
+}
+.variant-tl-b-studio .tl-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-tl-b-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 36px; font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-tl-b-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-tl-b-studio .tlb-grid {
+  display: grid;
+  grid-template-rows: auto repeat(3, 1fr);
+  gap: 0;
+  position: relative; z-index: 2;
+  align-self: center;
+  border-top: 1px solid var(--accent);
+}
+.variant-tl-b-studio .tlb-months {
+  display: grid;
+  grid-template-columns: 120px repeat(12, 1fr);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-faint);
+}
+.variant-tl-b-studio .tlb-month {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-align: center;
+  color: var(--text-muted);
+}
+.variant-tl-b-studio .tlb-month:first-child {
+  color: var(--accent);
+  font-weight: 700;
+  text-align: left;
+  padding-left: 4px;
+}
+.variant-tl-b-studio .tlb-project {
+  display: grid;
+  grid-template-columns: 120px repeat(12, 1fr);
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-faint);
+  position: relative;
+}
+.variant-tl-b-studio .tlb-project:last-child { border-bottom: 0; }
+.variant-tl-b-studio .tlb-name {
+  font-family: var(--font-zh);
+  font-size: 14px; font-weight: 800;
+  color: var(--text-primary);
+  padding-left: 4px;
+}
+.variant-tl-b-studio .tlb-bar {
+  grid-column-start: var(--start, 2);
+  grid-column-end: var(--end, 6);
+  height: 28px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  position: relative;
+  display: flex; align-items: center;
+  padding: 0 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-body);
+  letter-spacing: 0.08em;
+}
+.variant-tl-b-studio .tlb-bar.featured {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-invert);
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   §34 · PRC-A · 设计流程 (4-5 步)
+   ============================================================ */
+.variant-prc-a-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 28px;
+  --cols: 4;
+}
+.variant-prc-a-studio .prc-header {
+  position: relative; z-index: 2;
+}
+.variant-prc-a-studio .prc-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-prc-a-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 40px; font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-prc-a-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-prc-a-studio .prc-flow {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  gap: 14px;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-prc-a-studio .prc-step {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-faint);
+  padding: 24px 22px;
+  display: flex; flex-direction: column;
+  gap: 12px;
+  min-height: 280px;
+  position: relative;
+}
+.variant-prc-a-studio .prc-step.final {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.variant-prc-a-studio .prc-step::after {
+  content: "→";
+  position: absolute;
+  top: 50%; right: -18px;
+  transform: translateY(-50%);
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 900;
+  color: var(--accent);
+  z-index: 3;
+}
+.variant-prc-a-studio .prc-step:last-child::after { display: none; }
+.variant-prc-a-studio .prc-step .step-num {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+}
+.variant-prc-a-studio .prc-step.final .step-num { color: var(--text-invert); }
+.variant-prc-a-studio .prc-step .step-title {
+  font-family: var(--font-zh);
+  font-size: 22px; font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.variant-prc-a-studio .prc-step.final .step-title { color: var(--text-invert); }
+.variant-prc-a-studio .prc-step .step-text {
+  font-family: var(--font-body);
+  font-size: 12px; line-height: 1.6;
+  color: var(--text-body);
+}
+.variant-prc-a-studio .prc-step.final .step-text { color: var(--text-invert); }
+.variant-prc-a-studio .prc-step .step-text strong {
+  color: var(--text-primary); font-weight: 600;
+}
+.variant-prc-a-studio .prc-step.final .step-text strong { color: var(--text-invert); }
+.variant-prc-a-studio .prc-step .step-time {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+}
+.variant-prc-a-studio .prc-step.final .step-time {
+  color: var(--text-invert);
+  border-top-color: rgba(0,0,0,0.2);
+}
+
+
+/* ============================================================
+   §35 · FRW-A · 2×2 矩阵 (服务象限)
+   ============================================================ */
+.variant-frw-a-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 24px;
+}
+.variant-frw-a-studio .f-header {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: end;
+}
+.variant-frw-a-studio .f-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-frw-a-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 36px; font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-frw-a-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-frw-a-studio .frw-axis-info {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-align: right;
+  line-height: 1.6;
+}
+.variant-frw-a-studio .frw-axis-info strong { color: var(--accent); font-weight: 700; }
+.variant-frw-a-studio .quad-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 16px;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-frw-a-studio .quad {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-faint);
+  padding: 24px 24px;
+  display: flex; flex-direction: column; gap: 10px;
+  position: relative;
+}
+.variant-frw-a-studio .quad.featured {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.variant-frw-a-studio .quad-num {
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+}
+.variant-frw-a-studio .quad.featured .quad-num { color: var(--text-invert); }
+.variant-frw-a-studio .quad-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.variant-frw-a-studio .quad.featured .quad-label { color: rgba(0,0,0,0.7); }
+.variant-frw-a-studio .quad-title {
+  font-family: var(--font-zh);
+  font-size: 20px; font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.variant-frw-a-studio .quad.featured .quad-title { color: var(--text-invert); }
+.variant-frw-a-studio .quad-text {
+  font-family: var(--font-body);
+  font-size: 12px; line-height: 1.6;
+  color: var(--text-body);
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-faint);
+}
+.variant-frw-a-studio .quad.featured .quad-text {
+  color: var(--text-invert);
+  border-top-color: rgba(0,0,0,0.2);
+}
+
+
+/* ============================================================
+   §36 · FRW-D · 分层 framework (4 层金字塔)
+   ============================================================ */
+.variant-frw-d-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 24px;
+  --rows: 4;
+}
+.variant-frw-d-studio .f-header {
+  position: relative; z-index: 2;
+}
+.variant-frw-d-studio .f-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-frw-d-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 36px; font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-frw-d-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-frw-d-studio .layers {
+  display: flex; flex-direction: column;
+  gap: 8px;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-frw-d-studio .layer {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr 100px;
+  gap: 24px;
+  align-items: center;
+  padding: 20px 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-faint);
+}
+.variant-frw-d-studio .layer.featured {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.variant-frw-d-studio .layer-num {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+}
+.variant-frw-d-studio .layer.featured .layer-num { color: var(--text-invert); }
+.variant-frw-d-studio .layer-name {
+  font-family: var(--font-zh);
+  font-size: 20px; font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.variant-frw-d-studio .layer.featured .layer-name { color: var(--text-invert); }
+.variant-frw-d-studio .layer-desc {
+  font-family: var(--font-body);
+  font-size: 13px; line-height: 1.55;
+  color: var(--text-body);
+}
+.variant-frw-d-studio .layer.featured .layer-desc { color: var(--text-invert); }
+.variant-frw-d-studio .layer-desc strong { color: var(--text-primary); }
+.variant-frw-d-studio .layer.featured .layer-desc strong { color: var(--text-invert); }
+.variant-frw-d-studio .layer-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  text-align: right;
+}
+.variant-frw-d-studio .layer.featured .layer-tag { color: var(--text-invert); }
+
+
+/* ============================================================
+   §37 · CLO-A · 结语 CTA + 联系方式
+   ============================================================ */
+.variant-clo-a-studio {
+  padding: 64px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 40px;
+}
+.variant-clo-a-studio .clo-mid {
+  display: flex; flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative; z-index: 2;
+}
+.variant-clo-a-studio .clo-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 24px;
+}
+.variant-clo-a-studio .clo-eyebrow::before { content: "→ "; color: var(--accent); }
+.variant-clo-a-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 110px; font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+}
+.variant-clo-a-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-clo-a-studio .slot-title em.boxed {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--text-invert);
+  padding: 0 16px;
+  line-height: 1;
+  font-style: normal;
+}
+.variant-clo-a-studio .slot-subtitle {
+  margin-top: 24px;
+  font-family: var(--font-body);
+  font-size: 18px; font-weight: 500;
+  line-height: 1.6;
+  color: var(--text-body);
+  max-width: 720px;
+}
+.variant-clo-a-studio .slot-subtitle strong { color: var(--text-primary); }
+.variant-clo-a-studio .clo-cta {
+  display: flex; gap: 16px; align-items: center;
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-faint);
+  width: 100%;
+}
+.variant-clo-a-studio .cta-primary {
+  background: var(--accent);
+  color: var(--text-invert);
+  font-family: var(--font-mono);
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 14px 24px;
+  border: 0;
+}
+.variant-clo-a-studio .cta-contact {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-body); letter-spacing: 0.08em;
+}
+.variant-clo-a-studio .cta-contact strong {
+  color: var(--accent); font-weight: 700;
+}
+
+
+/* ============================================================
+   §38 · CLO-D · Thank you + 团队信息
+   ============================================================ */
+.variant-clo-d-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 32px;
+}
+.variant-clo-d-studio .clo-body {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 48px;
+  align-items: center;
+  position: relative; z-index: 2;
+}
+.variant-clo-d-studio .clo-text-block {}
+.variant-clo-d-studio .clo-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 20px;
+}
+.variant-clo-d-studio .slot-title {
+  font-family: var(--font-display);
+  font-size: 96px; font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+}
+.variant-clo-d-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-clo-d-studio .slot-subtitle {
+  margin-top: 24px;
+  font-family: var(--font-body);
+  font-size: 15px; line-height: 1.65;
+  color: var(--text-body);
+  max-width: 480px;
+}
+.variant-clo-d-studio .clo-team-block {
+  padding: 28px;
+  background: var(--bg-surface);
+  border: 1px solid var(--accent);
+}
+.variant-clo-d-studio .team-label {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.20em;
+  color: var(--accent);
+  margin-bottom: 18px;
+}
+.variant-clo-d-studio .team-list {
+  display: flex; flex-direction: column;
+  gap: 10px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-faint);
+}
+.variant-clo-d-studio .team-member {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 16px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-body);
+}
+.variant-clo-d-studio .team-member .role {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+}
+.variant-clo-d-studio .team-member .name {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.variant-clo-d-studio .team-meta {
+  margin-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+}
+.variant-clo-d-studio .team-meta strong { color: var(--accent); font-weight: 700; }
+
+
+/* ============================================================
+   §39 · CLO-E · 下一期预告
+   ============================================================ */
+.variant-clo-e-studio {
+  padding: 56px 64px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 28px;
+}
+.variant-clo-e-studio .clo-e-header {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: end;
+}
+.variant-clo-e-studio .clo-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.variant-clo-e-studio .slot-title {
+  font-family: var(--font-zh);
+  font-size: 40px; font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.variant-clo-e-studio .slot-title em { color: var(--accent); font-style: italic; }
+.variant-clo-e-studio .next-meta {
+  background: var(--accent);
+  color: var(--text-invert);
+  padding: 12px 18px;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.16em;
+  text-align: right;
+  line-height: 1.6;
+}
+.variant-clo-e-studio .next-themes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  align-self: center;
+  position: relative; z-index: 2;
+}
+.variant-clo-e-studio .theme-card {
+  padding: 28px 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-faint);
+  display: flex; flex-direction: column; gap: 14px;
+  min-height: 240px;
+}
+.variant-clo-e-studio .theme-num {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.20em;
+  color: var(--accent);
+}
+.variant-clo-e-studio .theme-title {
+  font-family: var(--font-zh);
+  font-size: 22px; font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.variant-clo-e-studio .theme-title em { color: var(--accent); font-style: italic; }
+.variant-clo-e-studio .theme-text {
+  font-family: var(--font-body);
+  font-size: 12px; line-height: 1.6;
+  color: var(--text-body);
+  margin-top: auto;
+}
+.variant-clo-e-studio .theme-text strong { color: var(--text-primary); }
+.variant-clo-e-studio .submission-bar {
+  background: var(--bg-surface);
+  border: 1px solid var(--accent);
+  padding: 18px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.variant-clo-e-studio .sub-info {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-body);
+}
+.variant-clo-e-studio .sub-info strong { color: var(--accent); font-weight: 700; }
+.variant-clo-e-studio .sub-email {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 0.10em;
+  font-weight: 700;
+}
+
+
+</style>
+</head>
+<body class="hide-dev-tags">
+
+
+<!-- ============================================================
+     SECTION 1 · COVER · 3 Variants
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 1 · COVER · 封面 · 3 of 3</div>
+  <div class="section-header-line"></div>
+</div>
+
+
+<!-- COV-A · 工作室年报封面 -->
+<div class="nav-label">COV-A · Studio Annual Report Cover · 工作室年报封面 (大字 hero + 4 列 meta)</div>
+<div class="slide variant-cov-a-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-tr"></div>
+  <div class="corner-bl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>STUDIO ▲ WORK 2024–2025</span>
+    <span>VOL. 03 · ANNUAL REPORT <span class="dev-tag"> · COV-A</span></span>
+  </div>
+  
+  <div class="cov-mid">
+    <div class="cov-eyebrow">Selected projects · 24 cases</div>
+    <h1 class="slot-title">WE MAKE<br>WORK THAT <em>LASTS.</em></h1>
+    <p class="slot-subtitle">A design studio based in Shanghai &amp; Tokyo. 我们用作品定义自己,不靠语言。这是过去 12 个月里我们最自豪的 24 件事。</p>
+  </div>
+  
+  <div class="cov-meta">
+    <div class="meta-cell">
+      <span class="meta-label">CLIENTS</span>
+      <span class="meta-value">142+</span>
+    </div>
+    <div class="meta-cell">
+      <span class="meta-label">PROJECTS</span>
+      <span class="meta-value">284</span>
+    </div>
+    <div class="meta-cell">
+      <span class="meta-label">AWARDS</span>
+      <span class="meta-value accent">17</span>
+    </div>
+    <div class="meta-cell">
+      <span class="meta-label">FOUNDED</span>
+      <span class="meta-value">2018</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- COV-B · Issue 编号封面 -->
+<div class="nav-label">COV-B · Issue Number Cover · 大字 №04 + 主题</div>
+<div class="slide variant-cov-b-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>STUDIO ▲ MAGAZINE · ISSUE №04</span>
+    <span>AUTUMN 2025 <span class="dev-tag"> · COV-B</span></span>
+  </div>
+  
+  <div class="cov-body">
+    <div class="cov-num-block">
+      <div class="cov-num-label">— ISSUE NO.</div>
+      <div class="slot-issue-num"><span class="hash">№</span>04</div>
+    </div>
+    <div class="cov-text-block">
+      <span class="cov-tag">★ AUTUMN EDITION · QUARTERLY</span>
+      <h1 class="slot-title">关于<em>克制</em>的<br>设计语言。</h1>
+      <p class="slot-subtitle">这一期我们想聊 <strong>克制</strong> — 不是少, 而是 <strong>精准</strong>。从 6 个案例里, 看设计师怎么"做得更少, 说得更准"。</p>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ QUARTERLY · NO.04</span>
+    <span>AUTUMN 2025 ・ SHANGHAI / TOKYO</span>
+  </div>
+</div>
+
+
+<!-- COV-C · 极简单图封面 (满版图 + 大字压图) -->
+<div class="nav-label">COV-C · Minimal Hero · 1 张满版图 + 大字压图</div>
+<div class="slide variant-cov-c-studio">
+  <div class="cov-c-bg studio-figure f-warm"></div>
+  <div class="cov-c-overlay"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="cov-c-top">
+    <span>STUDIO ▲ ANTA REBRAND</span>
+    <span>CASE STUDY · 2024 <span class="dev-tag"> · COV-C</span></span>
+  </div>
+  
+  <div class="cov-c-body">
+    <div class="cov-c-eyebrow">— Project hero · case 07</div>
+    <h1 class="slot-title">把<em>15 年</em>的<br>老品牌, 翻新。</h1>
+    <p class="slot-subtitle">从 logo 到 voice, 一套完整的 brand renew — 8 个月, 142 次迭代, 1 个 Red Dot。</p>
+  </div>
+  
+  <div class="cov-c-bottom">
+    <span>STUDIO ▲ CASE 07 / 24</span>
+    <span>BRAND IDENTITY · 8 MONTHS · 2024</span>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 2 · CHAPTER · 3 Variants
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 2 · CHAPTER · 章节扉页 · 3 of 3</div>
+  <div class="section-header-line"></div>
+</div>
+
+
+<!-- CB-A · 巨型数字章节扉页 -->
+<div class="nav-label">CB-A · Giant Number Chapter · 巨型 260px 荧光数字</div>
+<div class="slide variant-cb-a-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="cb-num-block">
+    <div class="cb-num-label">— CHAPTER 02 / 05<span class="dev-tag"> · CB-A</span></div>
+    <div class="slot-chapter-num">02</div>
+  </div>
+  
+  <div class="cb-text-block">
+    <span class="cb-tag">BRAND IDENTITY ・ 8 PROJECTS</span>
+    <h2 class="slot-chapter-title">为<em>不那么显眼</em>的好品牌, 做一件被记住的事。</h2>
+    <p class="slot-chapter-abstract">这一章讲的是我们做过的 <strong>8 个品牌识别</strong> 案例 — 从一家两个人开的咖啡店, 到一个 500 人的科技公司。我们相信好的品牌不是"喊得最大声"的那个, 是 <strong>被人在心里记住</strong> 的那个。</p>
+  </div>
+</div>
+
+
+<!-- CB-D · 引语式章节 -->
+<div class="nav-label">CB-D · Quote Chapter · 大字引语 + 章节大纲</div>
+<div class="slide variant-cb-d-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 03 ・ DESIGN PRINCIPLE</span>
+    <span>PG. 28 <span class="dev-tag"> · CB-D</span></span>
+  </div>
+  
+  <div class="cb-d-body">
+    <div>
+      <div class="cb-tag">A LINE WE LIVE BY</div>
+      <h2 class="slot-quote">"<em>少</em>不是节省,<br>是<em>选择</em>。"</h2>
+      <p class="quote-attr">— <strong>DIETER RAMS</strong> · 1928 · ten principles for good design</p>
+    </div>
+    <div class="cb-outline">
+      <div class="outline-item">
+        <span class="outline-num">01 · LESS</span>
+        <span class="outline-text">删掉一切非必要的</span>
+      </div>
+      <div class="outline-item">
+        <span class="outline-num">02 · CHOICE</span>
+        <span class="outline-text">每个元素都有理由</span>
+      </div>
+      <div class="outline-item">
+        <span class="outline-num">03 · CRAFT</span>
+        <span class="outline-text">细节决定一切</span>
+      </div>
+      <div class="outline-item">
+        <span class="outline-num">04 · LAST</span>
+        <span class="outline-text">好设计经得起时间</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ DESIGN PRINCIPLE</span>
+    <span>OUR MANIFESTO ・ 2018-PRESENT</span>
+  </div>
+</div>
+
+
+<!-- CB-E · 章节预告 (4 个子主题预览, 中间高亮) -->
+<div class="nav-label">CB-E · Chapter Preview · 4 个子主题预览 (中间高亮)</div>
+<div class="slide variant-cb-e-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 04 ・ DIGITAL PRODUCTS</span>
+    <span>PG. 38 <span class="dev-tag"> · CB-E</span></span>
+  </div>
+  
+  <div class="cb-e-header">
+    <div>
+      <span class="cb-tag">IN THIS CHAPTER · 4 STAGES</span>
+      <h2 class="slot-chapter-title">数字产品的<em>四个阶段</em>。</h2>
+    </div>
+    <div class="cb-e-meta">→ 142 PROJECTS<br><strong>★ STAGE 2 SHOWN</strong></div>
+  </div>
+  
+  <div class="cb-cards">
+    <div class="cb-card">
+      <span class="card-num">01 · DISCOVER</span>
+      <h3 class="card-title">理解问题</h3>
+      <p class="card-text">用户访谈、市场调研、<strong>团队 workshop</strong>。三周时间, 不动笔, 只想清楚。</p>
+    </div>
+    <div class="cb-card featured">
+      <span class="card-num">★ 02 · DESIGN</span>
+      <h3 class="card-title">设计方案</h3>
+      <p class="card-text">线框、原型、视觉。<strong>3-5 个方向并行</strong>, 客户参与每个决策。</p>
+    </div>
+    <div class="cb-card">
+      <span class="card-num">03 · BUILD</span>
+      <h3 class="card-title">开发实现</h3>
+      <p class="card-text">设计师 + 工程师 <strong>同桌</strong>。每周可见进展, 每两周可点击。</p>
+    </div>
+    <div class="cb-card">
+      <span class="card-num">04 · POLISH</span>
+      <h3 class="card-title">上线打磨</h3>
+      <p class="card-text">不是"做完了发布", 是 <strong>发布之后才开始做</strong>。</p>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ DIGITAL PRODUCT PROCESS</span>
+    <span>4 STAGES ・ 142 PROJECTS · 2018-PRESENT</span>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 3 · OUTLINE · 2 Variants
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 3 · OUTLINE · 目录 · 2 of 2</div>
+  <div class="section-header-line"></div>
+</div>
+
+
+<!-- OUT-A · 项目索引 (8 行自适应) -->
+<div class="nav-label">OUT-A · Project Index · 项目索引 [★ 自适应 N=8 rows]</div>
+<div class="slide variant-out-a-studio" style="--rows: 8;">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>STUDIO ▲ ANNUAL 2024-2025</span>
+    <span>TABLE OF CONTENTS · 8 CHAPTERS <span class="dev-tag"> · OUT-A · N=8</span></span>
+  </div>
+  
+  <div class="out-header">
+    <div>
+      <span class="out-tag">— TABLE OF CONTENTS · 8 SECTIONS</span>
+      <h2 class="slot-title">这一期里, 8 件<em>认真</em>做过的事。</h2>
+    </div>
+    <div class="out-summary">→ 24 PROJECTS · <strong>~72 PAGES</strong><br>YEAR 2024-2025</div>
+  </div>
+  
+  <div class="out-list">
+    <div class="out-row">
+      <span class="out-num">CH. 01</span>
+      <span class="out-name">前言 · Manifesto</span>
+      <span class="out-meta">我们的设计哲学 — 12 条 principle</span>
+      <span class="out-page">PG. 04</span>
+    </div>
+    <div class="out-row">
+      <span class="out-num">CH. 02</span>
+      <span class="out-name">品牌识别 · Brand Identity</span>
+      <span class="out-meta">8 个完整 brand system + 4 个 logo renew</span>
+      <span class="out-page">PG. 18</span>
+    </div>
+    <div class="out-row featured">
+      <span class="out-num">CH. 03</span>
+      <span class="out-name">数字产品 · Digital</span>
+      <span class="out-meta">12 个 web + app + 内部工具 — 我们最擅长的</span>
+      <span class="out-page">PG. 32</span>
+    </div>
+    <div class="out-row">
+      <span class="out-num">CH. 04</span>
+      <span class="out-name">动态影像 · Motion</span>
+      <span class="out-meta">6 个品牌片 + 产品 demo</span>
+      <span class="out-page">PG. 48</span>
+    </div>
+    <div class="out-row">
+      <span class="out-num">CH. 05</span>
+      <span class="out-name">案例细节 · Case Detail</span>
+      <span class="out-meta">放大看 — 3 个项目的全过程</span>
+      <span class="out-page">PG. 56</span>
+    </div>
+    <div class="out-row">
+      <span class="out-num">CH. 06</span>
+      <span class="out-name">设计流程 · Process</span>
+      <span class="out-meta">我们怎么从草图到上线</span>
+      <span class="out-page">PG. 64</span>
+    </div>
+    <div class="out-row">
+      <span class="out-num">CH. 07</span>
+      <span class="out-name">团队 · Team</span>
+      <span class="out-meta">18 个人, 2 座城市</span>
+      <span class="out-page">PG. 68</span>
+    </div>
+    <div class="out-row">
+      <span class="out-num">CH. 08</span>
+      <span class="out-name">联系 · Contact</span>
+      <span class="out-meta">下一个项目, 一起?</span>
+      <span class="out-page">PG. 72</span>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ INDEX</span>
+    <span>READING TIME ・ ~30 MIN ・ 72 PAGES</span>
+  </div>
+</div>
+
+
+<!-- OUT-B · 24 cases 网格预览 -->
+<div class="nav-label">OUT-B · 24 Cases Grid · 项目网格预览 (6×4 缩略)</div>
+<div class="slide variant-out-b-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>STUDIO ▲ ALL CASES 2024-2025</span>
+    <span>24 PROJECTS <span class="dev-tag"> · OUT-B</span></span>
+  </div>
+  
+  <div class="out-header">
+    <div>
+      <span class="out-tag">— ALL CASES · GRID VIEW</span>
+      <h2 class="slot-title">过去 12 个月的<em>全部 24 个</em>项目。</h2>
+    </div>
+    <div class="out-summary">→ <strong>24 PROJECTS</strong><br>BRAND · DIGITAL · MOTION</div>
+  </div>
+  
+  <div class="grid-cases">
+    <div class="case-thumb studio-figure"><span class="thumb-num">01</span><span class="thumb-name">ANTA</span></div>
+    <div class="case-thumb studio-figure f-mid"><span class="thumb-num">02</span><span class="thumb-name">PORT SH</span></div>
+    <div class="case-thumb studio-figure f-warm"><span class="thumb-num">03</span><span class="thumb-name">CAFE BLUE</span></div>
+    <div class="case-thumb studio-figure f-yellow featured"><span class="thumb-num">★ 04</span><span class="thumb-name">HERO</span></div>
+    <div class="case-thumb studio-figure"><span class="thumb-num">05</span><span class="thumb-name">NEXT BANK</span></div>
+    <div class="case-thumb studio-figure f-dark"><span class="thumb-num">06</span><span class="thumb-name">MOON LAB</span></div>
+    <div class="case-thumb studio-figure f-warm"><span class="thumb-num">07</span><span class="thumb-name">ZARA</span></div>
+    <div class="case-thumb studio-figure"><span class="thumb-num">08</span><span class="thumb-name">JD UI</span></div>
+    <div class="case-thumb studio-figure f-mid"><span class="thumb-num">09</span><span class="thumb-name">FILM</span></div>
+    <div class="case-thumb studio-figure f-dark"><span class="thumb-num">10</span><span class="thumb-name">SPACE X</span></div>
+    <div class="case-thumb studio-figure f-yellow"><span class="thumb-num">11</span><span class="thumb-name">NEON</span></div>
+    <div class="case-thumb studio-figure"><span class="thumb-num">12</span><span class="thumb-name">UNDER A</span></div>
+    <div class="case-thumb studio-figure f-warm"><span class="thumb-num">13</span><span class="thumb-name">RED CUP</span></div>
+    <div class="case-thumb studio-figure"><span class="thumb-num">14</span><span class="thumb-name">GREEN</span></div>
+    <div class="case-thumb studio-figure f-mid"><span class="thumb-num">15</span><span class="thumb-name">MAP</span></div>
+    <div class="case-thumb studio-figure f-dark"><span class="thumb-num">16</span><span class="thumb-name">DEEP</span></div>
+    <div class="case-thumb studio-figure"><span class="thumb-num">17</span><span class="thumb-name">FLOW</span></div>
+    <div class="case-thumb studio-figure f-warm"><span class="thumb-num">18</span><span class="thumb-name">PACK</span></div>
+    <div class="case-thumb studio-figure"><span class="thumb-num">19</span><span class="thumb-name">MUSE</span></div>
+    <div class="case-thumb studio-figure f-mid"><span class="thumb-num">20</span><span class="thumb-name">CIRCLE</span></div>
+    <div class="case-thumb studio-figure f-yellow"><span class="thumb-num">21</span><span class="thumb-name">SUN</span></div>
+    <div class="case-thumb studio-figure f-dark"><span class="thumb-num">22</span><span class="thumb-name">SHIFT</span></div>
+    <div class="case-thumb studio-figure"><span class="thumb-num">23</span><span class="thumb-name">EAST</span></div>
+    <div class="case-thumb studio-figure f-warm"><span class="thumb-num">24</span><span class="thumb-name">WEST</span></div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ GRID VIEW · ALL CASES</span>
+    <span>★ HIGHLIGHT · CASE 04 · ANTA REBRAND</span>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 4 · CLIMAX · 3 Variants
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 4 · CLIMAX · 关键数字 · 3 of 3</div>
+  <div class="section-header-line"></div>
+</div>
+
+
+<!-- CLX-A · 大数字 + context -->
+<div class="nav-label">CLX-A · Big Number + Context · 关键数字 + 上下文</div>
+<div class="slide variant-clx-a-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 02 ・ BRAND IDENTITY</span>
+    <span>PG. 18 <span class="dev-tag"> · CLX-A</span></span>
+  </div>
+  
+  <div class="clx-body">
+    <div class="num-block">
+      <span class="num-eyebrow">A number we care about</span>
+      <div class="slot-big-num">93<sub>%</sub></div>
+      <p class="slot-explain">的客户在<em>第一次合作之后</em>会回来 — 这不是营销数据, 是我们衡量"<strong>是否做对了</strong>"的唯一标准。</p>
+    </div>
+    
+    <div class="context-block">
+      <span class="context-label">— CONTEXT ・ 5-YEAR DATA</span>
+      <div class="context-stats">
+        <div class="context-stat">
+          <span class="stat-label">CLIENTS</span>
+          <span class="stat-value">142</span>
+        </div>
+        <div class="context-stat">
+          <span class="stat-label">REPEAT</span>
+          <span class="stat-value accent">132</span>
+        </div>
+        <div class="context-stat">
+          <span class="stat-label">RATE</span>
+          <span class="stat-value accent">93%</span>
+        </div>
+        <div class="context-stat">
+          <span class="stat-label">AVG · Y</span>
+          <span class="stat-value">3.2</span>
+        </div>
+      </div>
+      <p class="context-note">行业平均回头率 42%。我们做不到 100%, 但我们追求让每个客户都觉得 "下次还要找他们"。</p>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ ANNUAL REPORT 2024</span>
+    <span>METHODOLOGY ・ CLIENT RETENTION ・ 60M ROLLING</span>
+  </div>
+</div>
+
+
+<!-- CLX-D · Before/After 双数字对比 -->
+<div class="nav-label">CLX-D · Before/After · 双数字对比</div>
+<div class="slide variant-clx-d-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CASE 07 ・ ANTA REBRAND</span>
+    <span>PG. 28 <span class="dev-tag"> · CLX-D</span></span>
+  </div>
+  
+  <div class="clx-header">
+    <div>
+      <span class="clx-eyebrow">Before vs After · 改版前后</span>
+      <h2 class="slot-title"><em>15 年</em><span class="sep">到</span><em>下一个十年</em>。</h2>
+    </div>
+  </div>
+  
+  <div class="delta-grid">
+    <div class="delta-cell before">
+      <span class="delta-tag">— BEFORE · 2009</span>
+      <div class="delta-value">12<span class="unit">%</span></div>
+      <p class="delta-desc">原版 brand awareness — <strong>渐变 + 圆角字</strong>, 在新一代消费者那里已经"过时"。</p>
+    </div>
+    <div class="delta-arrow">→</div>
+    <div class="delta-cell after">
+      <span class="delta-tag">★ AFTER · 2024</span>
+      <div class="delta-value">47<span class="unit">%</span></div>
+      <p class="delta-desc">新版 brand awareness — <strong>极简几何 + 单色</strong>, 6 个月内提升 <strong>4 倍</strong>。</p>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ ANTA REBRAND · 8 MONTHS</span>
+    <span>SOURCE ・ MIAO YANJIU CONSUMER PANEL · Q3 2024</span>
+  </div>
+</div>
+
+
+<!-- CLX-Q · 反方观点对照 -->
+<div class="nav-label">CLX-Q · Two Views · 主流 vs 我们</div>
+<div class="slide variant-clx-q-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 01 ・ MANIFESTO</span>
+    <span>PG. 08 <span class="dev-tag"> · CLX-Q</span></span>
+  </div>
+  
+  <div class="clx-header">
+    <span class="clx-eyebrow">A different opinion</span>
+    <h2 class="slot-title">行业说<em>这样做</em>, 我们说<em>那样做</em>。</h2>
+  </div>
+  
+  <div class="views">
+    <div class="view mainstream">
+      <span class="view-tag">— MAINSTREAM · 行业主流</span>
+      <h3 class="view-statement">设计是 <em>解决问题</em> 的工具。</h3>
+      <p class="view-detail"><strong>主流逻辑</strong> — 设计要"功能优先 / 用户优先 / 商业目标优先"。漂亮是次要的, 能用、能转化、能 ROI 才重要。</p>
+    </div>
+    <div class="view ours">
+      <span class="view-tag">OURS · 我们认为</span>
+      <h3 class="view-statement">设计也是 <em>提出问题</em> 的方式。</h3>
+      <p class="view-detail"><strong>我们的逻辑</strong> — 解决问题是基础, 但好设计还会 <strong>提出问题</strong>: "为什么以前没人想到这种用法?" "为什么大家都接受了这种丑?"</p>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ DESIGN MANIFESTO</span>
+    <span>POSITION ・ AGAINST PURE PRAGMATISM</span>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 5 · SUPPORT · 3 Variants
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 5 · SUPPORT · 论证 · 3 of 3</div>
+  <div class="section-header-line"></div>
+</div>
+
+
+<!-- S-A · 三个能力 (中间高亮) -->
+<div class="nav-label">S-A · Three Things · 三个能力 (中间高亮)</div>
+<div class="slide variant-s-a-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 03 ・ WHAT WE DO</span>
+    <span>PG. 26 <span class="dev-tag"> · S-A</span></span>
+  </div>
+  
+  <div class="s-header">
+    <div>
+      <span class="s-eyebrow">Three things, done well</span>
+      <h2 class="slot-title">我们只做<em>三件事</em> — 但每一件都很认真。</h2>
+    </div>
+    <span class="pill outline-accent">★ FOCUSED</span>
+  </div>
+  
+  <div class="s-cards">
+    <div class="s-card">
+      <span class="card-num">01 · IDENTITY</span>
+      <h3 class="card-title">品牌识别</h3>
+      <p class="card-text">从 logo 到 voice, 从颜色到字体 — <strong>一套完整的视觉语言</strong>, 让你被认出, 也被记住。</p>
+      <span class="card-meta">8 CASES · 2018–2025</span>
+    </div>
+    <div class="s-card featured">
+      <span class="card-num">★ 02 · DIGITAL</span>
+      <h3 class="card-title">数字产品</h3>
+      <p class="card-text">网站、App、内部工具 — 不是"漂亮的界面", 而是 <strong>让人愿意每天打开的产品</strong>。这是我们最擅长的。</p>
+      <span class="card-meta">142 CASES · MOST LOVED</span>
+    </div>
+    <div class="s-card">
+      <span class="card-num">03 · MOTION</span>
+      <h3 class="card-title">动态影像</h3>
+      <p class="card-text">品牌动画、产品 demo、广告片 — 让品牌 <strong>动起来, 有节奏</strong>。给静态的世界加一点速度。</p>
+      <span class="card-meta">42 CASES · SINCE 2022</span>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ CAPABILITIES</span>
+    <span>SHANGHAI ・ TOKYO</span>
+  </div>
+</div>
+
+
+<!-- S-B · 单一论点 + 三证据 -->
+<div class="nav-label">S-B · Thesis + 3 Evidence · 单一论点 + 三证据</div>
+<div class="slide variant-s-b-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 03 ・ WHY WE'RE DIFFERENT</span>
+    <span>PG. 32 <span class="dev-tag"> · S-B</span></span>
+  </div>
+  
+  <div class="s-header">
+    <span class="s-eyebrow">One thesis, three proofs</span>
+    <h2 class="slot-thesis">为什么客户<em>愿意回来</em>?</h2>
+  </div>
+  
+  <div class="evidence-list">
+    <div class="evidence-row">
+      <span class="evidence-tag">01 · TIME</span>
+      <span class="evidence-value">3.2y</span>
+      <p class="evidence-text"><strong>平均合作时长</strong>是行业的 2 倍 — 我们不做"一锤子买卖", 每个项目都把客户当成 <strong>长期伙伴</strong>。</p>
+    </div>
+    <div class="evidence-row">
+      <span class="evidence-tag">02 · REFER</span>
+      <span class="evidence-value">68%</span>
+      <p class="evidence-text"><strong>新客户来自老客户介绍</strong> — 不靠营销, 不靠投放, 靠 <strong>每一个项目质量</strong> 的口碑传播。</p>
+    </div>
+    <div class="evidence-row">
+      <span class="evidence-tag">03 · NPS</span>
+      <span class="evidence-value">72</span>
+      <p class="evidence-text"><strong>客户净推荐值 NPS = 72</strong> — 远高于行业基准的 30。每个客户都 <strong>愿意把我们推给同行</strong>。</p>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ CLIENT RELATIONSHIP DATA</span>
+    <span>SOURCE ・ INTERNAL 5-YEAR PANEL · 2020-2024</span>
+  </div>
+</div>
+
+
+<!-- S-C · 链式因果 (A→B→C→D) -->
+<div class="nav-label">S-C · Causal Chain · 链式因果 (A→B→C→D)</div>
+<div class="slide variant-s-c-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 03 ・ HOW WE WORK</span>
+    <span>PG. 36 <span class="dev-tag"> · S-C</span></span>
+  </div>
+  
+  <div class="s-header">
+    <span class="s-eyebrow">A causal chain · 4 steps</span>
+    <h2 class="slot-title">我们做对一件事, 会引发<em>连锁反应</em>。</h2>
+  </div>
+  
+  <div class="chain">
+    <div class="chain-step">
+      <span class="step-num">01 · CAUSE</span>
+      <h4 class="step-title">认真做好<br>一个项目</h4>
+      <p class="step-text">不只是"满足需求", 而是 <strong>多做一步</strong> 的额外用心。</p>
+    </div>
+    <div class="chain-arrow">→</div>
+    <div class="chain-step">
+      <span class="step-num">02 · EFFECT</span>
+      <h4 class="step-title">客户主动<br>转介绍</h4>
+      <p class="step-text">客户主动把我们 <strong>推给同行</strong> — 真实的口碑。</p>
+    </div>
+    <div class="chain-arrow">→</div>
+    <div class="chain-step">
+      <span class="step-num">03 · LOOP</span>
+      <h4 class="step-title">遇到<br>同质量客户</h4>
+      <p class="step-text">老客户的圈子里都是 <strong>对设计认真</strong> 的人。</p>
+    </div>
+    <div class="chain-arrow">→</div>
+    <div class="chain-step final">
+      <span class="step-num">★ 04 · COMPOUND</span>
+      <h4 class="step-title">复利<br>正循环</h4>
+      <p class="step-text">认真 → 推介 → 同质 → 更认真 — <strong>正向飞轮</strong>。</p>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ COMPOUND GROWTH MODEL</span>
+    <span>METHODOLOGY ・ REFERRAL-DRIVEN BUSINESS</span>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 6 · COMPARISON · 2 Variants
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 6 · COMPARISON · 对比 · 2 of 2</div>
+  <div class="section-header-line"></div>
+</div>
+
+
+<!-- CMP-A · 双联对比 (我们 vs 同行) -->
+<div class="nav-label">CMP-A · Pair Compare · 我们 vs 同行</div>
+<div class="slide variant-cmp-a-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 04 ・ INDUSTRY POSITION</span>
+    <span>PG. 42 <span class="dev-tag"> · CMP-A</span></span>
+  </div>
+  
+  <div class="c-header">
+    <div>
+      <span class="c-eyebrow">A side-by-side comparison</span>
+      <h2 class="slot-title">我们 vs 同等规模 <em>4A 公司</em>。</h2>
+    </div>
+    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); letter-spacing: 0.16em;">→ 18 PEOPLE · BOUTIQUE STUDIO</span>
+  </div>
+  
+  <div class="pair-grid">
+    <div class="pair-cell subject">
+      <div class="pair-header">
+        <span class="pair-tag">★ OURS · STUDIO ▲</span>
+        <span class="pair-name">18 人</span>
+      </div>
+      <div class="pair-metrics">
+        <div class="pair-metric">
+          <span class="label">CLIENT/Y</span>
+          <span class="value">24</span>
+        </div>
+        <div class="pair-metric">
+          <span class="label">REPEAT</span>
+          <span class="value">93%</span>
+        </div>
+        <div class="pair-metric">
+          <span class="label">NPS</span>
+          <span class="value">72</span>
+        </div>
+        <div class="pair-metric">
+          <span class="label">AWARDS/Y</span>
+          <span class="value">17</span>
+        </div>
+      </div>
+      <p class="pair-narrative">小而精, <strong>每个项目都有合伙人深度参与</strong>。客户主动转介绍占新客 68%。我们不接超过 24 个项目/年。</p>
+    </div>
+    <div class="pair-cell peer">
+      <div class="pair-header">
+        <span class="pair-tag">— PEER · TYPICAL 4A</span>
+        <span class="pair-name">~ 1000+ 人</span>
+      </div>
+      <div class="pair-metrics">
+        <div class="pair-metric">
+          <span class="label">CLIENT/Y</span>
+          <span class="value">~300</span>
+        </div>
+        <div class="pair-metric">
+          <span class="label">REPEAT</span>
+          <span class="value">~42%</span>
+        </div>
+        <div class="pair-metric">
+          <span class="label">NPS</span>
+          <span class="value">~30</span>
+        </div>
+        <div class="pair-metric">
+          <span class="label">AWARDS/Y</span>
+          <span class="value">~80</span>
+        </div>
+      </div>
+      <p class="pair-narrative">规模化运营 — 合伙人通常只在签约时出现, 项目由初级团队执行。<strong>追求量, 容易牺牲质</strong>。但他们能做我们做不了的"大单"。</p>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ INDUSTRY BENCHMARK</span>
+    <span>SOURCE ・ AIGA 2024 STUDIO SURVEY · CHINA PANEL</span>
+  </div>
+</div>
+
+
+<!-- CMP-D · 多维表格 (5×5 项目 × 维度) -->
+<div class="nav-label">CMP-D · Multi-dim Table · 多维表格 [★ 自适应 N=5 rows]</div>
+<div class="slide variant-cmp-d-studio" style="--rows: 5;">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 04 ・ PROJECT SCORECARD</span>
+    <span>PG. 44 <span class="dev-tag"> · CMP-D · N=5</span></span>
+  </div>
+  
+  <div class="c-header">
+    <span class="c-eyebrow">5 projects × 5 dimensions</span>
+    <h2 class="slot-title">5 个代表项目 × 5 个<em>维度</em>的诚实评估。</h2>
+  </div>
+  
+  <div class="cmp-table">
+    <table>
+      <thead>
+        <tr>
+          <th>PROJECT</th>
+          <th class="center">IMPACT</th>
+          <th class="center">CRAFT</th>
+          <th class="center">SCALE</th>
+          <th class="center">DURATION</th>
+          <th class="featured">★ OVERALL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ANTA REBRAND</td>
+          <td class="center">★★★★★</td>
+          <td class="center">★★★★★</td>
+          <td class="center">★★★★☆</td>
+          <td class="center">8 mo</td>
+          <td class="featured">A+</td>
+        </tr>
+        <tr>
+          <td>SHANGHAI PORT</td>
+          <td class="center">★★★★☆</td>
+          <td class="center">★★★★☆</td>
+          <td class="center">★★★★★</td>
+          <td class="center">12 mo</td>
+          <td class="featured">A</td>
+        </tr>
+        <tr>
+          <td>JD INTERNAL TOOL</td>
+          <td class="center">★★★★★</td>
+          <td class="center">★★★★☆</td>
+          <td class="center">★★★☆☆</td>
+          <td class="center">6 mo</td>
+          <td class="featured">A</td>
+        </tr>
+        <tr>
+          <td>CAFE BLUE BRAND</td>
+          <td class="center">★★★☆☆</td>
+          <td class="center">★★★★★</td>
+          <td class="center">★★☆☆☆</td>
+          <td class="center">3 mo</td>
+          <td class="featured">B+</td>
+        </tr>
+        <tr>
+          <td>NEXT BANK APP</td>
+          <td class="center">★★★★☆</td>
+          <td class="center">★★★★☆</td>
+          <td class="center">★★★★☆</td>
+          <td class="center">9 mo</td>
+          <td class="featured">A</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ SCORECARD · 5 SELECTED CASES</span>
+    <span>SOURCE ・ INTERNAL POST-PROJECT REVIEW · 2024 Q4</span>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 7 · INSIGHT · 2 Variants
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 7 · INSIGHT · 洞察 · 2 of 2</div>
+  <div class="section-header-line"></div>
+</div>
+
+
+<!-- INS-A · 大字引语 (设计哲学) -->
+<div class="nav-label">INS-A · Big Quote · 大字引语 (设计哲学)</div>
+<div class="slide variant-ins-a-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-tr"></div>
+  <div class="corner-bl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 01 ・ DESIGN PRINCIPLE</span>
+    <span>PG. 06 <span class="dev-tag"> · INS-A</span></span>
+  </div>
+  
+  <div class="ins-body">
+    <span class="ins-eyebrow">A line we live by · since 2018</span>
+    <h2 class="slot-quote">"<em>少做一件事</em>,<br>把另一件 <em>做到底</em>。"</h2>
+    <div class="ins-attribution">
+      <div class="attr-name">— <strong>STUDIO ▲</strong><br>FOUNDING MEMO · 2018</div>
+      <p class="attr-context">这是工作室成立时, 写在第一封邮件里的一句话。7 年后, 我们还在用同一个标准考虑每个项目: <strong>能不能比已有的水平再多做一步?</strong></p>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ MANIFESTO · OPENING LINE</span>
+    <span>VOLUME 03 · ANNUAL 2024-2025</span>
+  </div>
+</div>
+
+
+<!-- INS-C · 反共识观点 -->
+<div class="nav-label">INS-C · Contrarian View · 反共识 (共识被划掉)</div>
+<div class="slide variant-ins-c-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 01 ・ AGAINST COMMON BELIEF</span>
+    <span>PG. 12 <span class="dev-tag"> · INS-C</span></span>
+  </div>
+  
+  <div class="ins-header">
+    <span class="ins-eyebrow">A different opinion · contrarian</span>
+    <h2 class="slot-title">行业的<em>共识</em> 不一定是 <em>对的</em>。</h2>
+  </div>
+  
+  <div class="opinion-grid">
+    <div class="opinion consensus">
+      <span class="opinion-tag">— CONSENSUS · 行业共识</span>
+      <h3 class="opinion-text">"做大才能做好。<br>规模带来话语权。"</h3>
+      <p class="opinion-detail"><strong>主流观点</strong>: 设计公司要尽快扩到 50+ 人, 拿大客户, 进资本市场, 才能"做大事"。</p>
+    </div>
+    <div class="opinion ours">
+      <span class="opinion-tag">★ OURS · 我们的看法</span>
+      <h3 class="opinion-text">"做小才能做精。<br>克制就是<em>话语权</em>。"</h3>
+      <p class="opinion-detail"><strong>我们的实践</strong>: 7 年只做到 18 人, 一年只接 24 个项目。<strong>拒绝的多, 做得就好</strong>。</p>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ CONTRARIAN POSITION</span>
+    <span>WHY WE STAY SMALL ・ 18 PEOPLE / 24 PROJECTS-Y</span>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 8 · GALLERY · 14 Variants (基础 + 注释 + 作品集 + 艺术编排)
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 8 · GALLERY · 图片版式总集 · 14 of 14</div>
+  <div class="section-header-line"></div>
+</div>
+
+<!-- ─── 子组 1 · 基础展示 (H1/H3/H4/GC-A) ─── -->
+<div class="section-header sub">
+  <div class="section-header-text" style="font-size: 11px; color: var(--text-muted); padding-left: 16px;">— A · 基础展示 · 4 of 14 (一张/双图/2×2/contact sheet)</div>
+</div>
+
+
+<!-- H1 · 全幅大图 + 工业 figure meta -->
+<div class="nav-label">H1 · Full Bleed · 全幅大图 + 工业 figure meta</div>
+<div class="slide variant-h1-studio gallery-base">
+  <div class="studio-top">
+    <span>CHAPTER 05 ・ HERO SHOTS</span>
+    <span>PG. 56 <span class="dev-tag"> · H1</span></span>
+  </div>
+  <span class="g-tag">— PROJECT HERO · FULL BLEED</span>
+  <h2 class="slot-caption">最骄傲的一张, 占满<em>一整页</em>。</h2>
+  
+  <div class="h1-figure studio-figure f-warm">
+    <div class="h1-figure-meta">
+      <span><strong>FIG. 01</strong> · ANTA REBRAND · 2024.08</span>
+      <span>SHOT BY · LIN XIAO · LEICA Q3</span>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ VISUAL ARCHIVE</span>
+    <span>PG. 56 ・ ALL HERO SHOTS</span>
+  </div>
+</div>
+
+
+<!-- H3 · 主图 + 2 副图 -->
+<div class="nav-label">H3 · Hero + 2 · 主图 + 2 副图</div>
+<div class="slide variant-h3-studio gallery-base">
+  <div class="studio-top">
+    <span>CHAPTER 05 ・ PROJECT GALLERY</span>
+    <span>PG. 58 <span class="dev-tag"> · H3</span></span>
+  </div>
+  <span class="g-tag">— A SHORT VISUAL ESSAY · 3 FRAMES</span>
+  <h2 class="slot-caption">一组画面里的<em>三个瞬间</em>。</h2>
+  
+  <div class="h3-grid">
+    <div class="h3-main studio-figure f-warm">
+      <span class="h3-meta"><strong>FIG. 02</strong> · MAIN SHOT</span>
+    </div>
+    <div class="h3-sub studio-figure f-mid">
+      <span class="h3-meta"><strong>FIG. 03</strong> · DETAIL</span>
+    </div>
+    <div class="h3-sub studio-figure f-yellow">
+      <span class="h3-meta"><strong>FIG. 04</strong> · COLOR</span>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ VISUAL ARCHIVE</span>
+    <span>3 FRAMES · 1 HERO + 2 SUPPORT</span>
+  </div>
+</div>
+
+
+<!-- H4 · 2×2 四象限 -->
+<div class="nav-label">H4 · 2×2 Grid · 2×2 四象限</div>
+<div class="slide variant-h4-studio gallery-base">
+  <div class="studio-top">
+    <span>CHAPTER 05 ・ FOUR ANGLES</span>
+    <span>PG. 60 <span class="dev-tag"> · H4</span></span>
+  </div>
+  <span class="g-tag">— FOUR ANGLES OF THE SAME PROJECT</span>
+  <h2 class="slot-caption">同一件作品, <em>四个</em>角度。</h2>
+  
+  <div class="h4-grid">
+    <div class="h4-cell studio-figure f-warm"><span class="h4-meta">01 · FRONT</span></div>
+    <div class="h4-cell studio-figure f-mid"><span class="h4-meta">02 · SIDE</span></div>
+    <div class="h4-cell studio-figure f-yellow"><span class="h4-meta">03 · DETAIL</span></div>
+    <div class="h4-cell studio-figure f-dark"><span class="h4-meta">04 · CONTEXT</span></div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ FOUR-ANGLE CATALOG</span>
+    <span>METHODOLOGY ・ DOCUMENT FROM 4 SIDES</span>
+  </div>
+</div>
+
+
+<!-- GC-A · 6 张项目缩略 -->
+<div class="nav-label">GC-A · Contact Sheet · 6 张项目缩略</div>
+<div class="slide variant-gc-a-studio gallery-base">
+  <div class="studio-top">
+    <span>CHAPTER 05 ・ A WEEK OF PROJECTS</span>
+    <span>PG. 62 <span class="dev-tag"> · GC-A</span></span>
+  </div>
+  <span class="g-tag">— SIX FRAMES · ONE WEEK · CONTACT SHEET</span>
+  <h2 class="slot-caption">一周里, <em>6 个</em>项目并行进行。</h2>
+  
+  <div class="gc-contact">
+    <div class="gc-frame studio-figure f-warm">
+      <span class="gc-frame-info"><span><strong>MON</strong> · 09:24</span><span>FRAME 01</span></span>
+    </div>
+    <div class="gc-frame studio-figure f-mid">
+      <span class="gc-frame-info"><span><strong>TUE</strong> · 14:50</span><span>FRAME 02</span></span>
+    </div>
+    <div class="gc-frame studio-figure f-yellow">
+      <span class="gc-frame-info"><span><strong>WED</strong> · 11:18</span><span>★ HERO</span></span>
+    </div>
+    <div class="gc-frame studio-figure f-dark">
+      <span class="gc-frame-info"><span><strong>THU</strong> · 16:42</span><span>FRAME 04</span></span>
+    </div>
+    <div class="gc-frame studio-figure f-warm">
+      <span class="gc-frame-info"><span><strong>FRI</strong> · 10:08</span><span>FRAME 05</span></span>
+    </div>
+    <div class="gc-frame studio-figure f-mid">
+      <span class="gc-frame-info"><span><strong>SAT</strong> · 13:30</span><span>FRAME 06</span></span>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ WEEKLY ARCHIVE</span>
+    <span>WEEK 23 ・ MAY 2024 ・ SHANGHAI</span>
+  </div>
+</div>
+
+
+<!-- ─── 子组 2 · 注释/讲解 (GC-B) ─── -->
+<div class="section-header sub">
+  <div class="section-header-text" style="font-size: 11px; color: var(--text-muted); padding-left: 16px;">— B · 注释/讲解 · 1 of 14 (一张图 + N 编号解释)</div>
+</div>
+
+
+<!-- GC-B · 1 图 + N 注释 (4 注释自适应) -->
+<div class="nav-label">GC-B · Photo + Captions · 1 图 + N 注释 [★ 自适应 N=4]</div>
+<div class="slide variant-gc-b-studio gallery-base" style="--rows: 4;">
+  <div class="studio-top">
+    <span>CHAPTER 05 ・ ANNOTATED VIEW</span>
+    <span>PG. 64 <span class="dev-tag"> · GC-B · N=4</span></span>
+  </div>
+  <span class="g-tag">— A PHOTO, WITH NOTES · 4 DETAILS</span>
+  <h2 class="slot-caption">一张照片里, <em>4 个</em>细节值得说说。</h2>
+  
+  <div class="gcb-grid">
+    <div class="gcb-fig studio-figure f-warm"></div>
+    <div class="gcb-caps">
+      <div class="gcb-cap">
+        <span class="gcb-num">①</span>
+        <p class="gcb-text"><strong>右上角 logo</strong> — 比例 1:0.618 黄金分割, 不是巧合。</p>
+      </div>
+      <div class="gcb-cap">
+        <span class="gcb-num">②</span>
+        <p class="gcb-text"><strong>中央色块</strong> — 不是渐变, 是 <strong>3 个色块</strong>叠加, 印刷上会有边缘。</p>
+      </div>
+      <div class="gcb-cap">
+        <span class="gcb-num">③</span>
+        <p class="gcb-text"><strong>底部留白</strong> — 1/3 的留白比标语更重要, 留给"想象空间"。</p>
+      </div>
+      <div class="gcb-cap">
+        <span class="gcb-num">④</span>
+        <p class="gcb-text"><strong>左下水印</strong> — 8pt 极小但有意义, 它说"这是 2024"。</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ ANNOTATED CASE</span>
+    <span>METHODOLOGY ・ EVERY DETAIL HAS A REASON</span>
+  </div>
+</div>
+
+
+<!-- ─── 子组 3 · ★ 作品集案例 (CASE-A/B/C) ─── -->
+<div class="section-header sub">
+  <div class="section-header-text" style="font-size: 11px; color: var(--text-muted); padding-left: 16px;">— C · ★ 作品集案例 · 3 of 14 (整页 hero / Before-After / 5 帧 process)</div>
+</div>
+
+
+<!-- CASE-A · 全屏案例 hero -->
+<div class="nav-label">CASE-A · Full-bleed Case Hero · 全屏案例</div>
+<div class="slide variant-case-a-studio">
+  <div class="case-top">
+    <div class="case-top-tag">
+      <span class="num">CASE 04 / 24</span>
+      <span class="case-top-name">SHANGHAI HARBOR · MASTER PLAN BRAND</span>
+    </div>
+    <span>BRAND IDENTITY ・ 2024.11 <span class="dev-tag"> · CASE-A</span></span>
+  </div>
+  <div class="case-hero studio-figure f-yellow">
+    <div class="case-hero-label">
+      上海港<br><em>新中央 CBD</em>
+      <span class="sub">— A bold rebrand for Shanghai's next port-side district</span>
+    </div>
+  </div>
+  <div class="case-meta">
+    <div class="meta-cell">
+      <span class="meta-label">CLIENT</span>
+      <span class="meta-value">上海港务集团</span>
+    </div>
+    <div class="meta-cell">
+      <span class="meta-label">SCOPE</span>
+      <span class="meta-value">BRAND + DIGITAL</span>
+    </div>
+    <div class="meta-cell">
+      <span class="meta-label">TIMELINE</span>
+      <span class="meta-value">8 MONTHS</span>
+    </div>
+    <div class="meta-cell">
+      <span class="meta-label">AWARDS</span>
+      <span class="meta-value accent">RED DOT ・ 2025</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- CASE-B · Before/After (品牌改版) -->
+<div class="nav-label">CASE-B · Before/After · 品牌改版对比</div>
+<div class="slide variant-case-b-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CASE 07 / 24 ・ ANTA BRAND RENEW</span>
+    <span>PG. 32 <span class="dev-tag"> · CASE-B</span></span>
+  </div>
+  
+  <div class="case-header">
+    <div>
+      <span class="case-eyebrow">Rebrand ・ before vs after</span>
+      <h2 class="case-title">把<em>15 年</em>的老品牌, 翻新到下一个十年。</h2>
+    </div>
+    <span class="case-tag">★ BRAND RENEW</span>
+  </div>
+  
+  <div class="compare-grid">
+    <div class="compare-cell before">
+      <span class="cell-tag">— BEFORE ・ 2009</span>
+      <div class="cell-fig studio-figure"></div>
+      <span class="cell-caption">原版 logo — 圆角字体 + 渐变色, <strong>过时</strong>但有情感累积。</span>
+    </div>
+    <div class="compare-cell after">
+      <span class="cell-tag">★ AFTER ・ 2024</span>
+      <div class="cell-fig studio-figure f-yellow"></div>
+      <span class="cell-caption">新版 logo — 极简几何 + 单色, <strong>锋利现代</strong>, 保留 15 年的"锐"字精神。</span>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ ANTA REBRAND 2024</span>
+    <span>SCOPE ・ LOGO + GUIDELINE + APPLICATIONS ・ 8 MONTHS</span>
+  </div>
+</div>
+
+
+<!-- CASE-C · Process 流程 -->
+<div class="nav-label">CASE-C · Design Process · 5 帧时间流程</div>
+<div class="slide variant-case-c-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CASE 12 / 24 ・ DESIGN PROCESS</span>
+    <span>PG. 48 ・ 5 PHASES <span class="dev-tag"> · CASE-C</span></span>
+  </div>
+  
+  <div class="case-header">
+    <div>
+      <span class="case-eyebrow">From sketch to final ・ 5 phases</span>
+      <h2 class="case-title">一个 logo 是怎样<em>长出来</em>的。</h2>
+    </div>
+    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); letter-spacing: 0.16em;">→ 8 MONTHS ・ 142 ITERATIONS</span>
+  </div>
+  
+  <div class="process-flow">
+    <div class="process-step">
+      <span class="step-num">01 · SKETCH</span>
+      <div class="step-fig studio-figure"><span class="step-arrow">→</span></div>
+      <span class="step-name">手稿</span>
+      <span class="step-detail">200+ 纸上草图<br>WEEK 01-02</span>
+    </div>
+    <div class="process-step">
+      <span class="step-num">02 · DIGITIZE</span>
+      <div class="step-fig studio-figure"><span class="step-arrow">→</span></div>
+      <span class="step-name">数字化</span>
+      <span class="step-detail">vector + 20 方向<br>WEEK 03-08</span>
+    </div>
+    <div class="process-step">
+      <span class="step-num">03 · REFINE</span>
+      <div class="step-fig studio-figure"><span class="step-arrow">→</span></div>
+      <span class="step-name">优化</span>
+      <span class="step-detail">栅格化 + 5 候选<br>WEEK 09-16</span>
+    </div>
+    <div class="process-step">
+      <span class="step-num">04 · TEST</span>
+      <div class="step-fig studio-figure"><span class="step-arrow">→</span></div>
+      <span class="step-name">测试</span>
+      <span class="step-detail">100+ 应用场景<br>WEEK 17-24</span>
+    </div>
+    <div class="process-step final">
+      <span class="step-num">★ 05 · FINAL</span>
+      <div class="step-fig studio-figure f-yellow"></div>
+      <span class="step-name">终稿</span>
+      <span class="step-detail">交付 + RED DOT<br>WEEK 32</span>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ DESIGN PROCESS</span>
+    <span>METHODOLOGY ・ ITERATION-DRIVEN ・ 142 VERSIONS</span>
+  </div>
+</div>
+
+
+<!-- ─── 子组 4 · ★★ 杂志艺术编排 (ART-A/B/C/D/E/F) ─── -->
+<div class="section-header sub">
+  <div class="section-header-text" style="font-size: 11px; color: var(--text-muted); padding-left: 16px;">— D · ★★ 杂志艺术编排 · 6 of 14 (TILT / OVERLAP / BLEED / SCALE / ZOOM / COLLAGE)</div>
+</div>
+
+
+<!-- ART-A · TILT 倾斜照片墙 -->
+<div class="nav-label">ART-A · TILT · 倾斜照片墙 (4 张 Polaroid 角度叠放)</div>
+<div class="slide variant-art-a-studio">
+  <div class="studio-top" style="position: absolute; top: 24px; left: 40px; right: 40px;">
+    <span>CASE 09 / 24 ・ FILM STILLS</span>
+    <span>PG. 40 ・ ART DIRECTION <span class="dev-tag"> · ART-A</span></span>
+  </div>
+  
+  <div class="stage">
+    <div class="tilt-photo t1">
+      <div class="tilt-inner studio-figure f-dark"></div>
+      <div class="tilt-caption">— FRAME 01 ・ 11:24</div>
+    </div>
+    <div class="tilt-photo t2">
+      <div class="tilt-inner studio-figure f-yellow"></div>
+      <div class="tilt-caption">★ FRAME 02 ・ HERO</div>
+    </div>
+    <div class="tilt-photo t3">
+      <div class="tilt-inner studio-figure f-warm"></div>
+      <div class="tilt-caption">— FRAME 03 ・ 14:50</div>
+    </div>
+    <div class="tilt-photo t4">
+      <div class="tilt-inner studio-figure f-mid"></div>
+      <div class="tilt-caption">— FRAME 04 ・ 16:12</div>
+    </div>
+  </div>
+  
+  <div class="art-header">
+    <span class="art-eyebrow">Behind the camera ・ contact sheet</span>
+    <h2 class="slot-title">一天拍了 <em>280 张</em>, 用了 4 张。</h2>
+  </div>
+  
+  <div class="studio-bottom" style="position: absolute; bottom: 24px; left: 40px; right: 40px;">
+    <span>STUDIO ▲ ART DIRECTION</span>
+    <span>SHOT ON ・ LEICA Q3 ・ 35MM SUMMILUX</span>
+  </div>
+</div>
+
+
+<!-- ART-B · OVERLAP 错位叠加 -->
+<div class="nav-label">ART-B · OVERLAP · 错位叠加 (3 层 + 文字穿插)</div>
+<div class="slide variant-art-b-studio">
+  <div class="studio-top" style="position: absolute; top: 24px; left: 40px; right: 40px; z-index: 6;">
+    <span>CASE 11 / 24 ・ EDITORIAL DESIGN</span>
+    <span>PG. 44 <span class="dev-tag"> · ART-B</span></span>
+  </div>
+  
+  <div class="ov-bg studio-figure f-mid"></div>
+  <div class="ov-front studio-figure f-warm"></div>
+  <div class="ov-small studio-figure f-yellow"></div>
+  
+  <div class="ov-text">
+    <span class="ov-eyebrow">Editorial ・ overlap composition</span>
+    <h2 class="slot-title">把<em>不同时刻</em>的<br>瞬间, 叠在一起。</h2>
+  </div>
+  
+  <div class="studio-bottom" style="position: absolute; bottom: 24px; left: 40px; right: 40px; z-index: 6;">
+    <span>STUDIO ▲ EDITORIAL DESIGN</span>
+    <span>3 LAYERS ・ MIXED TIMELINE</span>
+  </div>
+</div>
+
+
+<!-- ART-C · BLEED 出血大图 + 大字 mix-blend -->
+<div class="nav-label">ART-C · BLEED · 出血大图 + 大字 mix-blend</div>
+<div class="slide variant-art-c-studio">
+  <div class="bleed-img studio-figure f-warm"></div>
+  <div class="bleed-overlay"></div>
+  
+  <span class="bleed-tag">★ HERO ・ FULL BLEED <span class="dev-tag"> · ART-C</span></span>
+  
+  <div class="bleed-title">
+    <div class="slot-bigtype">LOUD<br>QUIETLY.</div>
+    <p class="bleed-sub">A photo essay on the <em>noise of everyday craft</em> ・ Shanghai ・ 2024</p>
+  </div>
+</div>
+
+
+<!-- ART-D · SCALE 极端尺寸对比 -->
+<div class="nav-label">ART-D · SCALE · 极端尺寸对比 (大图 + 超小图)</div>
+<div class="slide variant-art-d-studio">
+  <div class="studio-top" style="position: absolute; top: 24px; left: 64px; right: 64px;">
+    <span>CASE 15 / 24 ・ SCALE STUDY</span>
+    <span>PG. 56 <span class="dev-tag"> · ART-D</span></span>
+  </div>
+  
+  <div class="scale-stage">
+    <div class="scale-big studio-figure f-dark"></div>
+    <div class="scale-small studio-figure f-yellow"></div>
+    
+    <div class="scale-text">
+      <span class="scale-eyebrow">A study in scale ・ 100:1</span>
+      <h2 class="slot-title">最小的<em>细节</em>,<br>有最大的<em>力量</em>。</h2>
+      <p class="scale-body">这张设计稿里有 <strong>240 个元素</strong>, 但真正决定它"成立"的, 是右下角那个不到 1% 的<strong>三角形 micro-mark</strong>。看见了吗?</p>
+    </div>
+    
+    <div class="scale-relation">
+      ↑ <strong>1%</strong> of the<br>
+      whole design.<br>
+      &nbsp;<br>
+      Everything depends<br>
+      on this <strong>3px triangle</strong>.
+    </div>
+  </div>
+  
+  <div class="studio-bottom" style="position: absolute; bottom: 24px; left: 64px; right: 64px;">
+    <span>STUDIO ▲ SCALE STUDY</span>
+    <span>RATIO ・ 100:1 ・ DETAIL-DRIVEN</span>
+  </div>
+</div>
+
+
+<!-- ART-E · ZOOM 局部放大镜 -->
+<div class="nav-label">ART-E · ZOOM · 局部放大镜 (圆形放大圈)</div>
+<div class="slide variant-art-e-studio">
+  <div class="studio-top" style="position: absolute; top: 24px; left: 64px; right: 64px; z-index: 6;">
+    <span>CASE 18 / 24 ・ PRODUCT MACRO</span>
+    <span>PG. 60 <span class="dev-tag"> · ART-E</span></span>
+  </div>
+  
+  <div class="zoom-main studio-figure f-dark"></div>
+  <div class="zoom-line"></div>
+  <div class="zoom-lens">
+    <div class="zoom-fig"></div>
+  </div>
+  
+  <div class="zoom-info">
+    <span class="zoom-tag">★ ZOOM ・ 16×</span>
+    <h2 class="slot-title">放大 16 倍, 才能看见的 <em>手工痕迹</em>。</h2>
+    <div class="zoom-spec">
+      <div class="zoom-spec-cell">
+        <span class="zoom-spec-label">DEPTH</span>
+        <span class="zoom-spec-value">0.2mm</span>
+      </div>
+      <div class="zoom-spec-cell">
+        <span class="zoom-spec-label">CRAFT</span>
+        <span class="zoom-spec-value accent">HAND</span>
+      </div>
+      <div class="zoom-spec-cell">
+        <span class="zoom-spec-label">TIME</span>
+        <span class="zoom-spec-value">3 HRS</span>
+      </div>
+      <div class="zoom-spec-cell">
+        <span class="zoom-spec-label">ARTISAN</span>
+        <span class="zoom-spec-value">LIN ・ 1972</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="studio-bottom" style="position: absolute; bottom: 24px; left: 64px; right: 64px; z-index: 6;">
+    <span>STUDIO ▲ MACRO PHOTOGRAPHY</span>
+    <span>16× MAGNIFICATION ・ HANDCRAFTED DETAIL</span>
+  </div>
+</div>
+
+
+<!-- ART-F · COLLAGE 拼贴风 -->
+<div class="nav-label">ART-F · COLLAGE · 拼贴 (6 图 + 几何 + 数字穿插)</div>
+<div class="slide variant-art-f-studio">
+  <div class="studio-top" style="position: absolute; top: 24px; left: 40px; right: 40px; z-index: 9;">
+    <span>CASE 21 / 24 ・ MOOD BOARD</span>
+    <span>PG. 68 ・ COLLAGE <span class="dev-tag"> · ART-F</span></span>
+  </div>
+  
+  <div class="col-stage">
+    <div class="col-photo c1 studio-figure f-mid"></div>
+    <div class="col-photo c2 studio-figure f-warm"></div>
+    <div class="col-photo c3 studio-figure f-yellow"></div>
+    <div class="col-photo c4 studio-figure f-dark"></div>
+    <div class="col-photo c5 studio-figure f-yellow"></div>
+    <div class="col-photo c6 studio-figure f-mid"></div>
+    
+    <div class="col-shape triangle"></div>
+    <div class="col-shape label-num">21</div>
+    
+    <span class="col-label-tag lab1">★ HERO</span>
+    <span class="col-label-tag lab2">— DETAIL</span>
+  </div>
+  
+  <div class="col-text">
+    <span class="col-eyebrow">Mood board ・ for next project</span>
+    <h3 class="slot-title">下一个项目的<br><em>视觉语言</em>从这里开始。</h3>
+  </div>
+  
+  <div class="studio-bottom" style="position: absolute; bottom: 24px; left: 40px; right: 40px; z-index: 9;">
+    <span>STUDIO ▲ MOOD BOARD</span>
+    <span>6 IMAGES ・ 2 SHAPES ・ MIXED MEDIA</span>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 11 · TIMELINE · 2 Variants
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 9 · TIMELINE · 时间线 · 2 of 2</div>
+  <div class="section-header-line"></div>
+</div>
+
+
+<!-- TL-A · 工作室年表 -->
+<div class="nav-label">TL-A · Studio Timeline · 工作室年表 [★ 自适应 N=6 cols]</div>
+<div class="slide variant-tl-a-studio" style="--cols: 6;">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 05 ・ TIMELINE</span>
+    <span>PG. 58 ・ 7 YEARS <span class="dev-tag"> · TL-A · N=6</span></span>
+  </div>
+  
+  <div class="tl-header">
+    <div>
+      <span class="tl-eyebrow">7 years, 6 milestones</span>
+      <h2 class="slot-title">从<em>一个人</em>到<em>一支队伍</em>。</h2>
+    </div>
+    <span class="number-tag">EST. 2018</span>
+  </div>
+  
+  <div class="tl-axis">
+    <div class="tl-point">
+      <span class="tl-year">2018</span>
+      <span class="tl-event">FOUNDED</span>
+      <span class="tl-detail">SHANGHAI<br>1 PERSON</span>
+    </div>
+    <div class="tl-point">
+      <span class="tl-year">2019</span>
+      <span class="tl-event">FIRST 10</span>
+      <span class="tl-detail">10 CLIENTS<br>SOLO</span>
+    </div>
+    <div class="tl-point">
+      <span class="tl-year">2020</span>
+      <span class="tl-event">TEAM OF 4</span>
+      <span class="tl-detail">+ 3 DESIGNERS<br>FIRST OFFICE</span>
+    </div>
+    <div class="tl-point">
+      <span class="tl-year">2022</span>
+      <span class="tl-event">TOKYO BRANCH</span>
+      <span class="tl-detail">SECOND CITY<br>12 PEOPLE</span>
+    </div>
+    <div class="tl-point active">
+      <span class="tl-year">2024</span>
+      <span class="tl-event">★ MILESTONE</span>
+      <span class="tl-detail">100 PROJECTS<br>RED DOT × 3</span>
+    </div>
+    <div class="tl-point">
+      <span class="tl-year">2025</span>
+      <span class="tl-event">YEAR 7</span>
+      <span class="tl-detail">18 PEOPLE<br>142 CLIENTS</span>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ ANNUAL REPORT</span>
+    <span>SHANGHAI ・ TOKYO ・ 7 YRS</span>
+  </div>
+</div>
+
+
+<!-- TL-B · 项目周期对照 (3 项目 × 12 个月) -->
+<div class="nav-label">TL-B · Project Schedule · 3 项目 × 12 月时间轴</div>
+<div class="slide variant-tl-b-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 05 ・ Q1 2025 SCHEDULE</span>
+    <span>3 PROJECTS · 12 MONTHS <span class="dev-tag"> · TL-B</span></span>
+  </div>
+  
+  <div class="tl-header">
+    <span class="tl-eyebrow">Project schedule ・ 3 in parallel</span>
+    <h2 class="slot-title">3 个项目, <em>同时进行</em>。</h2>
+  </div>
+  
+  <div class="tlb-grid">
+    <div class="tlb-months">
+      <span class="tlb-month">PROJECT / MO</span>
+      <span class="tlb-month">JAN</span>
+      <span class="tlb-month">FEB</span>
+      <span class="tlb-month">MAR</span>
+      <span class="tlb-month">APR</span>
+      <span class="tlb-month">MAY</span>
+      <span class="tlb-month">JUN</span>
+      <span class="tlb-month">JUL</span>
+      <span class="tlb-month">AUG</span>
+      <span class="tlb-month">SEP</span>
+      <span class="tlb-month">OCT</span>
+      <span class="tlb-month">NOV</span>
+      <span class="tlb-month">DEC</span>
+    </div>
+    <div class="tlb-project">
+      <span class="tlb-name">ANTA REBRAND</span>
+      <div class="tlb-bar featured" style="--start: 2; --end: 10;">★ 8 MONTHS · DELIVERED 2024.08</div>
+    </div>
+    <div class="tlb-project">
+      <span class="tlb-name">SHANGHAI PORT</span>
+      <div class="tlb-bar" style="--start: 5; --end: 13;">12 MONTHS · ONGOING</div>
+    </div>
+    <div class="tlb-project">
+      <span class="tlb-name">JD INTERNAL TOOL</span>
+      <div class="tlb-bar" style="--start: 7; --end: 12;">6 MONTHS · IN BUILD</div>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ PROJECT TIMELINE</span>
+    <span>YEAR 2024 ・ 3 MAJOR PROJECTS</span>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 12 · PROCESS · 1 Variant
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 10 · PROCESS · 设计流程 · 1 of 1</div>
+  <div class="section-header-line"></div>
+</div>
+
+
+<!-- PRC-A · 设计流程 4 步 -->
+<div class="nav-label">PRC-A · Design Process · 设计流程 [★ 自适应 N=4 cols]</div>
+<div class="slide variant-prc-a-studio" style="--cols: 4;">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 06 ・ HOW WE WORK</span>
+    <span>PG. 64 <span class="dev-tag"> · PRC-A · N=4</span></span>
+  </div>
+  
+  <div class="prc-header">
+    <span class="prc-eyebrow">Our process ・ 4 stages</span>
+    <h2 class="slot-title">我们的<em>4 步</em>设计流程。</h2>
+  </div>
+  
+  <div class="prc-flow">
+    <div class="prc-step">
+      <span class="step-num">01 · DISCOVER</span>
+      <h4 class="step-title">理解问题</h4>
+      <p class="step-text">用户访谈、市场调研、<strong>团队 workshop</strong>。三周时间, 不动笔, 只想清楚。</p>
+      <span class="step-time">— WEEK 1-3</span>
+    </div>
+    <div class="prc-step">
+      <span class="step-num">02 · DESIGN</span>
+      <h4 class="step-title">设计方案</h4>
+      <p class="step-text">线框、原型、视觉。<strong>3-5 个方向并行</strong>, 客户参与每个决策。</p>
+      <span class="step-time">— WEEK 4-12</span>
+    </div>
+    <div class="prc-step">
+      <span class="step-num">03 · BUILD</span>
+      <h4 class="step-title">开发实现</h4>
+      <p class="step-text">设计师 + 工程师 <strong>同桌</strong>。每周可见进展, 每两周可点击。</p>
+      <span class="step-time">— WEEK 13-22</span>
+    </div>
+    <div class="prc-step final">
+      <span class="step-num">★ 04 · POLISH</span>
+      <h4 class="step-title">上线打磨</h4>
+      <p class="step-text">不是"做完了发布", 是 <strong>发布之后才开始做</strong>。</p>
+      <span class="step-time">— WEEK 23+</span>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ DESIGN PROCESS</span>
+    <span>4 STAGES ・ TYPICAL 6 MONTHS</span>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 13 · FRAMEWORK · 2 Variants
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 11 · FRAMEWORK · 框架 · 2 of 2</div>
+  <div class="section-header-line"></div>
+</div>
+
+
+<!-- FRW-A · 2×2 矩阵 -->
+<div class="nav-label">FRW-A · 2×2 Matrix · 服务象限</div>
+<div class="slide variant-frw-a-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 03 ・ POSITIONING</span>
+    <span>PG. 30 <span class="dev-tag"> · FRW-A</span></span>
+  </div>
+  
+  <div class="f-header">
+    <div>
+      <span class="f-eyebrow">A 2x2 framework</span>
+      <h2 class="slot-title">我们在<em>四个象限</em>里的位置。</h2>
+    </div>
+    <div class="frw-axis-info">
+      <strong>Y AXIS</strong> · CRAFT (LOW ↓ / HIGH ↑)<br>
+      <strong>X AXIS</strong> · SCALE (LOW ← / HIGH →)
+    </div>
+  </div>
+  
+  <div class="quad-grid">
+    <div class="quad">
+      <span class="quad-num">Q1 · TOP-LEFT</span>
+      <span class="quad-label">HIGH CRAFT · LOW SCALE</span>
+      <h3 class="quad-title">精品工作室</h3>
+      <p class="quad-text">小而精的设计工作室, <strong>10-30 人</strong>。手艺好但量小。</p>
+    </div>
+    <div class="quad featured">
+      <span class="quad-num">★ Q2 · TOP-RIGHT</span>
+      <span class="quad-label">HIGH CRAFT · MEDIUM SCALE</span>
+      <h3 class="quad-title">★ 我们在这里</h3>
+      <p class="quad-text">18 人, 24 项目/年, <strong>保持手艺, 适度规模</strong>。</p>
+    </div>
+    <div class="quad">
+      <span class="quad-num">Q3 · BOTTOM-LEFT</span>
+      <span class="quad-label">LOW CRAFT · LOW SCALE</span>
+      <h3 class="quad-title">个人接单</h3>
+      <p class="quad-text">freelance, <strong>1-5 人</strong>。规模小, 质量也参差。</p>
+    </div>
+    <div class="quad">
+      <span class="quad-num">Q4 · BOTTOM-RIGHT</span>
+      <span class="quad-label">LOW CRAFT · HIGH SCALE</span>
+      <h3 class="quad-title">大型 4A</h3>
+      <p class="quad-text">1000+ 人, <strong>追求量</strong>, 容易牺牲质。</p>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ POSITIONING FRAMEWORK</span>
+    <span>WHY WE STAY IN Q2 · CRAFT-FIRST</span>
+  </div>
+</div>
+
+
+<!-- FRW-D · 4 层金字塔 -->
+<div class="nav-label">FRW-D · 4-Layer Stack · 分层 framework [★ 自适应 N=4 rows]</div>
+<div class="slide variant-frw-d-studio" style="--rows: 4;">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>CHAPTER 03 ・ DESIGN STACK</span>
+    <span>PG. 34 <span class="dev-tag"> · FRW-D · N=4</span></span>
+  </div>
+  
+  <div class="f-header">
+    <span class="f-eyebrow">A 4-layer design stack</span>
+    <h2 class="slot-title">好设计的<em>4 个层级</em>。</h2>
+  </div>
+  
+  <div class="layers">
+    <div class="layer">
+      <span class="layer-num">L.4 · SURFACE</span>
+      <span class="layer-name">视觉表现</span>
+      <p class="layer-desc"><strong>颜色、字体、间距、动效</strong> — 大多数人讨论"设计"时, 说的是这一层。</p>
+      <span class="layer-tag">SURFACE</span>
+    </div>
+    <div class="layer">
+      <span class="layer-num">L.3 · BEHAVIOR</span>
+      <span class="layer-name">交互行为</span>
+      <p class="layer-desc"><strong>动作、反馈、节奏</strong> — 用户怎么操作, 系统怎么响应, 决定使用体验。</p>
+      <span class="layer-tag">BEHAVIOR</span>
+    </div>
+    <div class="layer featured">
+      <span class="layer-num">★ L.2 · STRUCTURE</span>
+      <span class="layer-name">信息结构</span>
+      <p class="layer-desc"><strong>信息架构、内容组织、心智模型</strong> — 这一层决定产品"易不易懂", 但最常被忽略。</p>
+      <span class="layer-tag">★ KEY</span>
+    </div>
+    <div class="layer">
+      <span class="layer-num">L.1 · STRATEGY</span>
+      <span class="layer-name">问题定义</span>
+      <p class="layer-desc"><strong>"为什么做" + "为谁做" + "解决什么"</strong> — 地基。这层错了, 上面三层都白做。</p>
+      <span class="layer-tag">FOUNDATION</span>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ DESIGN STACK</span>
+    <span>4 LAYERS ・ FROM STRATEGY TO SURFACE</span>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SECTION 14 · CLOSING · 3 Variants
+     ============================================================ -->
+<div class="section-header">
+  <div class="section-header-line"></div>
+  <div class="section-header-text">§ 12 · CLOSING · 结语 · 3 of 3</div>
+  <div class="section-header-line"></div>
+</div>
+
+
+<!-- CLO-A · 结语 CTA + 联系方式 -->
+<div class="nav-label">CLO-A · CTA Closing · 结语 + CTA + 联系方式</div>
+<div class="slide variant-clo-a-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-tr"></div>
+  <div class="corner-bl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>END OF REPORT 2024-2025</span>
+    <span>NEXT ・ COLLABORATE WITH US <span class="dev-tag"> · CLO-A</span></span>
+  </div>
+  
+  <div class="clo-mid">
+    <span class="clo-eyebrow">If you've made it here</span>
+    <h2 class="slot-title">下一个<br><em class="boxed">认真</em>的项目, 一起?</h2>
+    <p class="slot-subtitle">如果你正在做一件 <strong>需要被记住</strong> 的事 — 不管是新品牌、新产品、还是新公司 — 我们愿意听听。给我们写一封信。</p>
+    <div class="clo-cta">
+      <a class="cta-primary">START A PROJECT →</a>
+      <span class="cta-contact">— hello@<strong>studio.cn</strong> ・ +86 21 ・ <strong>SHA / TYO</strong></span>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ EST.2018</span>
+    <span>END OF DOCUMENT ・ 24 CASES ・ 72 PAGES</span>
+  </div>
+</div>
+
+
+<!-- CLO-D · Thank you + 团队信息 -->
+<div class="nav-label">CLO-D · Thanks + Team · 致谢 + 团队信息</div>
+<div class="slide variant-clo-d-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>STUDIO ▲ THANKS</span>
+    <span>VOL. 03 · COLOPHON <span class="dev-tag"> · CLO-D</span></span>
+  </div>
+  
+  <div class="clo-body">
+    <div class="clo-text-block">
+      <span class="clo-eyebrow">— Colophon · 致谢与版权</span>
+      <h2 class="slot-title">THANKS <em>FOR<br>READING.</em></h2>
+      <p class="slot-subtitle">这本年报是 18 个人, 用 8 个月做出来的。每一页都重新设计过, 每一段都重写过 — 因为我们觉得 <strong>值得</strong>。</p>
+    </div>
+    
+    <div class="clo-team-block">
+      <span class="team-label">★ MADE BY ・ 18 PEOPLE</span>
+      <div class="team-list">
+        <div class="team-member">
+          <span class="role">EDITOR</span>
+          <span class="name">林晓 LIN XIAO</span>
+        </div>
+        <div class="team-member">
+          <span class="role">ART DIRECTOR</span>
+          <span class="name">陈一 CHEN YI</span>
+        </div>
+        <div class="team-member">
+          <span class="role">PHOTOGRAPHY</span>
+          <span class="name">王森 / 李墨 / + 3</span>
+        </div>
+        <div class="team-member">
+          <span class="role">TYPE</span>
+          <span class="name">Inter Tight / Noto SC</span>
+        </div>
+        <div class="team-member">
+          <span class="role">PRINT</span>
+          <span class="name">东京印刷所 ・ FSC paper</span>
+        </div>
+      </div>
+      <div class="team-meta">© 2025 STUDIO ▲ · <strong>EST. 2018</strong> · SHA + TYO</div>
+    </div>
+  </div>
+  
+  <div class="studio-bottom">
+    <span>STUDIO ▲ ANNUAL REPORT</span>
+    <span>VOL. 03 ・ 72 PAGES ・ 18 CONTRIBUTORS</span>
+  </div>
+</div>
+
+
+<!-- CLO-E · 下一期预告 + 邀稿 -->
+<div class="nav-label">CLO-E · Next Issue · 下一期预告 + 邀稿</div>
+<div class="slide variant-clo-e-studio">
+  <div class="studio-grid"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  
+  <div class="studio-top">
+    <span>NEXT ISSUE ・ VOL. 04</span>
+    <span>SPRING 2026 <span class="dev-tag"> · CLO-E</span></span>
+  </div>
+  
+  <div class="clo-e-header">
+    <div>
+      <span class="clo-eyebrow">Coming next ・ Vol. 04 · Spring 2026</span>
+      <h2 class="slot-title">下一期, 我们想聊<em>三件事</em>。</h2>
+    </div>
+    <div class="next-meta">
+      VOL. 04 · SPRING 2026<br>
+      DEADLINE · 2026.01.31
+    </div>
+  </div>
+  
+  <div class="next-themes">
+    <div class="theme-card">
+      <span class="theme-num">★ 01 · COVER STORY</span>
+      <h3 class="theme-title">AI 时代的<em>手感</em></h3>
+      <p class="theme-text">当所有设计都能 AI 生成, <strong>"人做的"</strong> 还有什么意义?</p>
+    </div>
+    <div class="theme-card">
+      <span class="theme-num">02 · INTERVIEWS</span>
+      <h3 class="theme-title">5 位<em>年轻总监</em></h3>
+      <p class="theme-text">采访 5 位 30-35 岁的设计总监, 听他们 <strong>怎么想下一个十年</strong>。</p>
+    </div>
+    <div class="theme-card">
+      <span class="theme-num">03 · CASE STUDY</span>
+      <h3 class="theme-title">10 个<em>失败</em>案例</h3>
+      <p class="theme-text">不只讲成功 — 我们也讲过去一年 <strong>哪些案例没做好</strong>, 为什么。</p>
+    </div>
+  </div>
+  
+  <div class="submission-bar">
+    <span class="sub-info">想给下一期 <strong>投稿</strong> 或 <strong>提建议</strong>? 给我们写信:</span>
+    <span class="sub-email">— next@studio.cn</span>
+  </div>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,110 @@
+/* fullscreen-preview.css · 全屏播放样式 */
+
+.fp-container {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+  overflow: hidden;
+  cursor: default;
+}
+
+.fp-stage {
+  /* JS 会动态设 width / height / transform */
+  background: #FFF;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+
+.fp-iframe {
+  width: 1280px;
+  height: 720px;
+  border: 0;
+  display: block;
+}
+
+/* 鼠标点击区域 - 不可见, 但有 hover 提示 */
+.fp-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 10;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.fp-zone-left {
+  left: 0;
+  width: 33.33%;
+}
+
+.fp-zone-right {
+  right: 0;
+  width: 33.33%;
+}
+
+.fp-zone-center {
+  left: 33.33%;
+  right: 33.33%;
+}
+
+/* hover 时左右区域有轻微提示 */
+.fp-zone-left:hover {
+  background: linear-gradient(to right, rgba(255,255,255,0.06), transparent);
+  cursor: w-resize;
+}
+
+.fp-zone-right:hover {
+  background: linear-gradient(to left, rgba(255,255,255,0.06), transparent);
+  cursor: e-resize;
+}
+
+.fp-zone-center {
+  cursor: default;
+}
+
+/* HUD: 底部页码 + 提示 */
+.fp-hud {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.fp-container.fp-hud-visible .fp-hud {
+  opacity: 1;
+}
+
+.fp-hud-pagenum {
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 14px;
+  color: #FFF;
+  padding: 6px 14px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+
+.fp-hud-pagenum .fp-sep {
+  margin: 0 4px;
+  opacity: 0.5;
+}
+
+.fp-hud-pagenum .fp-total {
+  opacity: 0.6;
+}
+
+.fp-hud-hint {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.05em;
+}

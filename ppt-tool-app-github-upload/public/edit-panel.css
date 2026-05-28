@@ -1,0 +1,278 @@
+/* edit-panel.css · 单页编辑面板样式 */
+
+.ep-empty {
+  margin: 24px 0;
+  color: #A3A3A3;
+  font-size: 13px;
+  text-align: center;
+}
+
+.ep-header {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #E5E5E5;
+  margin-bottom: 12px;
+}
+
+.ep-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.ep-pageno {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.ep-variant {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  padding: 2px 6px;
+  background: #1A1A1A;
+  color: #FFF;
+  border-radius: 4px;
+}
+
+.ep-role {
+  font-size: 11px;
+  padding: 2px 6px;
+  background: #F4F4F5;
+  color: #525252;
+  border-radius: 4px;
+}
+
+.ep-variant-desc {
+  font-size: 11px;
+  color: #737373;
+  margin: 4px 0 0;
+  line-height: 1.4;
+}
+
+.ep-actions {
+  margin-bottom: 12px;
+}
+
+.ep-actions button {
+  width: 100%;
+}
+
+.ep-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ep-field {
+  background: #FAFAFA;
+  border: 1px solid #E5E5E5;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.ep-field-disabled {
+  opacity: 0.5;
+}
+
+.ep-field-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.ep-field-label strong {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  color: #1A1A1A;
+}
+
+.ep-type-tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  background: #DBEAFE;
+  color: #1E40AF;
+  border-radius: 999px;
+}
+
+.ep-max {
+  font-size: 10px;
+  color: #A3A3A3;
+}
+
+.ep-desc {
+  margin: 0 0 6px;
+  font-size: 11px;
+  color: #737373;
+  line-height: 1.4;
+}
+
+.ep-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #D4D4D4;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+  background: #FFF;
+  box-sizing: border-box;
+}
+
+.ep-input:focus {
+  outline: 1px solid #0066FF;
+  outline-offset: -1px;
+  border-color: #0066FF;
+}
+
+.ep-input-rich {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.ep-hint {
+  font-size: 10px;
+  color: #A3A3A3;
+  margin: 4px 0 0;
+  font-family: ui-monospace, monospace;
+}
+
+.ep-hint-inline {
+  font-size: 10px;
+  color: #A3A3A3;
+  font-weight: normal;
+}
+
+/* 组合字段 / 嵌套 sub */
+.ep-composite,
+.ep-image,
+.ep-img-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ep-sub label,
+.ep-image label,
+.ep-img-item label {
+  font-size: 10px;
+  color: #525252;
+  display: block;
+  margin-bottom: 2px;
+  font-family: ui-monospace, monospace;
+}
+
+.ep-sub {
+  padding: 4px 0;
+}
+
+.ep-sub-nested {
+  margin-left: 8px;
+  padding: 2px 0;
+}
+
+.ep-nested-group {
+  background: #F4F4F5;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.ep-readonly {
+  padding: 4px 8px;
+  background: #FFF;
+  border: 1px solid #E5E5E5;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #737373;
+  font-family: ui-monospace, monospace;
+  word-break: break-all;
+}
+
+/* 同质列表 */
+.ep-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ep-li {
+  display: flex;
+  gap: 4px;
+}
+
+/* 重复列表 */
+.ep-list-rep {
+  gap: 8px;
+}
+
+.ep-item {
+  background: #FFF;
+  border: 1px solid #E5E5E5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ep-item.featured {
+  border-color: #0066FF;
+  box-shadow: 0 0 0 1px #0066FF;
+}
+
+.ep-item-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #F4F4F5;
+  font-size: 11px;
+}
+
+.ep-item.featured .ep-item-header {
+  background: #DBEAFE;
+}
+
+.ep-item-no {
+  font-family: ui-monospace, monospace;
+  color: #737373;
+  min-width: 14px;
+}
+
+.ep-featured-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 14px;
+  color: #A3A3A3;
+  line-height: 1;
+}
+
+.ep-item.featured .ep-featured-toggle {
+  color: #0066FF;
+}
+
+.ep-item-summary {
+  flex: 1;
+  color: #404040;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ep-item-body {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 图片 */
+.ep-img-item {
+  background: #FFF;
+  border: 1px solid #E5E5E5;
+  padding: 6px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
