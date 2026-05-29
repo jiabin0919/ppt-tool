@@ -1,6 +1,5 @@
 {
   "schema_version": "1.2",
-
   "_usage": {
     "本文档作用": "描述 Capsule SaaS DNA 的全部 42 个 variant。供 visual-planner skill 在为 PPT 每一页选 variant 时查询。",
     "消费方": [
@@ -22,12 +21,15 @@
       "如果所有 variant 都不合适, 在 yaml 的 review_comments 里如实说明, 不要硬塞"
     ]
   },
-
   "_type_definitions": {
     "纯文本": {
       "格式": "字符串, 不含任何 HTML 标签",
       "示例": "下一代的项目协作方式",
-      "禁止": ["<em>...</em>", "<br>", "**markdown**"]
+      "禁止": [
+        "<em>...</em>",
+        "<br>",
+        "**markdown**"
+      ]
     },
     "富文本": {
       "格式": "字符串, 允许以下 HTML 标签",
@@ -37,29 +39,56 @@
         "<br>": "换行(只在标题类 slot 用)"
       },
       "示例": "下一代的<em>项目协作</em>方式。",
-      "禁止": ["其他 HTML 标签如 <span> <div>", "嵌套 HTML", "markdown 语法"]
+      "禁止": [
+        "其他 HTML 标签如 <span> <div>",
+        "嵌套 HTML",
+        "markdown 语法"
+      ]
     },
     "组合字段": {
       "格式": "JSON 对象, 有多个固定子字段",
-      "示例": {"currency": "$", "num": "12", "period": "/ user / 月"},
+      "示例": {
+        "currency": "$",
+        "num": "12",
+        "period": "/ user / 月"
+      },
       "说明": "每个子字段在 variant 的 slots 定义里详细说明, 必须按定义填"
     },
     "同质列表": {
       "格式": "JSON 数组, 每项是字符串",
-      "示例": ["无限成员 + 项目", "完整 AI Assist", "API + Webhooks"],
+      "示例": [
+        "无限成员 + 项目",
+        "完整 AI Assist",
+        "API + Webhooks"
+      ],
       "说明": "用于一组同类型简单项, 如 feature 清单"
     },
     "重复列表": {
       "格式": "JSON 对象数组, 每项是一个对象",
       "示例": [
-        {"plan-name": "Starter", "plan-price": {"num": "0"}},
-        {"plan-name": "Pro", "plan-price": {"num": "12"}, "_featured": true}
+        {
+          "plan-name": "Starter",
+          "plan-price": {
+            "num": "0"
+          }
+        },
+        {
+          "plan-name": "Pro",
+          "plan-price": {
+            "num": "12"
+          },
+          "_featured": true
+        }
       ],
       "说明": "用于一组异质项, 每项含多字段。featured 项用 _featured: true 标记"
     },
     "图片": {
       "格式": "JSON 对象",
-      "示例": {"url": "https://example.com/dashboard.png", "alt": "Dashboard", "image_fit": "cover"},
+      "示例": {
+        "url": "https://example.com/dashboard.png",
+        "alt": "Dashboard",
+        "image_fit": "cover"
+      },
       "image_fit 枚举值": {
         "cover": "填满容器, 居中裁切, 不变形 - 适合摄影 / 风景 / 抽象艺术",
         "contain": "完整显示, 周围 padding - 适合产品图 / logo / 比例不规则",
@@ -71,14 +100,32 @@
       "格式": "JSON 对象",
       "示例": {
         "type": "line",
-        "x_labels": ["Q1", "Q2", "Q3", "Q4"],
-        "primary": {"label": "销量", "data": [25, 32, 38, 42]}
+        "x_labels": [
+          "Q1",
+          "Q2",
+          "Q3",
+          "Q4"
+        ],
+        "primary": {
+          "label": "销量",
+          "data": [
+            25,
+            32,
+            38,
+            42
+          ]
+        }
       },
-      "type 枚举值 (封闭)": ["line", "bar", "bar-line-combo", "doughnut", "pie"],
+      "type 枚举值 (封闭)": [
+        "line",
+        "bar",
+        "bar-line-combo",
+        "doughnut",
+        "pie"
+      ],
       "禁止": "不要用枚举外的类型, 渲染器没桥接会画空白"
     }
   },
-
   "_fallback_rules": {
     "内容项数超过最多": {
       "处理": "拆成两页, 第二页用相同 variant",
@@ -101,10 +148,8 @@
       "底线": "不能为了塞内容而违反字数限制, 也不要截断显示"
     }
   },
-
   "_yaml_example": "见 _yaml_example_text 字段",
   "_yaml_example_text": "# visual_plan.yaml 完整示例:\n\nglobal:\n  dna: \"capsule\"\n  total_pages: 22\n  review_comments: |\n    全篇 22 页, 18 个不同 variant\n    高潮: 1 个 climax (P06 CLX-A)\n    Gallery: 4 个 (P08 H1, P09 GC-B, P11 H3, P12 CASE-C)\n\npages:\n  - slide: 1\n    variant_id: \"COV-A\"\n    page_role: \"cover\"\n    director_note: |\n      【情绪定调】发布会开场, 有期待感\n      【内容载体】3 pill 徽章 + 104px 大字标题 + 副标\n      【视觉主角】slot-title\n      【空间分配】骨架默认\n      【演讲配合】slot-title (delay-1) → 副标 + 底部 (delay-2)\n    slots:\n      slot-title: \"下一代的<em>项目协作</em>方式。\"\n      slot-subtitle: \"3 个全新模块、12 项性能优化、1 套全新界面。\"\n      badge-row:\n        - \"★ Spring Release · 2026\"\n        - \"v3.0 · NEW\"\n        - \"● LIVE\"\n      bottom-bar-left: \"linear.app/release/3.0\"\n      bottom-bar-right: \"2026.03.15 · SAN FRANCISCO\"\n\n  - slide: 18\n    variant_id: \"CMP-X\"\n    page_role: \"comparison\"\n    director_note: |\n      【情绪定调】清晰商业化\n      【内容载体】3 列 plan card, 中间 featured\n      【视觉主角】中间 Pro 档\n      【空间分配】骨架默认\n      【演讲配合】中间 Pro (delay-1) → 左右 (delay-2/3)\n    slots:\n      slot-title: \"选一个适合<em>你团队</em>的方案。\"\n      pr-eyebrow: \"→ SIMPLE, TRANSPARENT PRICING\"\n      plans:\n        - plan-name: \"Starter\"\n          plan-price: {currency: \"$\", num: \"0\", period: \"/ user / 月\"}\n          plan-desc: \"个人项目和小团队入门, 无限期免费\"\n          plan-features: [\"最多 10 个成员\", \"基础项目管理\", \"社区支持\"]\n          plan-cta: \"免费开始\"\n        - plan-name: \"Pro\"\n          _featured: true\n          plan-price: {currency: \"$\", num: \"12\", period: \"/ user / 月\"}\n          plan-desc: \"成长型团队, 完整功能 + AI 助手\"\n          plan-features: [\"无限成员 + 项目\", \"完整 AI Assist\", \"API + Webhooks\", \"优先技术支持\"]\n          plan-cta: \"14 天免费试用\"\n        - plan-name: \"Enterprise\"\n          plan-price: {num: \"Custom\"}\n          plan-desc: \"大型组织, 定制部署 + 企业安全\"\n          plan-features: [\"Pro 全部功能\", \"SSO + SCIM + SAML\", \"SOC 2 + 私有部署\"]\n          plan-cta: \"联系销售\"\n      pr-footnote: \"— 14 天免费试用 · 无需信用卡 · 随时取消\"\n\n  - slide: 8\n    variant_id: \"H1\"\n    page_role: \"gallery\"\n    director_note: |\n      【情绪定调】展示产品本体的'高光时刻'\n      【内容载体】全屏 dashboard mockup\n      【视觉主角】产品截图本体\n      【空间分配】图片占满\n      【演讲配合】图片 (delay-1) → caption (delay-2)\n    slots:\n      slot-caption: \"这就是新版的<em>主界面</em>。\"\n      g-eyebrow: \"— Product hero · full screen\"\n      h1-mock:\n        url: \"https://example.com/dashboard.png\"\n        alt: \"Linear 3.0 主 dashboard\"\n        image_fit: \"cover\"\n",
-
   "dna": {
     "id": "capsule",
     "name": "Capsule SaaS",
@@ -126,7 +171,18 @@
       "传统咨询的严密数据分析(用 Archive)",
       "生活方式 / 慢节奏内容(用 Macaron)"
     ],
-    "关键词": ["SaaS", "产品发布", "Linear", "Notion", "Vercel", "现代", "工具", "B2B", "Stripe", "Figma"],
+    "关键词": [
+      "SaaS",
+      "产品发布",
+      "Linear",
+      "Notion",
+      "Vercel",
+      "现代",
+      "工具",
+      "B2B",
+      "Stripe",
+      "Figma"
+    ],
     "_renderer": {
       "skeleton_file": "capsule_skeleton_full.html",
       "preview_image": "capsule_all42_wall.png"
@@ -135,28 +191,37 @@
     "创建时间": "2026-05-26",
     "版本": "1.0"
   },
-
   "skins": [
     {
       "id": "capsule-light",
       "name": "浅紫 · Linear 风",
       "is_default": true,
-      "色块预览": {"底色": "#FAFAFA", "正文色": "#18181B", "品牌色": "#5E5CE6"}
+      "色块预览": {
+        "底色": "#FAFAFA",
+        "正文色": "#18181B",
+        "品牌色": "#5E5CE6"
+      }
     },
     {
       "id": "capsule-mono",
       "name": "纯黑 · Notion / Vercel 风",
-      "色块预览": {"底色": "#FAFAFA", "正文色": "#18181B", "品牌色": "#18181B"}
+      "色块预览": {
+        "底色": "#FAFAFA",
+        "正文色": "#18181B",
+        "品牌色": "#18181B"
+      }
     },
     {
       "id": "capsule-blue",
       "name": "钴蓝 · Stripe / Figma 风",
-      "色块预览": {"底色": "#FAFAFA", "正文色": "#18181B", "品牌色": "#2563EB"}
+      "色块预览": {
+        "底色": "#FAFAFA",
+        "正文色": "#18181B",
+        "品牌色": "#2563EB"
+      }
     }
   ],
-
   "variants": [
-
     {
       "id": "COV-A",
       "page_role": "cover",
@@ -196,24 +261,29 @@
           "类型": "同质列表",
           "描述": "顶部徽章 pill",
           "项数": "1-3",
-          "示例": ["★ Spring Release · 2026", "v3.0 · NEW", "● LIVE"]
+          "示例": [
+            "★ Spring Release · 2026",
+            "v3.0 · NEW",
+            "● LIVE"
+          ]
         },
-        "bottom-bar-left": {
+        "slot-bottom-bar-left": {
           "类型": "纯文本",
           "描述": "底部 URL / 链接",
           "最大字数": 40,
           "示例": "linear.app/release/3.0"
         },
-        "bottom-bar-right": {
+        "slot-bottom-bar-right": {
           "类型": "纯文本",
           "描述": "底部时间地点",
           "最大字数": 30,
           "示例": "2026.03.15 · SAN FRANCISCO"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "COV-B",
       "page_role": "cover",
@@ -243,23 +313,32 @@
           "最大字数": 90,
           "示例": "Linear 3.0 — 重新设计的工作流引擎,集成 AI 助手。"
         },
-        "version-num": {
+        "version-label": {
+          "类型": "组合字段",
+          "子字段": {
+            "name": {
+              "类型": "纯文本",
+              "最大字数": 30,
+              "示例": "Linear · Spring 2026"
+            },
+            "url": {
+              "类型": "纯文本",
+              "最大字数": 40,
+              "示例": "linear.app/release/3.0"
+            }
+          }
+        },
+        "vnum": {
           "类型": "纯文本",
           "描述": "36px 紫色版本号",
           "最大字数": 6,
           "示例": "3.0"
-        },
-        "version-label": {
-          "类型": "组合字段",
-          "子字段": {
-            "name": {"类型": "纯文本", "最大字数": 30, "示例": "Linear · Spring 2026"},
-            "url": {"类型": "纯文本", "最大字数": 40, "示例": "linear.app/release/3.0"}
-          }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "COV-C",
       "page_role": "cover",
@@ -299,13 +378,20 @@
           "类型": "同质列表",
           "描述": "标题上方徽章",
           "项数": "1-2",
-          "示例": ["v3.0 · NEW", "● SHIPPED"]
+          "示例": [
+            "v3.0 · NEW",
+            "● SHIPPED"
+          ]
         },
         "feature-list": {
           "类型": "同质列表",
           "描述": "feature ✓ 清单",
           "项数": "2-4",
-          "示例": ["实时项目状态聚合", "AI 智能摘要 + 风险预警", "事件时间线一目了然"]
+          "示例": [
+            "实时项目状态聚合",
+            "AI 智能摘要 + 风险预警",
+            "事件时间线一目了然"
+          ]
         }
       },
       "图片占位": [
@@ -322,7 +408,6 @@
         "_action": "用户要 PowerPoint 导出时, 渲染器应警告 COV-C 的倾斜效果会失真, 建议改 COV-A"
       }
     },
-
     {
       "id": "CB-A",
       "page_role": "chapter_break",
@@ -335,7 +420,10 @@
       "_renderer": {
         "dom_selector": ".variant-cb-a-capsule"
       },
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
       "slots": {
         "slot-chapter-num": {
           "类型": "纯文本",
@@ -368,9 +456,10 @@
           "示例": "这一章讲怎么把 <strong>AI 助手</strong>集成到日常工作流。"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CB-D",
       "page_role": "chapter_break",
@@ -423,9 +512,10 @@
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CB-E",
       "page_role": "chapter_break",
@@ -489,9 +579,10 @@
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "OUT-A",
       "page_role": "outline",
@@ -531,16 +622,33 @@
           "项数": "4-10",
           "featured_index": 2,
           "每项字段": {
-            "out-num": {"类型": "纯文本", "最大字数": 4, "示例": "01"},
-            "out-name": {"类型": "纯文本", "最大字数": 20, "示例": "为什么是现在"},
-            "out-meta": {"类型": "纯文本", "最大字数": 40, "示例": "市场背景 + 用户痛点"},
-            "out-page": {"类型": "纯文本", "最大字数": 8, "示例": "P. 04"}
+            "out-num": {
+              "类型": "纯文本",
+              "最大字数": 4,
+              "示例": "01"
+            },
+            "out-name": {
+              "类型": "纯文本",
+              "最大字数": 20,
+              "示例": "为什么是现在"
+            },
+            "out-meta": {
+              "类型": "纯文本",
+              "最大字数": 40,
+              "示例": "市场背景 + 用户痛点"
+            },
+            "out-page": {
+              "类型": "纯文本",
+              "最大字数": 8,
+              "示例": "P. 04"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "OUT-B",
       "page_role": "outline",
@@ -573,15 +681,28 @@
           "类型": "重复列表",
           "项数": "8-12",
           "每项字段": {
-            "mod-num": {"类型": "纯文本", "最大字数": 16, "示例": "01 · CORE"},
-            "mod-name": {"类型": "纯文本", "最大字数": 16, "示例": "Projects"},
-            "mod-meta": {"类型": "纯文本", "最大字数": 12, "示例": "P.04"}
+            "mod-num": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "01 · CORE"
+            },
+            "mod-name": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "Projects"
+            },
+            "mod-meta": {
+              "类型": "纯文本",
+              "最大字数": 12,
+              "示例": "P.04"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLX-A",
       "page_role": "climax",
@@ -618,16 +739,36 @@
           "项数": 5,
           "featured_index": 0,
           "每项字段": {
-            "m-label": {"类型": "纯文本", "最大字数": 30, "示例": "MAU · MONTHLY ACTIVE USERS"},
-            "m-value": {"类型": "纯文本", "描述": "副卡 44px / featured 主卡 88px", "最大字数": 8, "示例": "142K"},
-            "m-delta": {"类型": "纯文本", "描述": "↑↓ 变化", "最大字数": 20, "示例": "↑ +28% QoQ"},
-            "m-meta": {"类型": "纯文本", "描述": "仅 featured 卡有", "最大字数": 80, "示例": "连续第 4 个季度增长超 20%"}
+            "m-label": {
+              "类型": "纯文本",
+              "最大字数": 30,
+              "示例": "MAU · MONTHLY ACTIVE USERS"
+            },
+            "m-value": {
+              "类型": "纯文本",
+              "描述": "副卡 44px / featured 主卡 88px",
+              "最大字数": 8,
+              "示例": "142K"
+            },
+            "m-delta": {
+              "类型": "纯文本",
+              "描述": "↑↓ 变化",
+              "最大字数": 20,
+              "示例": "↑ +28% QoQ"
+            },
+            "m-meta": {
+              "类型": "纯文本",
+              "描述": "仅 featured 卡有",
+              "最大字数": 80,
+              "示例": "连续第 4 个季度增长超 20%"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLX-B",
       "page_role": "climax",
@@ -661,16 +802,34 @@
           "项数": "3-4",
           "featured_index": 1,
           "每项字段": {
-            "num-icon": {"类型": "纯文本", "最大字数": 2, "示例": "⚡"},
-            "num-value": {"类型": "富文本", "描述": "52px 大数字, 可含 <span class='num-unit'>", "最大字数": 12, "示例": "3.2<span class='num-unit'>×</span>"},
-            "num-label": {"类型": "纯文本", "最大字数": 24, "示例": "FASTER"},
-            "num-text": {"类型": "富文本", "最大字数": 60, "示例": "任务完成速度提升 <strong>3.2 倍</strong>。"}
+            "num-icon": {
+              "类型": "纯文本",
+              "最大字数": 2,
+              "示例": "⚡"
+            },
+            "num-value": {
+              "类型": "富文本",
+              "描述": "52px 大数字, 可含 <span class='num-unit'>",
+              "最大字数": 12,
+              "示例": "3.2<span class='num-unit'>×</span>"
+            },
+            "num-label": {
+              "类型": "纯文本",
+              "最大字数": 24,
+              "示例": "FASTER"
+            },
+            "num-text": {
+              "类型": "富文本",
+              "最大字数": 60,
+              "示例": "任务完成速度提升 <strong>3.2 倍</strong>。"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLX-D",
       "page_role": "climax",
@@ -685,23 +844,46 @@
         "items_dom_selector": ".ba-cell",
         "items_count": 2
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "对比块"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "对比块"
+      },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "同样的任务, <em>差 5 倍</em>。"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "同样的任务, <em>差 5 倍</em>。"
+        },
         "ba-cells": {
           "类型": "重复列表",
           "项数": 2,
           "featured_index": 1,
           "每项字段": {
-            "ba-tag": {"类型": "纯文本", "最大字数": 30, "示例": "— BEFORE · v2.0"},
-            "ba-value": {"类型": "富文本", "描述": "88px 大数字 + <span class='unit'>", "最大字数": 10, "示例": "12<span class='unit'>s</span>"},
-            "ba-desc": {"类型": "富文本", "最大字数": 100, "示例": "创建新项目需要 <strong>12 秒</strong>, 6 次点击。"}
+            "ba-tag": {
+              "类型": "纯文本",
+              "最大字数": 30,
+              "示例": "— BEFORE · v2.0"
+            },
+            "ba-value": {
+              "类型": "富文本",
+              "描述": "88px 大数字 + <span class='unit'>",
+              "最大字数": 10,
+              "示例": "12<span class='unit'>s</span>"
+            },
+            "ba-desc": {
+              "类型": "富文本",
+              "最大字数": 100,
+              "示例": "创建新项目需要 <strong>12 秒</strong>, 6 次点击。"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLX-Q",
       "page_role": "climax",
@@ -716,23 +898,46 @@
         "items_dom_selector": ".views .view",
         "items_count": 2
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "立场块"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "立场块"
+      },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "大多数项目工具<em>这么做</em>, 我们<em>不</em>。"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "大多数项目工具<em>这么做</em>, 我们<em>不</em>。"
+        },
         "views": {
           "类型": "重复列表",
           "项数": 2,
           "featured_index": 1,
           "每项字段": {
-            "view-tag": {"类型": "纯文本", "最大字数": 30, "示例": "— THEM · 行业主流"},
-            "view-statement": {"类型": "富文本", "描述": "26px 主张", "最大字数": 30, "示例": "把<em>更多功能</em>塞进产品。"},
-            "view-detail": {"类型": "富文本", "最大字数": 100, "示例": "<strong>主流逻辑</strong> — feature 越多越值钱。"}
+            "view-tag": {
+              "类型": "纯文本",
+              "最大字数": 30,
+              "示例": "— THEM · 行业主流"
+            },
+            "view-statement": {
+              "类型": "富文本",
+              "描述": "26px 主张",
+              "最大字数": 30,
+              "示例": "把<em>更多功能</em>塞进产品。"
+            },
+            "view-detail": {
+              "类型": "富文本",
+              "最大字数": 100,
+              "示例": "<strong>主流逻辑</strong> — feature 越多越值钱。"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "S-A",
       "page_role": "support",
@@ -748,31 +953,60 @@
         "items_dom_selector": ".f-card",
         "items_count": 3
       },
-      "数量约束": {"类型": "严格固定", "数量": 3, "支持自适应": false, "对象描述": "feature 卡片"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 3,
+        "支持自适应": false,
+        "对象描述": "feature 卡片"
+      },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 40, "示例": "3 个新模块, 让团队<em>从沟通到执行</em>更顺畅。"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 40,
+          "示例": "3 个新模块, 让团队<em>从沟通到执行</em>更顺畅。"
+        },
         "f-cards": {
           "类型": "重复列表",
           "项数": 3,
           "featured_index": 1,
           "每项字段": {
-            "icon": {"类型": "纯文本", "最大字数": 2, "示例": "⚡"},
-            "badge": {"类型": "纯文本", "描述": "仅 featured 卡, 选填", "最大字数": 16, "示例": "★ HIGHLIGHT"},
-            "f-title": {"类型": "纯文本", "最大字数": 20, "示例": "AI Assist"},
-            "f-text": {"类型": "富文本", "最大字数": 120, "示例": "基于 Claude 的智能助手, <strong>团队效率提升 3.2 倍</strong>。"},
+            "icon": {
+              "类型": "纯文本",
+              "最大字数": 2,
+              "示例": "⚡"
+            },
+            "f-title": {
+              "类型": "纯文本",
+              "最大字数": 20,
+              "示例": "AI Assist"
+            },
+            "f-text": {
+              "类型": "富文本",
+              "最大字数": 120,
+              "示例": "基于 Claude 的智能助手, <strong>团队效率提升 3.2 倍</strong>。"
+            },
             "f-meta": {
               "类型": "组合字段",
               "子字段": {
-                "label": {"类型": "纯文本", "最大字数": 16, "示例": "正式上线"},
-                "value": {"类型": "纯文本", "最大字数": 16, "示例": "3.2× faster"}
+                "label": {
+                  "类型": "纯文本",
+                  "最大字数": 16,
+                  "示例": "正式上线"
+                },
+                "value": {
+                  "类型": "纯文本",
+                  "最大字数": 16,
+                  "示例": "3.2× faster"
+                }
               }
             }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "S-B",
       "page_role": "support",
@@ -787,22 +1021,46 @@
         "items_dom_selector": ".evidence-row",
         "items_count": 3
       },
-      "数量约束": {"类型": "严格固定", "数量": 3, "支持自适应": false, "对象描述": "证据行"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 3,
+        "支持自适应": false,
+        "对象描述": "证据行"
+      },
       "slots": {
-        "slot-thesis": {"类型": "富文本", "描述": "52px 大字主张", "最大字数": 30, "示例": "为什么 18000 个团队<em>选择我们</em>?"},
+        "slot-thesis": {
+          "类型": "富文本",
+          "描述": "52px 大字主张",
+          "最大字数": 30,
+          "示例": "为什么 18000 个团队<em>选择我们</em>?"
+        },
         "evidence-rows": {
           "类型": "重复列表",
           "项数": 3,
           "每项字段": {
-            "evidence-tag": {"类型": "纯文本", "最大字数": 20, "示例": "01 · SPEED"},
-            "evidence-value": {"类型": "纯文本", "描述": "36px 大数字", "最大字数": 10, "示例": "3.2×"},
-            "evidence-text": {"类型": "富文本", "最大字数": 100, "示例": "<strong>工作流速度比 v2.0 快 3.2 倍</strong>。"}
+            "evidence-tag": {
+              "类型": "纯文本",
+              "最大字数": 20,
+              "示例": "01 · SPEED"
+            },
+            "evidence-value": {
+              "类型": "纯文本",
+              "描述": "36px 大数字",
+              "最大字数": 10,
+              "示例": "3.2×"
+            },
+            "evidence-text": {
+              "类型": "富文本",
+              "最大字数": 100,
+              "示例": "<strong>工作流速度比 v2.0 快 3.2 倍</strong>。"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "S-C",
       "page_role": "support",
@@ -817,23 +1075,45 @@
         "items_dom_selector": ".chain-step",
         "items_count": 4
       },
-      "数量约束": {"类型": "严格固定", "数量": 4, "支持自适应": false, "对象描述": "链式步骤"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 4,
+        "支持自适应": false,
+        "对象描述": "链式步骤"
+      },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "从<em>用户痛点</em>到<em>产品结果</em>的 4 步推导。"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "从<em>用户痛点</em>到<em>产品结果</em>的 4 步推导。"
+        },
         "chain-steps": {
           "类型": "重复列表",
           "项数": 4,
           "featured_index": 3,
           "每项字段": {
-            "step-num": {"类型": "纯文本", "最大字数": 20, "示例": "01 · PAIN"},
-            "step-title": {"类型": "纯文本", "最大字数": 12, "示例": "用户痛点"},
-            "step-text": {"类型": "富文本", "最大字数": 60, "示例": "PM 每天花 <strong>2 小时</strong>写状态摘要。"}
+            "step-num": {
+              "类型": "纯文本",
+              "最大字数": 20,
+              "示例": "01 · PAIN"
+            },
+            "step-title": {
+              "类型": "纯文本",
+              "最大字数": 12,
+              "示例": "用户痛点"
+            },
+            "step-text": {
+              "类型": "富文本",
+              "最大字数": 60,
+              "示例": "PM 每天花 <strong>2 小时</strong>写状态摘要。"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "S-D",
       "page_role": "support",
@@ -858,21 +1138,38 @@
         "对象描述": "推导步骤行"
       },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "AI Assist 的<em>4 步设计推导</em>。"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "AI Assist 的<em>4 步设计推导</em>。"
+        },
         "ded-rows": {
           "类型": "重复列表",
           "项数": "3-5",
           "featured_index": 2,
           "每项字段": {
-            "step-pill": {"类型": "纯文本", "最大字数": 30, "示例": "STEP 01 · OBSERVE"},
-            "ded-title": {"类型": "纯文本", "最大字数": 14, "示例": "用户在做什么"},
-            "ded-detail": {"类型": "富文本", "最大字数": 100, "示例": "观察 142 个团队的真实使用, 发现 PM 70% 时间在<strong>整理和翻译</strong>。"}
+            "ded-title": {
+              "类型": "纯文本",
+              "最大字数": 14,
+              "示例": "用户在做什么"
+            },
+            "ded-detail": {
+              "类型": "富文本",
+              "最大字数": 100,
+              "示例": "观察 142 个团队的真实使用, 发现 PM 70% 时间在<strong>整理和翻译</strong>。"
+            },
+            "ded-step-pill": {
+              "类型": "纯文本",
+              "最大字数": 30,
+              "示例": "STEP 01 · OBSERVE"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CMP-A",
       "page_role": "comparison",
@@ -888,31 +1185,61 @@
         "items_dom_selector": ".pair-cell",
         "items_count": 2
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "对比块"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "对比块"
+      },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "同样的<em>任务</em>, 不同的<em>体验</em>。"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "同样的<em>任务</em>, 不同的<em>体验</em>。"
+        },
         "pair-cells": {
           "类型": "重复列表",
           "项数": 2,
           "featured_index": 0,
           "每项字段": {
-            "pair-tag": {"类型": "纯文本", "最大字数": 24, "示例": "★ LINEAR · v3.0"},
-            "pair-name": {"类型": "纯文本", "最大字数": 12, "示例": "我们"},
+            "pair-tag": {
+              "类型": "纯文本",
+              "最大字数": 24,
+              "示例": "★ LINEAR · v3.0"
+            },
+            "pair-name": {
+              "类型": "纯文本",
+              "最大字数": 12,
+              "示例": "我们"
+            },
             "pair-metrics": {
               "类型": "重复列表",
               "项数": 4,
               "每项字段": {
-                "label": {"类型": "纯文本", "最大字数": 14, "示例": "SPEED"},
-                "value": {"类型": "纯文本", "最大字数": 10, "示例": "2.4s"}
+                "label": {
+                  "类型": "纯文本",
+                  "最大字数": 14,
+                  "示例": "SPEED"
+                },
+                "value": {
+                  "类型": "纯文本",
+                  "最大字数": 10,
+                  "示例": "2.4s"
+                }
               }
             },
-            "pair-narrative": {"类型": "富文本", "最大字数": 100, "示例": "<strong>Cmd + K</strong> 一次操作完成, 不需要离开页面。"}
+            "pair-narrative": {
+              "类型": "富文本",
+              "最大字数": 100,
+              "示例": "<strong>Cmd + K</strong> 一次操作完成, 不需要离开页面。"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CMP-D",
       "page_role": "comparison",
@@ -924,9 +1251,7 @@
         "维度数 ≥ 9 → 拆两页"
       ],
       "_renderer": {
-        "dom_selector": ".variant-cmp-d-capsule",
-        "items_dom_selector": ".cmp-table tbody tr",
-        "items_count": 5
+        "dom_selector": ".variant-cmp-d-capsule"
       },
       "数量约束": {
         "类型": "开放自适应",
@@ -938,29 +1263,166 @@
         "对象描述": "对比维度(表格行)"
       },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "5 个维度对比, <em>我们的差异化</em>。"},
-        "table-headers": {
-          "类型": "同质列表",
-          "描述": "表头列(第 1 列 FEATURE + N 列产品名, 我方列加 _featured)",
-          "项数": "3-5",
-          "示例": ["FEATURE", "★ LINEAR (featured)", "Jira", "Asana", "Monday"]
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "5 个维度对比, <em>我们的差异化</em>。"
         },
-        "table-rows": {
-          "类型": "重复列表",
-          "项数": "3-8",
-          "每项字段": {
-            "feature-name": {"类型": "纯文本", "最大字数": 20, "示例": "AI 智能助手"},
-            "values": {
-              "类型": "同质列表",
-              "描述": "每列值, 跟 table-headers 数量一致, 第 1 列对应我方",
-              "示例": ["✓ 原生", "✗", "插件", "✗"]
-            }
-          }
+        "slot-col-1": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": "列1"
+        },
+        "slot-col-2": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": "列2"
+        },
+        "slot-col-3": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": "列3"
+        },
+        "slot-col-4": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": "列4"
+        },
+        "slot-col-5": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": "列5"
+        },
+        "slot-r1-c1": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r1-c2": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r1-c3": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r1-c4": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r1-c5": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r2-c1": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r2-c2": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r2-c3": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r2-c4": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r2-c5": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r3-c1": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r3-c2": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r3-c3": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r3-c4": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r3-c5": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r4-c1": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r4-c2": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r4-c3": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r4-c4": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r4-c5": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r5-c1": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r5-c2": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r5-c3": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r5-c4": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
+        },
+        "slot-r5-c5": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": ""
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CMP-X",
       "page_role": "comparison",
@@ -976,39 +1438,85 @@
         "items_dom_selector": ".plan",
         "items_count": 3
       },
-      "数量约束": {"类型": "严格固定", "数量": 3, "支持自适应": false, "对象描述": "定价档位"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 3,
+        "支持自适应": false,
+        "对象描述": "定价档位"
+      },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "选一个适合<em>你团队</em>的方案。"},
-        "pr-eyebrow": {"类型": "纯文本", "最大字数": 40, "示例": "→ SIMPLE, TRANSPARENT PRICING"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "选一个适合<em>你团队</em>的方案。"
+        },
+        "pr-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 40,
+          "示例": "→ SIMPLE, TRANSPARENT PRICING"
+        },
         "plans": {
           "类型": "重复列表",
           "项数": 3,
           "featured_index": 1,
           "每项字段": {
-            "plan-tag": {"类型": "纯文本", "描述": "仅 featured 卡(★ MOST POPULAR)", "最大字数": 20, "示例": "★ MOST POPULAR"},
-            "plan-name": {"类型": "纯文本", "最大字数": 16, "示例": "Pro"},
+            "plan-name": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "Pro"
+            },
             "plan-price": {
               "类型": "组合字段",
               "子字段": {
-                "currency": {"类型": "纯文本", "最大字数": 4, "示例": "$"},
-                "num": {"类型": "纯文本", "最大字数": 8, "示例": "12"},
-                "period": {"类型": "纯文本", "最大字数": 20, "示例": "/ user / 月"}
+                "currency": {
+                  "类型": "纯文本",
+                  "最大字数": 4,
+                  "示例": "$"
+                },
+                "num": {
+                  "类型": "纯文本",
+                  "最大字数": 8,
+                  "示例": "12"
+                },
+                "period": {
+                  "类型": "纯文本",
+                  "最大字数": 20,
+                  "示例": "/ user / 月"
+                }
               }
             },
-            "plan-desc": {"类型": "纯文本", "最大字数": 50, "示例": "成长型团队, 完整功能 + AI 助手"},
+            "plan-desc": {
+              "类型": "纯文本",
+              "最大字数": 50,
+              "示例": "成长型团队, 完整功能 + AI 助手"
+            },
             "plan-features": {
               "类型": "同质列表",
               "项数": "3-6",
-              "示例": ["无限成员 + 项目", "完整 AI Assist", "API + Webhooks", "优先技术支持"]
+              "示例": [
+                "无限成员 + 项目",
+                "完整 AI Assist",
+                "API + Webhooks",
+                "优先技术支持"
+              ]
             },
-            "plan-cta": {"类型": "纯文本", "最大字数": 16, "示例": "14 天免费试用"}
+            "plan-cta": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "14 天免费试用"
+            }
           }
         },
-        "pr-footnote": {"类型": "纯文本", "最大字数": 50, "示例": "— 14 天免费试用 · 无需信用卡 · 随时取消"}
+        "pr-footnote": {
+          "类型": "纯文本",
+          "最大字数": 50,
+          "示例": "— 14 天免费试用 · 无需信用卡 · 随时取消"
+        }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CMP-Y",
       "page_role": "comparison",
@@ -1023,37 +1531,80 @@
         "items_dom_selector": ".y-plan",
         "items_count": 2
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "定价档位"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "定价档位"
+      },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "不管<em>大小团队</em>, 都有合适的方案。"},
-        "pr-eyebrow": {"类型": "纯文本", "最大字数": 40, "示例": "→ TWO PATHS · SAME PRODUCT"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "不管<em>大小团队</em>, 都有合适的方案。"
+        },
+        "pr-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 40,
+          "示例": "→ TWO PATHS · SAME PRODUCT"
+        },
         "y-plans": {
           "类型": "重复列表",
           "项数": 2,
           "featured_index": 1,
           "每项字段": {
-            "y-plan-tag": {"类型": "纯文本", "最大字数": 20, "示例": "SELF-SERVE"},
-            "y-plan-name": {"类型": "纯文本", "最大字数": 16, "示例": "Pro"},
+            "y-plan-tag": {
+              "类型": "纯文本",
+              "最大字数": 20,
+              "示例": "SELF-SERVE"
+            },
+            "y-plan-name": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "Pro"
+            },
             "y-plan-price": {
               "类型": "组合字段",
               "子字段": {
-                "num": {"类型": "纯文本", "描述": "64px 大字", "最大字数": 12, "示例": "$12"},
-                "period": {"类型": "纯文本", "最大字数": 20, "示例": "/ user / 月"}
+                "num": {
+                  "类型": "纯文本",
+                  "描述": "64px 大字",
+                  "最大字数": 12,
+                  "示例": "$12"
+                },
+                "period": {
+                  "类型": "纯文本",
+                  "最大字数": 20,
+                  "示例": "/ user / 月"
+                }
               }
             },
-            "y-plan-desc": {"类型": "富文本", "最大字数": 100, "示例": "10-200 人团队的最佳选择, 信用卡支付即开即用。"},
+            "y-plan-desc": {
+              "类型": "富文本",
+              "最大字数": 100,
+              "示例": "10-200 人团队的最佳选择, 信用卡支付即开即用。"
+            },
             "y-feat": {
               "类型": "同质列表",
               "项数": "2-5",
-              "示例": ["完整 AI Assist + Workflow API", "14 天免费试用,无需信用卡", "99.95% SLA"]
+              "示例": [
+                "完整 AI Assist + Workflow API",
+                "14 天免费试用,无需信用卡",
+                "99.95% SLA"
+              ]
             },
-            "y-cta": {"类型": "纯文本", "最大字数": 20, "示例": "立即开始 →"}
+            "y-cta": {
+              "类型": "纯文本",
+              "最大字数": 20,
+              "示例": "立即开始 →"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "INS-A",
       "page_role": "insight",
@@ -1063,18 +1614,46 @@
         "需要对比共识 vs 我们 → 用 INS-C",
         "需要章节扉页引语 → 用 CB-D"
       ],
-      "_renderer": {"dom_selector": ".variant-ins-a-capsule"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
-      "slots": {
-        "slot-quote": {"类型": "富文本", "描述": "88px 巨型引语, 支持 <em> 和 <br>", "最大字数": 60, "示例": "\"我们终于<br><em>不用</em>开例会<br>对状态了。\""},
-        "ins-eyebrow": {"类型": "纯文本", "最大字数": 30, "示例": "— What our users say"},
-        "attr-avatar": {"类型": "纯文本", "描述": "首字母缩写", "最大字数": 4, "示例": "RM"},
-        "attr-name": {"类型": "纯文本", "最大字数": 24, "示例": "Rebecca Mitchell"},
-        "attr-role": {"类型": "富文本", "最大字数": 60, "示例": "VP of Engineering · <strong>Vercel</strong> · 团队 80 人"}
+      "_renderer": {
+        "dom_selector": ".variant-ins-a-capsule"
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-quote": {
+          "类型": "富文本",
+          "描述": "88px 巨型引语, 支持 <em> 和 <br>",
+          "最大字数": 60,
+          "示例": "\"我们终于<br><em>不用</em>开例会<br>对状态了。\""
+        },
+        "ins-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 30,
+          "示例": "— What our users say"
+        },
+        "attr-avatar": {
+          "类型": "纯文本",
+          "描述": "首字母缩写",
+          "最大字数": 4,
+          "示例": "RM"
+        },
+        "attr-name": {
+          "类型": "纯文本",
+          "最大字数": 24,
+          "示例": "Rebecca Mitchell"
+        },
+        "attr-role": {
+          "类型": "富文本",
+          "最大字数": 60,
+          "示例": "VP of Engineering · <strong>Vercel</strong> · 团队 80 人"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "INS-C",
       "page_role": "insight",
@@ -1089,23 +1668,46 @@
         "items_dom_selector": ".opinion",
         "items_count": 2
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "观点块"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "观点块"
+      },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "行业的<em>共识</em>不一定是<em>对的</em>。"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "行业的<em>共识</em>不一定是<em>对的</em>。"
+        },
         "opinions": {
           "类型": "重复列表",
           "项数": 2,
           "featured_index": 1,
           "每项字段": {
-            "opinion-tag": {"类型": "纯文本", "最大字数": 30, "示例": "— CONSENSUS · 行业共识"},
-            "opinion-text": {"类型": "富文本", "描述": "24px 主张", "最大字数": 30, "示例": "\"SaaS 工具要做到 <em>大而全</em>, 才有粘性。\""},
-            "opinion-detail": {"类型": "富文本", "最大字数": 120, "示例": "<strong>主流逻辑</strong>: 功能越多, 客户越离不开。"}
+            "opinion-tag": {
+              "类型": "纯文本",
+              "最大字数": 30,
+              "示例": "— CONSENSUS · 行业共识"
+            },
+            "opinion-text": {
+              "类型": "富文本",
+              "描述": "24px 主张",
+              "最大字数": 30,
+              "示例": "\"SaaS 工具要做到 <em>大而全</em>, 才有粘性。\""
+            },
+            "opinion-detail": {
+              "类型": "富文本",
+              "最大字数": 120,
+              "示例": "<strong>主流逻辑</strong>: 功能越多, 客户越离不开。"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "H1",
       "page_role": "gallery",
@@ -1116,11 +1718,24 @@
         "需要主图 + 副图 → 用 H3",
         "需要 2×2 四模块 → 用 H4"
       ],
-      "_renderer": {"dom_selector": ".variant-h1-capsule"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
+      "_renderer": {
+        "dom_selector": ".variant-h1-capsule"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
       "slots": {
-        "slot-caption": {"类型": "富文本", "最大字数": 24, "示例": "这就是新版的<em>主界面</em>。"},
-        "g-eyebrow": {"类型": "纯文本", "最大字数": 30, "示例": "— Product hero · full screen"}
+        "slot-caption": {
+          "类型": "富文本",
+          "最大字数": 24,
+          "示例": "这就是新版的<em>主界面</em>。"
+        },
+        "g-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 30,
+          "示例": "— Product hero · full screen"
+        }
       },
       "图片占位": [
         {
@@ -1130,9 +1745,10 @@
           "描述": "全屏 UI 截图, 带 macOS 装饰条"
         }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "H2",
       "page_role": "gallery",
@@ -1148,17 +1764,37 @@
         "items_dom_selector": ".h2-grid > .ui-mock",
         "items_count": 2
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "屏幕 cell"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "屏幕 cell"
+      },
       "slots": {
-        "slot-caption": {"类型": "富文本", "最大字数": 24, "示例": "同一个产品, <em>两个屏幕</em>都好用。"}
+        "slot-caption": {
+          "类型": "富文本",
+          "最大字数": 24,
+          "示例": "同一个产品, <em>两个屏幕</em>都好用。"
+        }
       },
       "图片占位": [
-        {"yaml key": "h2-web", "数量": 1, "默认 image_fit": "cover", "描述": "Web 端宽屏"},
-        {"yaml key": "h2-mobile", "数量": 1, "默认 image_fit": "cover", "描述": "移动端竖屏"}
+        {
+          "yaml key": "h2-web",
+          "数量": 1,
+          "默认 image_fit": "cover",
+          "描述": "Web 端宽屏"
+        },
+        {
+          "yaml key": "h2-mobile",
+          "数量": 1,
+          "默认 image_fit": "cover",
+          "描述": "移动端竖屏"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "H3",
       "page_role": "gallery",
@@ -1174,17 +1810,36 @@
         "items_dom_selector": ".h3-main, .h3-sub",
         "items_count": 3
       },
-      "数量约束": {"类型": "严格固定", "数量": 3, "支持自适应": false, "对象描述": "图片 cell"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 3,
+        "支持自适应": false,
+        "对象描述": "图片 cell"
+      },
       "slots": {
-        "slot-caption": {"类型": "富文本", "最大字数": 24, "示例": "AI Assist, <em>3 个使用场景</em>。"}
+        "slot-caption": {
+          "类型": "富文本",
+          "最大字数": 24,
+          "示例": "AI Assist, <em>3 个使用场景</em>。"
+        }
       },
       "图片占位": [
-        {"yaml key": "h3-main", "数量": 1, "默认 image_fit": "cover"},
-        {"yaml key": "h3-subs", "数量": 2, "默认 image_fit": "cover", "描述": "右侧 2 张小图(数组)"}
+        {
+          "yaml key": "h3-main",
+          "数量": 1,
+          "默认 image_fit": "cover"
+        },
+        {
+          "yaml key": "h3-subs",
+          "数量": 2,
+          "默认 image_fit": "cover",
+          "描述": "右侧 2 张小图(数组)"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "H4",
       "page_role": "gallery",
@@ -1199,16 +1854,31 @@
         "items_dom_selector": ".h4-cell",
         "items_count": 4
       },
-      "数量约束": {"类型": "严格固定", "数量": 4, "支持自适应": false, "对象描述": "屏幕 cell"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 4,
+        "支持自适应": false,
+        "对象描述": "屏幕 cell"
+      },
       "slots": {
-        "slot-caption": {"类型": "富文本", "最大字数": 30, "示例": "4 个核心屏幕, 你<em>每天都会用到</em>。"}
+        "slot-caption": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "4 个核心屏幕, 你<em>每天都会用到</em>。"
+        }
       },
       "图片占位": [
-        {"yaml key": "h4-cells", "数量": 4, "默认 image_fit": "cover", "描述": "2×2 网格图片数组"}
+        {
+          "yaml key": "h4-cells",
+          "数量": 4,
+          "默认 image_fit": "cover",
+          "描述": "2×2 网格图片数组"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "GC-A",
       "page_role": "gallery",
@@ -1223,25 +1893,48 @@
         "items_dom_selector": ".gc-thumb",
         "items_count": 6
       },
-      "数量约束": {"类型": "严格固定", "数量": 6, "支持自适应": false, "对象描述": "缩略 cell"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 6,
+        "支持自适应": false,
+        "对象描述": "缩略 cell"
+      },
       "slots": {
-        "slot-caption": {"类型": "富文本", "最大字数": 30, "示例": "6 个新功能, <em>一眼看全</em>。"},
+        "slot-caption": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "6 个新功能, <em>一眼看全</em>。"
+        },
         "gc-thumbs": {
           "类型": "重复列表",
           "项数": 6,
           "featured_index": 1,
           "每项字段": {
-            "thumb-num": {"类型": "纯文本", "最大字数": 6, "示例": "01"},
-            "thumb-name": {"类型": "纯文本", "最大字数": 16, "示例": "Cmd+K"}
+            "slot-thumb-num": {
+              "类型": "纯文本",
+              "最大字数": 6,
+              "示例": "01"
+            },
+            "slot-thumb-name": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "Cmd+K"
+            }
           }
         }
       },
       "图片占位": [
-        {"yaml key": "gc-thumbs-images", "数量": 6, "默认 image_fit": "cover", "描述": "6 张截图(数组), 跟 gc-thumbs 文本对应"}
+        {
+          "yaml key": "gc-thumbs-images",
+          "数量": 6,
+          "默认 image_fit": "cover",
+          "描述": "6 张截图(数组), 跟 gc-thumbs 文本对应"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "GC-B",
       "page_role": "gallery",
@@ -1266,14 +1959,31 @@
         "对象描述": "热点 + 注释卡对(数量必须配对)"
       },
       "slots": {
-        "slot-caption": {"类型": "富文本", "最大字数": 30, "示例": "新版 dashboard, <em>4 个</em>值得注意的细节。"},
+        "slot-caption": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "新版 dashboard, <em>4 个</em>值得注意的细节。"
+        },
         "gcb-notes": {
           "类型": "重复列表",
           "项数": "3-6",
           "每项字段": {
-            "note-num": {"类型": "纯文本", "描述": "1/2/3/...", "最大字数": 4, "示例": "1"},
-            "note-title": {"类型": "纯文本", "最大字数": 16, "示例": "命令面板"},
-            "note-text": {"类型": "富文本", "最大字数": 60, "示例": "Cmd+K 一键唤起, 50+ 命令。"}
+            "note-num": {
+              "类型": "纯文本",
+              "描述": "1/2/3/...",
+              "最大字数": 4,
+              "示例": "1"
+            },
+            "note-title": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "命令面板"
+            },
+            "note-text": {
+              "类型": "富文本",
+              "最大字数": 60,
+              "示例": "Cmd+K 一键唤起, 50+ 命令。"
+            }
           }
         }
       },
@@ -1287,9 +1997,10 @@
           "热点数量": "跟 gcb-notes 数量一致"
         }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "GC-D",
       "page_role": "gallery",
@@ -1313,20 +2024,39 @@
         "对象描述": "集成 logo cell"
       },
       "slots": {
-        "slot-caption": {"类型": "富文本", "最大字数": 24, "示例": "已经集成的<em>12 个工具</em>。"},
+        "slot-caption": {
+          "类型": "富文本",
+          "最大字数": 24,
+          "示例": "已经集成的<em>12 个工具</em>。"
+        },
         "logo-cells": {
           "类型": "重复列表",
           "项数": "8-12",
           "每项字段": {
-            "logo-mark": {"类型": "纯文本", "描述": "首字母", "最大字数": 2, "示例": "S"},
-            "logo-name": {"类型": "富文本", "描述": "可加 ★ 前缀标记 featured", "最大字数": 16, "示例": "★ Zoom"},
-            "logo-cat": {"类型": "纯文本", "最大字数": 20, "示例": "NEW · MEETING"}
+            "logo-name": {
+              "类型": "富文本",
+              "描述": "可加 ★ 前缀标记 featured",
+              "最大字数": 16,
+              "示例": "★ Zoom"
+            },
+            "logo-cat": {
+              "类型": "纯文本",
+              "最大字数": 20,
+              "示例": "NEW · MEETING"
+            },
+            "logo-mark-square": {
+              "类型": "纯文本",
+              "描述": "首字母",
+              "最大字数": 2,
+              "示例": "S"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CASE-A",
       "page_role": "gallery",
@@ -1341,18 +2071,49 @@
         "items_dom_selector": ".case-stat",
         "items_count": 3
       },
-      "数量约束": {"类型": "严格固定", "数量": 3, "支持自适应": false, "对象描述": "客户 stat"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 3,
+        "支持自适应": false,
+        "对象描述": "客户 stat"
+      },
       "slots": {
-        "customer-logo": {"类型": "纯文本", "描述": "首字母", "最大字数": 2, "示例": "V"},
-        "customer-name": {"类型": "纯文本", "最大字数": 24, "示例": "Vercel"},
-        "customer-detail": {"类型": "纯文本", "最大字数": 60, "示例": "SAN FRANCISCO · 280 人团队 · 使用 18 个月"},
-        "case-quote": {"类型": "富文本", "描述": "36px 客户引言", "最大字数": 80, "示例": "\"我们的<em>发布速度</em>提升了 <em>3 倍</em>。\""},
+        "customer-logo": {
+          "类型": "纯文本",
+          "描述": "首字母",
+          "最大字数": 2,
+          "示例": "V"
+        },
+        "customer-name": {
+          "类型": "纯文本",
+          "最大字数": 24,
+          "示例": "Vercel"
+        },
+        "customer-detail": {
+          "类型": "纯文本",
+          "最大字数": 60,
+          "示例": "SAN FRANCISCO · 280 人团队 · 使用 18 个月"
+        },
+        "case-quote": {
+          "类型": "富文本",
+          "描述": "36px 客户引言",
+          "最大字数": 80,
+          "示例": "\"我们的<em>发布速度</em>提升了 <em>3 倍</em>。\""
+        },
         "case-stats": {
           "类型": "重复列表",
           "项数": 3,
           "每项字段": {
-            "label": {"类型": "纯文本", "最大字数": 20, "示例": "SHIPPED"},
-            "value": {"类型": "纯文本", "最大字数": 10, "示例": "3.2×"}
+            "label": {
+              "类型": "纯文本",
+              "最大字数": 20,
+              "示例": "SHIPPED"
+            },
+            "value": {
+              "类型": "纯文本",
+              "最大字数": 10,
+              "示例": "3.2×"
+            }
           }
         }
       },
@@ -1370,7 +2131,6 @@
         "_action": "用户要 PowerPoint 导出时, 警告 CASE-A 的轻微旋转 (-1deg) 在 PPT 失真"
       }
     },
-
     {
       "id": "CASE-B",
       "page_role": "gallery",
@@ -1385,25 +2145,48 @@
         "items_dom_selector": ".ba-side",
         "items_count": 2
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "改版块"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "改版块"
+      },
       "slots": {
-        "case-title": {"类型": "富文本", "最大字数": 30, "示例": "3 年迭代后, 我们<em>重新设计</em>了 dashboard。"},
+        "case-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "3 年迭代后, 我们<em>重新设计</em>了 dashboard。"
+        },
         "ba-sides": {
           "类型": "重复列表",
           "项数": 2,
           "featured_index": 1,
           "每项字段": {
-            "ba-tag": {"类型": "纯文本", "最大字数": 16, "示例": "— BEFORE · v2.0"},
-            "ba-caption": {"类型": "富文本", "最大字数": 100, "示例": "旧版 dashboard, <strong>用户找不到重点</strong>。NPS 38。"}
+            "ba-tag": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "— BEFORE · v2.0"
+            },
+            "ba-caption": {
+              "类型": "富文本",
+              "最大字数": 100,
+              "示例": "旧版 dashboard, <strong>用户找不到重点</strong>。NPS 38。"
+            }
           }
         }
       },
       "图片占位": [
-        {"yaml key": "ba-mocks", "数量": 2, "默认 image_fit": "cover", "描述": "前后截图(数组)"}
+        {
+          "yaml key": "ba-mocks",
+          "数量": 2,
+          "默认 image_fit": "cover",
+          "描述": "前后截图(数组)"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CASE-C",
       "page_role": "gallery",
@@ -1427,27 +2210,49 @@
         "对象描述": "分组"
       },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "完整生态 — <em>100+ 工具</em>原生集成。"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "完整生态 — <em>100+ 工具</em>原生集成。"
+        },
         "cat-groups": {
           "类型": "重复列表",
           "项数": "2-4",
           "每项字段": {
-            "cat-name": {"类型": "富文本", "描述": "可加 ★ 标记 featured 分组", "最大字数": 16, "示例": "★ Development"},
-            "cat-count": {"类型": "纯文本", "最大字数": 16, "示例": "→ 36 apps"},
+            "cat-name": {
+              "类型": "富文本",
+              "描述": "可加 ★ 标记 featured 分组",
+              "最大字数": 16,
+              "示例": "★ Development"
+            },
+            "cat-count": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "→ 36 apps"
+            },
             "cat-items": {
               "类型": "重复列表",
               "项数": "3-5",
               "每项字段": {
-                "item-logo": {"类型": "纯文本", "最大字数": 2, "示例": "G"},
-                "item-name": {"类型": "富文本", "最大字数": 30, "示例": "<strong>GitHub</strong> · 代码同步"}
+                "item-logo": {
+                  "类型": "纯文本",
+                  "最大字数": 2,
+                  "示例": "G"
+                },
+                "item-name": {
+                  "类型": "富文本",
+                  "最大字数": 30,
+                  "示例": "<strong>GitHub</strong> · 代码同步"
+                }
               }
             }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "TL-A",
       "page_role": "timeline",
@@ -1472,22 +2277,42 @@
         "对象描述": "版本节点"
       },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "从 <em>v1.0</em> 到 <em>v3.0</em>, 6 年的迭代。"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "从 <em>v1.0</em> 到 <em>v3.0</em>, 6 年的迭代。"
+        },
         "tl-points": {
           "类型": "重复列表",
           "项数": "4-7",
           "每项字段": {
-            "tl-version": {"类型": "纯文本", "最大字数": 8, "示例": "v3.0"},
-            "tl-year": {"类型": "纯文本", "最大字数": 16, "示例": "2026 · Q1 · ★"},
-            "tl-event": {"类型": "纯文本", "最大字数": 12, "示例": "AI Native"},
-            "tl-detail": {"类型": "富文本", "最大字数": 30, "示例": "AI Assist + Workflow API"},
-            "status": {"类型": "纯文本", "描述": "枚举值: done / active / next / future", "最大字数": 8, "示例": "active"}
+            "tl-version": {
+              "类型": "纯文本",
+              "最大字数": 8,
+              "示例": "v3.0"
+            },
+            "tl-year": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "2026 · Q1 · ★"
+            },
+            "tl-event": {
+              "类型": "纯文本",
+              "最大字数": 12,
+              "示例": "AI Native"
+            },
+            "tl-detail": {
+              "类型": "富文本",
+              "最大字数": 30,
+              "示例": "AI Assist + Workflow API"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "TL-B",
       "page_role": "timeline",
@@ -1511,27 +2336,55 @@
         "对象描述": "团队行"
       },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "5 个团队的<em>并行进度</em>。"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "5 个团队的<em>并行进度</em>。"
+        },
         "gantt-rows": {
           "类型": "重复列表",
           "项数": "3-7",
           "每项字段": {
-            "gantt-name": {"类型": "纯文本", "最大字数": 12, "示例": "AI 团队"},
+            "gantt-name": {
+              "类型": "纯文本",
+              "最大字数": 12,
+              "示例": "AI 团队"
+            },
             "gantt-bar": {
               "类型": "组合字段",
               "子字段": {
-                "start": {"类型": "纯文本", "描述": "起始季度 1-4", "最大字数": 2, "示例": "1"},
-                "end": {"类型": "纯文本", "描述": "结束季度 2-5 (end-exclusive)", "最大字数": 2, "示例": "5"},
-                "label": {"类型": "纯文本", "最大字数": 40, "示例": "AI Assist v1 → v2 · 9 months"},
-                "status": {"类型": "纯文本", "描述": "枚举值: default / featured / done", "最大字数": 12, "示例": "featured"}
+                "start": {
+                  "类型": "纯文本",
+                  "描述": "起始季度 1-4",
+                  "最大字数": 2,
+                  "示例": "1"
+                },
+                "end": {
+                  "类型": "纯文本",
+                  "描述": "结束季度 2-5 (end-exclusive)",
+                  "最大字数": 2,
+                  "示例": "5"
+                },
+                "label": {
+                  "类型": "纯文本",
+                  "最大字数": 40,
+                  "示例": "AI Assist v1 → v2 · 9 months"
+                },
+                "status": {
+                  "类型": "纯文本",
+                  "描述": "枚举值: default / featured / done",
+                  "最大字数": 12,
+                  "示例": "featured"
+                }
               }
             }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "PRC-A",
       "page_role": "process",
@@ -1556,31 +2409,65 @@
         "对象描述": "季度列"
       },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "2026 年, 我们要交付<em>这 4 件事</em>。"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "2026 年, 我们要交付<em>这 4 件事</em>。"
+        },
         "r-cols": {
           "类型": "重复列表",
           "项数": "3-5",
           "每项字段": {
-            "r-quarter": {"类型": "纯文本", "最大字数": 20, "示例": "Q1 2026 · 已完成"},
-            "r-status-pill": {"类型": "纯文本", "描述": "枚举: SHIPPED / IN PROGRESS / PLANNED / EXPLORING", "最大字数": 16, "示例": "● SHIPPED"},
-            "status": {"类型": "纯文本", "描述": "枚举: done / active / next / future", "最大字数": 8, "示例": "done"},
-            "r-title": {"类型": "纯文本", "最大字数": 16, "示例": "v3.0 基础架构"},
-            "r-summary": {"类型": "富文本", "最大字数": 80, "示例": "重新设计的 UI 系统, 命令面板, 开放的 API。"},
+            "r-quarter": {
+              "类型": "纯文本",
+              "最大字数": 20,
+              "示例": "Q1 2026 · 已完成"
+            },
+            "r-status-pill": {
+              "类型": "纯文本",
+              "描述": "枚举: done / active / next / future",
+              "最大字数": 8,
+              "示例": "done"
+            },
+            "r-title": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "v3.0 基础架构"
+            },
+            "r-summary": {
+              "类型": "富文本",
+              "最大字数": 80,
+              "示例": "重新设计的 UI 系统, 命令面板, 开放的 API。"
+            },
             "r-items": {
               "类型": "重复列表",
               "项数": "3-5",
               "每项字段": {
-                "marker": {"类型": "纯文本", "描述": "枚举: ✓ (done) / ★ (active) / ○ (planned/future)", "最大字数": 2, "示例": "✓"},
-                "text": {"类型": "纯文本", "最大字数": 30, "示例": "新 UI 系统 (Notion 风)"}
+                "marker": {
+                  "类型": "纯文本",
+                  "描述": "枚举: ✓ (done) / ★ (active) / ○ (planned/future)",
+                  "最大字数": 2,
+                  "示例": "✓"
+                },
+                "text": {
+                  "类型": "纯文本",
+                  "最大字数": 30,
+                  "示例": "新 UI 系统 (Notion 风)"
+                }
               }
             },
-            "r-impact": {"类型": "富文本", "最大字数": 30, "示例": "★ 交付时间: <strong>2026.03.15</strong>"}
+            "r-impact": {
+              "类型": "富文本",
+              "最大字数": 30,
+              "示例": "★ 交付时间: <strong>2026.03.15</strong>"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "FRW-A",
       "page_role": "framework",
@@ -1595,25 +2482,56 @@
         "items_dom_selector": ".quad",
         "items_count": 4
       },
-      "数量约束": {"类型": "严格固定", "数量": 4, "支持自适应": false, "对象描述": "象限"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 4,
+        "支持自适应": false,
+        "对象描述": "象限"
+      },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "SaaS 工具的<em>定位象限</em>。"},
-        "frw-axis-info": {"类型": "富文本", "描述": "Y 轴 / X 轴说明", "最大字数": 80, "示例": "<strong>Y AXIS</strong> · DEPTH<br><strong>X AXIS</strong> · SCOPE"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "SaaS 工具的<em>定位象限</em>。"
+        },
+        "frw-axis-info": {
+          "类型": "富文本",
+          "描述": "Y 轴 / X 轴说明",
+          "最大字数": 80,
+          "示例": "<strong>Y AXIS</strong> · DEPTH<br><strong>X AXIS</strong> · SCOPE"
+        },
         "quads": {
           "类型": "重复列表",
           "项数": 4,
           "featured_index": 1,
           "每项字段": {
-            "quad-num": {"类型": "纯文本", "最大字数": 16, "示例": "★ Q2 · TOP-RIGHT"},
-            "quad-label": {"类型": "纯文本", "最大字数": 20, "示例": "DEEP · WIDE"},
-            "quad-title": {"类型": "纯文本", "最大字数": 12, "示例": "★ 我们在这里"},
-            "quad-text": {"类型": "富文本", "最大字数": 60, "示例": "Linear — <strong>覆盖项目全流程, 每个环节都做深</strong>。"}
+            "quad-num": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "★ Q2 · TOP-RIGHT"
+            },
+            "quad-label": {
+              "类型": "纯文本",
+              "最大字数": 20,
+              "示例": "DEEP · WIDE"
+            },
+            "quad-title": {
+              "类型": "纯文本",
+              "最大字数": 12,
+              "示例": "★ 我们在这里"
+            },
+            "quad-text": {
+              "类型": "富文本",
+              "最大字数": 60,
+              "示例": "Linear — <strong>覆盖项目全流程, 每个环节都做深</strong>。"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "FRW-D",
       "page_role": "framework",
@@ -1638,22 +2556,43 @@
         "对象描述": "架构层"
       },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "Linear 的<em>4 层架构</em>。"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "Linear 的<em>4 层架构</em>。"
+        },
         "layers": {
           "类型": "重复列表",
           "项数": "3-5",
           "featured_index": 1,
           "每项字段": {
-            "layer-num": {"类型": "纯文本", "最大字数": 20, "示例": "★ L.3 · INTELLIGENCE"},
-            "layer-name": {"类型": "富文本", "最大字数": 12, "示例": "智能层 ★"},
-            "layer-desc": {"类型": "富文本", "最大字数": 100, "示例": "<strong>AI Assist / 智能优先级 / 风险预警</strong> — 让产品'看见'用户看不见的。"},
-            "layer-tag": {"类型": "纯文本", "最大字数": 16, "示例": "★ KEY DIFF"}
+            "layer-num": {
+              "类型": "纯文本",
+              "最大字数": 20,
+              "示例": "★ L.3 · INTELLIGENCE"
+            },
+            "layer-name": {
+              "类型": "富文本",
+              "最大字数": 12,
+              "示例": "智能层 ★"
+            },
+            "layer-desc": {
+              "类型": "富文本",
+              "最大字数": 100,
+              "示例": "<strong>AI Assist / 智能优先级 / 风险预警</strong> — 让产品'看见'用户看不见的。"
+            },
+            "layer-tag": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "★ KEY DIFF"
+            }
           }
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLO-A",
       "page_role": "closing",
@@ -1665,18 +2604,46 @@
         "招聘 → 用 CLO-E",
         "单档定价 CTA → 用 CLO-X"
       ],
-      "_renderer": {"dom_selector": ".variant-clo-a-capsule"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
-      "slots": {
-        "slot-title": {"类型": "富文本", "描述": "96px 大字 CTA 标题", "最大字数": 24, "示例": "把你的团队<br>带到<em>下一代</em>。"},
-        "slot-subtitle": {"类型": "纯文本", "最大字数": 120, "示例": "从今天开始, 14 天免费试用 — 不用信用卡, 不用销售对接。"},
-        "cta-primary": {"类型": "纯文本", "最大字数": 16, "示例": "免费试用 14 天 →"},
-        "cta-ghost": {"类型": "纯文本", "最大字数": 16, "示例": "查看演示视频"},
-        "cta-link": {"类型": "富文本", "描述": "邮箱或链接", "最大字数": 40, "示例": "— hello@<strong>linear.app</strong>"}
+      "_renderer": {
+        "dom_selector": ".variant-clo-a-capsule"
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "96px 大字 CTA 标题",
+          "最大字数": 24,
+          "示例": "把你的团队<br>带到<em>下一代</em>。"
+        },
+        "slot-subtitle": {
+          "类型": "纯文本",
+          "最大字数": 120,
+          "示例": "从今天开始, 14 天免费试用 — 不用信用卡, 不用销售对接。"
+        },
+        "cta-primary": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": "免费试用 14 天 →"
+        },
+        "cta-ghost": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": "查看演示视频"
+        },
+        "cta-link": {
+          "类型": "富文本",
+          "描述": "邮箱或链接",
+          "最大字数": 40,
+          "示例": "— hello@<strong>linear.app</strong>"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLO-B",
       "page_role": "closing",
@@ -1700,16 +2667,33 @@
         "对象描述": "联系方式行"
       },
       "slots": {
-        "slot-title": {"类型": "富文本", "描述": "72px 大字", "最大字数": 20, "示例": "扫码即可<br><em>立即体验</em>。"},
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "72px 大字",
+          "最大字数": 20,
+          "示例": "扫码即可<br><em>立即体验</em>。"
+        },
         "clo-contact": {
           "类型": "重复列表",
           "项数": "2-5",
           "每项字段": {
-            "label": {"类型": "纯文本", "最大字数": 16, "示例": "WEB"},
-            "val": {"类型": "富文本", "最大字数": 50, "示例": "→ linear.app/<strong>release/3.0</strong>"}
+            "label": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "WEB"
+            },
+            "val": {
+              "类型": "富文本",
+              "最大字数": 50,
+              "示例": "→ linear.app/<strong>release/3.0</strong>"
+            }
           }
         },
-        "qr-label": {"类型": "富文本", "最大字数": 40, "示例": "扫码 → 跳转 <strong>linear.app/3.0</strong>"}
+        "qr-label": {
+          "类型": "富文本",
+          "最大字数": 40,
+          "示例": "扫码 → 跳转 <strong>linear.app/3.0</strong>"
+        }
       },
       "图片占位": [
         {
@@ -1719,9 +2703,10 @@
           "描述": "QR 码图, url 留空时显示棋盘占位"
         }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLO-D",
       "page_role": "closing",
@@ -1746,22 +2731,49 @@
         "对象描述": "团队成员"
       },
       "slots": {
-        "slot-title": {"类型": "富文本", "描述": "96px 大字 THANKS", "最大字数": 30, "示例": "THANKS <em>FOR<br>WATCHING.</em>"},
-        "slot-subtitle": {"类型": "富文本", "最大字数": 100, "示例": "Linear 3.0 是 42 个人用 18 个月做出来的。"},
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "96px 大字 THANKS",
+          "最大字数": 30,
+          "示例": "THANKS <em>FOR<br>WATCHING.</em>"
+        },
+        "slot-subtitle": {
+          "类型": "富文本",
+          "最大字数": 100,
+          "示例": "Linear 3.0 是 42 个人用 18 个月做出来的。"
+        },
         "team-list": {
           "类型": "重复列表",
           "项数": "3-6",
           "每项字段": {
-            "member-avatar": {"类型": "纯文本", "描述": "首字母缩写或 +N", "最大字数": 4, "示例": "KS"},
-            "member-name": {"类型": "纯文本", "最大字数": 24, "示例": "Karri Saarinen"},
-            "member-role": {"类型": "纯文本", "最大字数": 30, "示例": "CEO + DESIGN"}
+            "member-avatar": {
+              "类型": "纯文本",
+              "描述": "首字母缩写或 +N",
+              "最大字数": 4,
+              "示例": "KS"
+            },
+            "member-name": {
+              "类型": "纯文本",
+              "最大字数": 24,
+              "示例": "Karri Saarinen"
+            },
+            "member-role": {
+              "类型": "纯文本",
+              "最大字数": 30,
+              "示例": "CEO + DESIGN"
+            }
           }
         },
-        "team-meta": {"类型": "富文本", "最大字数": 60, "示例": "© 2026 LINEAR · <strong>42 PEOPLE · 18 COUNTRIES</strong>"}
+        "team-meta": {
+          "类型": "富文本",
+          "最大字数": 60,
+          "示例": "© 2026 LINEAR · <strong>42 PEOPLE · 18 COUNTRIES</strong>"
+        }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLO-E",
       "page_role": "closing",
@@ -1785,29 +2797,58 @@
         "对象描述": "岗位卡"
       },
       "slots": {
-        "slot-title": {"类型": "富文本", "最大字数": 30, "示例": "我们在找<em>3 类人</em>。"},
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "我们在找<em>3 类人</em>。"
+        },
         "role-cards": {
           "类型": "重复列表",
           "项数": "2-4",
           "featured_index": 1,
           "每项字段": {
-            "role-tag": {"类型": "纯文本", "最大字数": 24, "示例": "★ AI · 2 ROLES"},
-            "role-title": {"类型": "纯文本", "最大字数": 16, "示例": "AI Engineer"},
+            "role-tag": {
+              "类型": "纯文本",
+              "最大字数": 24,
+              "示例": "★ AI · 2 ROLES"
+            },
+            "role-title": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "AI Engineer"
+            },
             "role-meta": {
               "类型": "同质列表",
               "描述": "REMOTE / $XXXk / STOCK 等 pill",
               "项数": "2-4",
-              "示例": ["REMOTE", "$180-260K", "STOCK"]
+              "示例": [
+                "REMOTE",
+                "$180-260K",
+                "STOCK"
+              ]
             },
-            "role-desc": {"类型": "富文本", "最大字数": 100, "示例": "参与 <strong>AI Assist v2</strong> 设计与实现。LLM 经验加分。"}
+            "role-desc": {
+              "类型": "富文本",
+              "最大字数": 100,
+              "示例": "参与 <strong>AI Assist v2</strong> 设计与实现。LLM 经验加分。"
+            }
           }
         },
-        "apply-info": {"类型": "富文本", "最大字数": 60, "示例": "看到合适的? 直接发简历, <strong>不需要 cover letter</strong>"},
-        "apply-link": {"类型": "纯文本", "最大字数": 30, "示例": "→ careers@linear.app"}
+        "apply-info": {
+          "类型": "富文本",
+          "最大字数": 60,
+          "示例": "看到合适的? 直接发简历, <strong>不需要 cover letter</strong>"
+        },
+        "apply-link": {
+          "类型": "纯文本",
+          "最大字数": 30,
+          "示例": "→ careers@linear.app"
+        }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLO-X",
       "page_role": "closing",
@@ -1832,34 +2873,79 @@
         "对象描述": "左侧 stat 块"
       },
       "slots": {
-        "slot-title": {"类型": "富文本", "描述": "48px 标题", "最大字数": 30, "示例": "一个方案,<em>包括一切</em>。"},
-        "z-desc": {"类型": "富文本", "最大字数": 100, "示例": "没有'基础版'和'专业版'的折腾, 所有功能, 所有团队都能用。"},
+        "slot-title": {
+          "类型": "富文本",
+          "描述": "48px 标题",
+          "最大字数": 30,
+          "示例": "一个方案,<em>包括一切</em>。"
+        },
+        "z-desc": {
+          "类型": "富文本",
+          "最大字数": 100,
+          "示例": "没有'基础版'和'专业版'的折腾, 所有功能, 所有团队都能用。"
+        },
         "z-stats": {
           "类型": "重复列表",
           "项数": "3-4",
           "每项字段": {
-            "label": {"类型": "纯文本", "最大字数": 16, "示例": "TRIAL"},
-            "value": {"类型": "纯文本", "最大字数": 16, "示例": "14 days"}
+            "label": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "TRIAL"
+            },
+            "value": {
+              "类型": "纯文本",
+              "最大字数": 16,
+              "示例": "14 days"
+            }
           }
         },
-        "z-plan-tag": {"类型": "纯文本", "最大字数": 16, "示例": "FLAGSHIP"},
-        "z-plan-name": {"类型": "纯文本", "最大字数": 20, "示例": "Linear Pro"},
+        "z-plan-tag": {
+          "类型": "纯文本",
+          "最大字数": 16,
+          "示例": "FLAGSHIP"
+        },
+        "z-plan-name": {
+          "类型": "纯文本",
+          "最大字数": 20,
+          "示例": "Linear Pro"
+        },
         "z-plan-price": {
           "类型": "组合字段",
           "子字段": {
-            "num": {"类型": "纯文本", "描述": "80px 大字价格", "最大字数": 12, "示例": "$12"},
-            "period": {"类型": "纯文本", "最大字数": 20, "示例": "/ user / 月"}
+            "num": {
+              "类型": "纯文本",
+              "描述": "80px 大字价格",
+              "最大字数": 12,
+              "示例": "$12"
+            },
+            "period": {
+              "类型": "纯文本",
+              "最大字数": 20,
+              "示例": "/ user / 月"
+            }
           }
         },
         "z-plan-features": {
           "类型": "同质列表",
           "项数": "3-7",
-          "示例": ["无限成员 + 项目", "完整 AI Assist", "Workflow API + Webhooks", "100+ 集成", "优先技术支持"]
+          "示例": [
+            "无限成员 + 项目",
+            "完整 AI Assist",
+            "Workflow API + Webhooks",
+            "100+ 集成",
+            "优先技术支持"
+          ]
         },
-        "z-plan-cta": {"类型": "纯文本", "最大字数": 30, "示例": "立即开始 14 天试用 →"}
+        "z-plan-cta": {
+          "类型": "纯文本",
+          "最大字数": 30,
+          "示例": "立即开始 14 天试用 →"
+        }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     }
-
   ]
 }
