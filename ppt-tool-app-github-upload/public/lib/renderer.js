@@ -37,9 +37,9 @@ class CssRenderer {
     const parser = new DOMParser();
     const sourceDoc = parser.parseFromString(skeletonHtml, "text/html");
 
-    // 输出文档 = skeleton 复制一份, 然后移除所有 .slide
+    // 输出文档 = skeleton 复制一份
     const outputDoc = parser.parseFromString(skeletonHtml, "text/html");
-    const slidesContainer = outputDoc.querySelector("main") || outputDoc.body;
+    // 移除所有原始 .slide(我们会重新生成填充后的)
     outputDoc.querySelectorAll(".slide").forEach((s) => s.remove());
 
     // 索引化 variants
@@ -47,6 +47,7 @@ class CssRenderer {
     manifest.variants.forEach((v) => (variantsById[v.id] = v));
 
     const stats = { pages: 0, fills: 0, failed: [] };
+    const generatedSlides = []; // 收集生成的 slide, 最后统一放入干净容器
 
     for (const page of visualPlan.pages) {
       const vid = page.variant_id;
@@ -71,6 +72,12 @@ class CssRenderer {
       // 深拷贝
       const newSlide = srcSlide.cloneNode(true);
       newSlide.setAttribute("data-page", String(page.slide));
+
+      // 清除 slide 内部的开发标记(dev-tag / variant-tag / slide-index 等), 这些不该出现在最终 PPT
+      // slide-index 是 skeleton 写死的 variant 代号或假页码(如 "COV-MERIDIAN · 01" / "01 / 58"), 对用户 PPT 无意义
+      newSlide
+        .querySelectorAll(".dev-tag, .variant-tag, .nav-label, .slide-tag, .variant-label, .slide-index")
+        .forEach((el) => el.remove());
 
       // 填 slots
       for (const [slotName, slotValue] of Object.entries(page.slots || {})) {
@@ -113,8 +120,15 @@ class CssRenderer {
         }
       }
 
-      slidesContainer.appendChild(newSlide);
+      generatedSlides.push(newSlide);
       stats.pages++;
+    }
+
+    // 清空 body, 只放入生成的 slide (彻底杜绝 skeleton 的游离元素 / dev-tag / 注释 / script 残留)
+    const body = outputDoc.body;
+    while (body.firstChild) body.removeChild(body.firstChild);
+    for (const slide of generatedSlides) {
+      body.appendChild(slide);
     }
 
     // 输出
@@ -131,12 +145,53 @@ class CssRenderer {
       slide.querySelector(`.slot-${slotName}`);
     if (!target) return false;
 
+    // 检查内部有没有嵌套的其他 slot 元素(如 slot-value 里嵌 slot-unit)
+    const nestedSlots = target.querySelectorAll('[class*="slot-"]');
+
     if (isRich) {
-      target.innerHTML = String(value); // 富文本允许 HTML 标签(已在 visual-planner 阶段校验)
+      if (nestedSlots.length > 0) {
+        // 富文本但有嵌套 slot: 只替换最前面的文本节点, 保留嵌套子元素
+        this._setLeadingText(target, String(value), true);
+      } else {
+        target.innerHTML = String(value);
+      }
     } else {
-      target.textContent = String(value);
+      if (nestedSlots.length > 0) {
+        // 纯文本但有嵌套 slot: 只改直接文本节点, 不动子 slot 元素
+        this._setLeadingText(target, String(value), false);
+      } else {
+        target.textContent = String(value);
+      }
     }
     return true;
+  }
+
+  // 替换元素的"前导文本"(第一个文本节点), 保留后面的子元素
+  // 用于 <div class="slot-value">175<span class="slot-unit">万</span></div> 这种嵌套
+  _setLeadingText(el, text, isRich) {
+    // 找第一个直接文本节点
+    let firstText = null;
+    for (const node of el.childNodes) {
+      if (node.nodeType === 3 /* TEXT_NODE */) {
+        firstText = node;
+        break;
+      }
+    }
+    if (firstText) {
+      if (isRich && /<[a-z]/i.test(text)) {
+        // 富文本含标签: 用一个临时 span 承载, 插在第一个子元素前
+        const tmp = el.ownerDocument.createElement("span");
+        tmp.innerHTML = text;
+        firstText.remove();
+        el.insertBefore(tmp, el.firstChild);
+      } else {
+        firstText.textContent = text;
+      }
+    } else {
+      // 没有直接文本节点: 插到最前面
+      const textNode = el.ownerDocument.createTextNode(text);
+      el.insertBefore(textNode, el.firstChild);
+    }
   }
 
   _fillImage(slide, slotName, value, phInfo) {
