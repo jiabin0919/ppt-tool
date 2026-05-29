@@ -529,6 +529,9 @@
         userPrompt,
         temperature: 0.4,
         maxTokens: 12000,
+        onProgress: (fullText) => {
+          showLoading(`正在生成内容规划… 已写 ${fullText.length} 字`);
+        },
       });
 
       if (!result.ok) {
@@ -561,71 +564,281 @@
     }
   });
 
-  // ===== 阶段 2: outline → preview =====
+  // ===== 阶段 2: outline → preview (并发分批 + 实时进度) =====
+  // 全局并发控制状态
+  let batchCancelled = false;
+  let activeBatchPromises = [];
+
   $('btn-to-preview').addEventListener('click', async () => {
     if (!state.planning || !state.selectedDna) {
       showToast('请先选 DNA', 'error');
       return;
     }
 
-    showLoading('调用 visual-planner 选 variant + 渲染 PPT…');
-
     try {
       const skillRes = await fetch('/skills/visual-planner.md');
       const skillText = await skillRes.text();
-
-      // 取选定 DNA 的 manifest
       const manifest = window.MANIFEST_REGISTRY.getManifest(state.selectedDna);
+      const allPages = state.planning.pages;
+      const totalPages = allPages.length;
 
-      const userPrompt = buildVisualPlannerPrompt(state, manifest);
+      // 并发参数(经验值, 后续可调)
+      const CONCURRENCY = 4;
+      const MAX_RETRY = 2;
 
-      const result = await llmCall({
-        model: state.model,
-        password: state.password,
-        systemPrompt: skillText,
-        userPrompt,
-        temperature: 0.3,
-        maxTokens: 16000,
-      });
+      // 初始化占位 visualPlan: 每页一个占位项
+      state.visualPlan = {
+        global: { dna: state.selectedDna, total_pages: totalPages },
+        pages: allPages.map((p, i) => ({
+          slide: i + 1,
+          variant_id: '?',
+          page_role: p.page_role || '?',
+          _status: 'pending', // pending / loading / ok / error
+          _planning: p, // 保留 planning 数据供生成时用
+          slots: {},
+        })),
+      };
 
-      if (!result.ok) {
-        showToast('生成失败: ' + (result.error || 'unknown'), 'error', 4000);
-        console.error(result);
-        return;
-      }
-
-      // 解析 yaml
-      state.visualPlan = parseYaml(result.content);
-      if (!state.visualPlan || !state.visualPlan.pages) {
-        showToast('解析 visual_plan.yaml 失败', 'error', 4000);
-        console.error('Visual plan content:', result.content);
-        return;
-      }
-
-      // 浏览器侧 renderer 渲染
+      // 提前进入阶段 3, 让用户看到进度
       const renderer = new window.CssRenderer(window.MANIFEST_REGISTRY);
-      const renderResult = renderer.render(state.visualPlan, state.selectedDna);
-      state.generatedHtml = renderResult.html;
-
+      state.generatedHtml = '<html><body><div style="padding:40px;color:#888;font-family:sans-serif">正在生成 PPT,请稍候…</div></body></html>';
       renderPreviewStage();
       setStage('preview');
-      // setStage 让 layout 显示后, 立即计算缩放
       requestAnimationFrame(() => fitPreviewIframe());
 
-      if (result.mocked) {
-        showToast('提示:本地环境使用 mock 数据', '', 3000);
-      } else {
-        const ok = renderResult.stats.fills;
-        const failed = renderResult.stats.failed.length;
-        showToast(`渲染完成 · ${ok} 个 slot 已填充, ${failed} 个失败`, 'success');
+      // 顶部进度条
+      showProgressBar(0, totalPages);
+      batchCancelled = false;
+
+      // 单页生成函数
+      const generateOnePage = async (pageIdx) => {
+        if (batchCancelled) return { skipped: true };
+        const planningPage = allPages[pageIdx];
+        // 标记 loading
+        markPageStatus(pageIdx, 'loading');
+
+        const userPrompt = buildVisualPlannerPromptBatch(state, manifest, [planningPage], totalPages);
+
+        let lastErr = null;
+        for (let attempt = 0; attempt <= MAX_RETRY; attempt++) {
+          if (batchCancelled) return { skipped: true };
+          const result = await llmCall({
+            model: state.model,
+            password: state.password,
+            systemPrompt: skillText,
+            userPrompt,
+            temperature: 0.3,
+            maxTokens: 2500, // 单页, token 上限低
+          });
+          if (result.ok) {
+            const parsed = parseYaml(result.content);
+            if (parsed && parsed.pages && parsed.pages[0]) {
+              return { ok: true, page: parsed.pages[0] };
+            }
+            lastErr = { error: 'parse_failed', content: result.content };
+          } else {
+            lastErr = result;
+            // 致命错误不重试
+            if (['wrong_password', 'api_key_not_configured', 'invalid_model'].includes(result.error)) {
+              return { ok: false, error: result.error, message: result.message };
+            }
+          }
+          if (attempt < MAX_RETRY) await new Promise(r => setTimeout(r, 500));
+        }
+        return { ok: false, ...lastErr };
+      };
+
+      // 并发池: 限制同时跑的请求数
+      const queue = Array.from({ length: totalPages }, (_, i) => i);
+      let completed = 0;
+      let failed = 0;
+      const workers = [];
+
+      for (let w = 0; w < CONCURRENCY; w++) {
+        workers.push((async () => {
+          while (queue.length > 0 && !batchCancelled) {
+            const pageIdx = queue.shift();
+            const result = await generateOnePage(pageIdx);
+            if (batchCancelled) return;
+
+            if (result.skipped) continue;
+            if (result.ok) {
+              // 把生成的页填回 state.visualPlan
+              const realPage = { ...result.page, slide: pageIdx + 1, _status: 'ok' };
+              state.visualPlan.pages[pageIdx] = realPage;
+              completed++;
+              markPageStatus(pageIdx, 'ok', realPage);
+              rerenderIframeIncrementally();
+              // 如果这页是当前选中的, 刷新编辑面板
+              if (state.selectedPageIdx === pageIdx && editPanel) {
+                editPanel.renderForPage(state.visualPlan, pageIdx);
+              }
+            } else {
+              failed++;
+              state.visualPlan.pages[pageIdx]._status = 'error';
+              state.visualPlan.pages[pageIdx]._error = result.message || result.error || 'unknown';
+              markPageStatus(pageIdx, 'error');
+            }
+            updateProgressBar(completed + failed, totalPages, completed, failed);
+          }
+        })());
       }
+
+      await Promise.all(workers);
+
+      // 完成
+      hideProgressBar();
+
+      if (batchCancelled) {
+        showToast(`已暂停 · 已生成 ${completed}/${totalPages} 页`, '', 4000);
+      } else if (failed > 0) {
+        showToast(`生成完成 · ${completed} 成功, ${failed} 失败(点击失败页可重试)`, '', 5000);
+      } else {
+        showToast(`✓ ${totalPages} 页全部生成成功`, 'success');
+      }
+
+      // 整体重渲染一次
+      rerenderIframeIncrementally();
+      scheduleSave(1000);
     } catch (err) {
+      hideProgressBar();
       showToast('错误: ' + err.message, 'error', 4000);
       console.error(err);
-    } finally {
-      hideLoading();
     }
   });
+
+  // 增量重渲染(只重新渲染所有已 ok 的页)
+  function rerenderIframeIncrementally() {
+    if (!state.visualPlan) return;
+    // 过滤出已成功的页, 用 renderer 渲染
+    const okPages = state.visualPlan.pages.filter(p => p._status === 'ok' || (!p._status && p.variant_id && p.variant_id !== '?'));
+    if (okPages.length === 0) return;
+    try {
+      const renderer = new window.CssRenderer(window.MANIFEST_REGISTRY);
+      const renderPlan = {
+        global: state.visualPlan.global,
+        pages: okPages.map((p, i) => ({ ...p, slide: i + 1 })),
+      };
+      const r = renderer.render(renderPlan, state.selectedDna);
+      state.generatedHtml = r.html;
+      const iframe = $('preview-iframe');
+      if (iframe) iframe.srcdoc = r.html;
+    } catch (e) {
+      console.warn('增量渲染失败:', e);
+    }
+  }
+
+  // 标记某页状态(更新缩略图视觉)
+  function markPageStatus(pageIdx, status, pageData) {
+    const items = qsa('.thumb-item');
+    const item = items[pageIdx];
+    if (!item) return;
+    item.classList.remove('status-pending', 'status-loading', 'status-ok', 'status-error');
+    item.classList.add('status-' + status);
+    if (pageData) {
+      // 更新 variant_id 显示
+      const vidEl = item.querySelector('.ti-vid');
+      if (vidEl) vidEl.textContent = pageData.variant_id || '?';
+      const roleEl = item.querySelector('.ti-role');
+      if (roleEl) roleEl.textContent = pageData.page_role || '';
+    }
+    // 失败页: 加 title 显示原因
+    if (status === 'error') {
+      const errMsg = state.visualPlan?.pages[pageIdx]?._error || '生成失败';
+      item.title = '点击重试 · ' + errMsg;
+    } else {
+      item.removeAttribute('title');
+    }
+  }
+
+  // 重试单页(失败页点击触发)
+  async function retryPage(pageIdx) {
+    if (!state.visualPlan || !state.planning) return;
+    const planningPage = state.planning.pages[pageIdx];
+    if (!planningPage) return;
+
+    const skillRes = await fetch('/skills/visual-planner.md');
+    const skillText = await skillRes.text();
+    const manifest = window.MANIFEST_REGISTRY.getManifest(state.selectedDna);
+    const totalPages = state.planning.pages.length;
+
+    markPageStatus(pageIdx, 'loading');
+    showToast(`重试第 ${pageIdx + 1} 页…`, '', 2000);
+
+    const userPrompt = buildVisualPlannerPromptBatch(state, manifest, [planningPage], totalPages);
+    const MAX_RETRY = 2;
+    let lastErr = null;
+    for (let attempt = 0; attempt <= MAX_RETRY; attempt++) {
+      const result = await llmCall({
+        model: state.model, password: state.password,
+        systemPrompt: skillText, userPrompt,
+        temperature: 0.3, maxTokens: 2500,
+      });
+      if (result.ok) {
+        const parsed = parseYaml(result.content);
+        if (parsed && parsed.pages && parsed.pages[0]) {
+          const realPage = { ...parsed.pages[0], slide: pageIdx + 1, _status: 'ok' };
+          state.visualPlan.pages[pageIdx] = realPage;
+          markPageStatus(pageIdx, 'ok', realPage);
+          rerenderIframeIncrementally();
+          if (state.selectedPageIdx === pageIdx && editPanel) {
+            editPanel.renderForPage(state.visualPlan, pageIdx);
+          }
+          showToast(`第 ${pageIdx + 1} 页已生成`, 'success', 2500);
+          scheduleSave(1000);
+          return;
+        }
+        lastErr = { error: 'parse_failed' };
+      } else lastErr = result;
+      if (attempt < MAX_RETRY) await new Promise(r => setTimeout(r, 500));
+    }
+    // 重试也失败
+    state.visualPlan.pages[pageIdx]._status = 'error';
+    state.visualPlan.pages[pageIdx]._error = lastErr?.message || lastErr?.error || 'unknown';
+    markPageStatus(pageIdx, 'error');
+    showToast(`第 ${pageIdx + 1} 页仍失败: ${lastErr?.error || ''}`, 'error', 4000);
+  }
+
+  // 进度条 UI
+  function showProgressBar(done, total) {
+    let bar = $('gen-progress-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'gen-progress-bar';
+      bar.className = 'gen-progress-bar';
+      bar.innerHTML = `
+        <div class="gpb-content">
+          <div class="gpb-info">
+            <span class="gpb-text">准备生成…</span>
+            <span class="gpb-stats"></span>
+          </div>
+          <div class="gpb-track"><div class="gpb-fill"></div></div>
+          <button class="gpb-cancel" type="button">暂停</button>
+        </div>
+      `;
+      document.body.appendChild(bar);
+      bar.querySelector('.gpb-cancel').addEventListener('click', () => {
+        batchCancelled = true;
+        bar.querySelector('.gpb-cancel').textContent = '暂停中…';
+      });
+    }
+    bar.style.display = 'block';
+    updateProgressBar(done, total, 0, 0);
+  }
+  function updateProgressBar(done, total, ok, failed) {
+    const bar = $('gen-progress-bar');
+    if (!bar) return;
+    const pct = total ? Math.round(done / total * 100) : 0;
+    bar.querySelector('.gpb-fill').style.width = pct + '%';
+    bar.querySelector('.gpb-text').textContent = `生成中… ${done}/${total} 页`;
+    const stats = bar.querySelector('.gpb-stats');
+    if (failed > 0) stats.innerHTML = `<span class="gpb-ok">${ok} 成功</span> · <span class="gpb-fail">${failed} 失败</span>`;
+    else stats.textContent = ok > 0 ? `${ok} 成功` : '';
+  }
+  function hideProgressBar() {
+    const bar = $('gen-progress-bar');
+    if (bar) bar.style.display = 'none';
+  }
 
   // ===== 阶段返回按钮 =====
   qsa('[data-back-to]').forEach(btn => {
@@ -821,12 +1034,21 @@
       const p = state.visualPlan.pages[i];
       const item = document.createElement('div');
       item.className = 'thumb-item';
+      // 初始状态: 如果有 _status, 加对应 class
+      if (p._status) item.classList.add('status-' + p._status);
       item.innerHTML = `
         <span class="ti-idx">${p.slide || i + 1}</span>
         <span class="ti-vid">${escapeHTML(p.variant_id || '?')}</span>
         <span class="ti-role">${escapeHTML(p.page_role || '')}</span>
       `;
-      item.addEventListener('click', () => selectPage(i));
+      item.addEventListener('click', () => {
+        // 失败页: 点击重试; 其他: 选中预览
+        if (item.classList.contains('status-error')) {
+          retryPage(i);
+        } else {
+          selectPage(i);
+        }
+      });
       thumbList.appendChild(item);
     }
 
@@ -1073,6 +1295,60 @@ ${reportBlock}${attachmentsBlock}
 请按 content-planner skill 的工作流程,直接产出完整的 planning.md(从 "# 报告 · PPT 内容规划" 标题开始)。不需要再问我任何问题。`;
   }
 
+  // 分批版: 只为指定的几页生成 visual_plan (方案 Y)
+  function buildVisualPlannerPromptBatch(state, manifest, batchPages, totalPages) {
+    const dnaInfo = {
+      id: manifest.dna.id,
+      name: manifest.dna.name,
+      tagline: manifest.dna.tagline,
+    };
+    const variantsSummary = manifest.variants.map(v => ({
+      id: v.id,
+      page_role: v.page_role,
+      描述: v['描述'],
+      什么时候用: v['什么时候用'],
+      slots: Object.keys(v.slots || {}),
+    }));
+
+    // 该批页面的 planning 文本(只取这几页)
+    const batchPlanningText = batchPages.map(p => {
+      const slotsHint = p.content_elements ? JSON.stringify(p.content_elements, null, 2) : '';
+      return `### 第 ${p.slide} 页\n` +
+             (p.page_intent ? `叙事目标: ${p.page_intent}\n` : '') +
+             (p.page_role ? `page_role: ${p.page_role}\n` : '') +
+             (p.raw_block || slotsHint || JSON.stringify(p, null, 2));
+    }).join('\n\n');
+
+    const slideNums = batchPages.map(p => p.slide).join(', ');
+
+    return `# 任务:为指定的几页选 variant + 生成 visual_plan.yaml(分批模式)
+
+## DNA(已确定,不要重选)
+\`\`\`json
+${JSON.stringify(dnaInfo, null, 2)}
+\`\`\`
+
+## 该 DNA 的 variants 清单
+\`\`\`json
+${JSON.stringify(variantsSummary, null, 2)}
+\`\`\`
+
+## 本批要生成的页面(共 ${batchPages.length} 页,整份 PPT 共 ${totalPages} 页)
+
+${batchPlanningText}
+
+---
+
+请只为上面列出的第 ${slideNums} 页生成 visual_plan:
+1. DNA 已定为 ${dnaInfo.id},不要重选
+2. 每页从 variants 清单挑 page_role 匹配的最合适 variant
+3. 撰写 director_note
+4. 按 variant 的 slots 定义,用页面内容填充每个 slot(slot 名必须和清单里的完全一致)
+5. 每页的 slide 字段必须用上面给定的页码(${slideNums})
+
+输出格式:从 "global:" 开始的纯 YAML,pages 数组只含本批 ${batchPages.length} 页。不要 markdown 代码块包裹,yaml 块内必须是纯 yaml。`;
+  }
+
   function buildVisualPlannerPrompt(state, manifest) {
     // 只挑必要的 manifest 字段,避免过大
     const dnaInfo = {
@@ -1181,7 +1457,7 @@ ${state.planning.raw}
   }
 
   function parsePlanningPage(block, idx) {
-    const page = { slide: idx };
+    const page = { slide: idx, raw_block: block.trim() };
     // page_intent
     const intentMatch = block.match(/\*\*叙事目标\*\*[::]?\s*[::]?\s*\n?([^\n]+)/);
     if (intentMatch) page.page_intent = intentMatch[1].trim();
