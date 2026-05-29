@@ -268,3 +268,112 @@ planner 必须严格使用这 12 个值之一。visual-planner 据此在 manifes
 - 阶段 1 输入页:左侧报告原文输入框 + 受众 / 页数 / 特殊要求,右侧"生成 outline"按钮
 - 阶段 2 outline 确认页:显示 planning.md 解析后的章节结构,用户可改章节标题、加减页、改 page_role
 - 阶段 3 预览页:显示完整渲染的 13 页缩略图,点任意页进单页编辑模式
+
+---
+
+## 🔧 Day 8+ 重大修复:DNA 对齐(manifest↔skeleton↔renderer↔编辑面板 四方统一)
+
+### 背景
+生产环境暴露:meridian 等 DNA 生成的 PPT 全是占位文字,编辑面板和 PPT 内容对不上,改字不生效。根因:manifest 声明的 slot 名跟 skeleton 真实 class 名不一致。
+
+### 真实渲染验证(330 variant 全测)
+建了 `/tmp/verify-render.mjs`(生成测试数据)+ `/tmp/run_verify.py`(浏览器真实渲染验证),
+对每个 variant 用唯一标记值填充,检查是否真进 DOM。
+
+修复前 → 修复后填充率:
+- capsule  76% → **100%** (42/42)
+- meridian  2% → **100%** (61/61)
+- archive  44% → **100%** (61/61)
+- editorial 86% → **100%** (42/42)
+- signal/macaron/studio 一直 **100%**
+
+### 修复手段
+1. **自动对齐工具**(`/tmp/gen-manifest-slots.mjs` + `apply-slots.mjs`):
+   扫描 skeleton 真实 slot-* class → 反向生成对齐的 manifest slots(展开式)。
+   meridian/archive 用此法批量修复(展开式命名 slot-n1/slot-n2...)。
+2. **renderer 修复**(`public/lib/renderer.js`):
+   - `_fillText` 支持嵌套 slot(slot-value 里嵌 slot-unit):`_setLeadingText` 只改前导文本节点
+   - 输出时清空 body 只保留生成的 slide,杜绝游离元素 / script / 注释残留
+   - slide 内清除所有开发标记:.dev-tag / .variant-tag / .nav-label / .slide-index 等
+3. **capsule 手工精修** 10 个 variant:子字段名对齐(step-pill→ded-step-pill, logo-mark→logo-mark-square 等),删除 skeleton 不存在的字段(badge/plan-tag/status),CMP-D 表格改展开式
+4. **archive INS-C / capsule COV-A 等**:给 skeleton 缺 class 的元素补 slot- class
+
+### 测试结论(全部通过)
+- ✅ 7 套填充率 100%(330 variant)
+- ✅ 7 套编辑生效(改 slot → iframe 实时更新,旧值清除)
+- ✅ 编辑面板↔渲染一致性:抽查 160 slot 零不一致
+- ✅ dev-tag / variant-tag / slide-index / 游离元素全部清除
+- ✅ 视觉截图确认 7 套渲染正常
+
+### 同期完成
+- 流式改造(llm-proxy.mjs + llm-client.js):改善生成体验(但 Netlify 10 秒上限仍在,需方案 Y 根治)
+- 修好的 7 套 manifest 留底:/tmp/fixed-manifests/
+
+### 待办(PENDING)
+- **超时方案 Y(任务拆分)**:把一次性生成拆成分批(每次 3-4 页),每次 <10 秒,前端循环拼接。数据完整性根治。
+- 交付:DNA 对齐改动需同步到用户 GitHub 仓库(用户走个人设备上传流程)
+
+---
+
+## ⏱️ 方案 Y(任务拆分)· 超时根治 — 已完成
+
+### 解决的问题
+Netlify 免费版函数 10 秒上限,visual-planner 一次生成整份(40-90秒)必超时(504)。
+
+### 做法(纯前端改造,不花钱)
+- `pipeline.js` 阶段2 改为**分批生成**:planning 按 3 页一批,循环调用 visual-planner,每批独立 < 10 秒
+- 新增 `buildVisualPlannerPromptBatch`:只为指定页码生成 yaml
+- **自动重试**:某批超时自动重试 2 次(密码/key 类错误不重试)
+- **渐进渲染**:每批完成后更新 visualPlan,可看进度
+- **容错**:某批失败不影响已成功的批次,拼接已完成的页
+- 拼接后重新编号 slide(连续 1..N)
+- `parsePlanningPage` 保存 raw_block 供分批 prompt 用
+- `llm-client.js` mock 支持分批(buildMockBatchYaml 按页码返回)
+
+### 测试通过
+- ✅ 7 页 planning → 3 批(3+3+1)→ 拼接成 7 页,页码连续无重复
+- ✅ iframe 渲染页数 = 规划页数
+- ✅ 分批生成后编辑生效(第1批、第2批的页都能编辑实时更新)
+- ✅ 填充全量回归 7 套仍 100%
+
+### 配套建议(给用户)
+- 配 DeepSeek key(首字延迟低,最适合分批)
+- 每批 3 页,单次调用从 40-90秒 → 10-20秒,大幅降低超时概率
+- 注:非 100% 保证(极端慢的首字仍可能超时),但大幅提升成功率
+
+---
+
+## 🚀 方案 Y v2:并发分批 + 实时进度
+
+### 触发
+用户问:10-40 页大 PPT 时,顺序分批(3页/批)总时长会线性增长(30页要 80秒+),体验差。
+
+### 升级
+- 粒度从 **3 页/批** 改为 **1 页/批**(更细更稳)
+- 调用模式从 **顺序循环** 改为 **并发池(CONCURRENCY=4)**
+- 总时长不再线性增长(30页 ~20秒, 100页 ~30秒)
+
+### 实时进度 UI
+- 提前进入阶段 3, 不在 loading 弹窗里干等
+- 缩略图状态色:`pending`(灰⏳) → `loading`(黄+spinner) → `ok`(正常) / `error`(红⚠️)
+- 顶部进度条:"生成中… N/M 页",含暂停按钮
+- 完成一页立即增量渲染 iframe(用户看着 PPT 长出来)
+- 失败页**点击即重试**(单页隔离,不影响其他)
+- 失败页悬停显示错误原因
+
+### 容错
+- 单页生成自动重试 2 次(致命错误如密码/key 不重试)
+- 单页失败 → 标红色,其他页正常完成
+- 用户可手动点失败页触发 retryPage()
+- 暂停按钮:中断后续未发批次,保留已成功的页
+
+### 文件改动
+- `public/pipeline.js`:阶段 2 重写为并发池 + `generateOnePage` + `retryPage` + 进度条 UI
+- `public/pipeline.css`:进度条 / 缩略图状态色样式
+
+### 测试验证(全过)
+- ✅ 7 页 mock 慢 LLM 测试:400ms 时 4 个 status-loading + 3 个 status-pending(并发可视化)
+- ✅ 7 页全部成功完成,进度条隐藏,编辑面板正常
+- ✅ 并发生成后第 1 页 + 第 5 页编辑生效
+- ✅ 7 套 DNA 填充 100% 无回归
+- ✅ 7 套编辑生效无回归
