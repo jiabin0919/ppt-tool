@@ -9,8 +9,13 @@
  *     userPrompt: '...',
  *     temperature: 0.3,
  *     maxTokens: 8000,
+ *     onProgress: (partialText, deltaText) => { ... },  // 可选: 流式进度回调
  *   });
  *   // result: { ok, content, usage } 或 { ok: false, error, ... }
+ *
+ * 关键: 默认走流式 (SSE), 解决 Netlify 10 秒超时。
+ *   只要 LLM 首 token 在 10 秒内开始吐, 后续边流边收, 整个长生成不会被掐断。
+ *   传 onProgress 能看到实时生成进度(打字机效果)。
  *
  * 本地开发时(没有 Netlify Functions),会返回模拟响应,方便 UI 调试
  */
@@ -26,6 +31,8 @@ async function llmCall({
   temperature = 0.3,
   maxTokens = 8000,
   responseFormat,
+  onProgress, // 可选: (fullText, deltaText) => void, 传了就显示流式进度
+  stream = true, // 默认流式
 }) {
   const msgs = messages || [
     ...(systemPrompt ? [{ role: "system", content: systemPrompt }] : []),
@@ -35,6 +42,35 @@ async function llmCall({
   const isLocal = window.location.hostname === "localhost" ||
                   window.location.hostname === "127.0.0.1";
 
+  // 本地环境直接用 mock (没有 Netlify Functions)
+  if (isLocal) {
+    // 探测一下 functions 是否可用; 不可用就 mock
+    try {
+      const probe = await fetch(LLM_PROXY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model, password, messages: msgs, stream: false,
+          temperature, max_tokens: maxTokens }),
+      });
+      if (!probe.ok) {
+        console.warn("[llm-client] 本地 /api/llm-proxy 返回", probe.status, "→ mock");
+        return mockResponse(systemPrompt, userPrompt, messages);
+      }
+      // 本地 functions 可用(netlify dev), 用非流式拿结果
+      const data = await probe.json();
+      return data;
+    } catch (err) {
+      console.warn("[llm-client] 本地 fetch 失败, 用 mock:", err.message);
+      return mockResponse(systemPrompt, userPrompt, messages);
+    }
+  }
+
+  // 生产环境
+  if (!stream) {
+    return llmCallNonStream({ model, password, msgs, temperature, maxTokens, responseFormat });
+  }
+
+  // === 流式调用 ===
   try {
     const res = await fetch(LLM_PROXY_URL, {
       method: "POST",
@@ -46,16 +82,12 @@ async function llmCall({
         temperature,
         max_tokens: maxTokens,
         response_format: responseFormat,
+        stream: true,
       }),
     });
 
     if (!res.ok) {
-      // 本地 server 没有 Functions, 会返回 404/405 等
-      if (isLocal) {
-        console.warn("[llm-client] /api/llm-proxy returned", res.status, "→ 用 mock 响应");
-        return mockResponse(systemPrompt, userPrompt, messages);
-      }
-      // 生产: 返回错误给上层
+      // 错误是普通 JSON (不是流)
       let errBody = {};
       try { errBody = await res.json(); } catch (e) {}
       return {
@@ -66,18 +98,97 @@ async function llmCall({
       };
     }
 
-    const data = await res.json();
-    return data;
-  } catch (err) {
-    if (isLocal) {
-      console.warn("[llm-client] fetch 失败, 用 mock 响应:", err.message);
-      return mockResponse(systemPrompt, userPrompt, messages);
+    // 读 SSE 流
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let fullContent = "";
+    let doneInfo = null;
+    let errorInfo = null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+
+      // 按 SSE 行分割: 每条以 "data: " 开头, "\n\n" 结尾
+      const lines = buffer.split("\n\n");
+      buffer = lines.pop() || ""; // 最后一段可能不完整, 留到下次
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith("data:")) continue;
+        const jsonStr = trimmed.slice(5).trim();
+        if (!jsonStr) continue;
+
+        let evt;
+        try { evt = JSON.parse(jsonStr); } catch (e) { continue; }
+
+        if (evt.type === "delta") {
+          fullContent += evt.content;
+          if (onProgress) {
+            try { onProgress(fullContent, evt.content); } catch (e) {}
+          }
+        } else if (evt.type === "done") {
+          doneInfo = evt;
+        } else if (evt.type === "error") {
+          errorInfo = evt;
+        }
+      }
     }
+
+    if (errorInfo) {
+      return {
+        ok: false,
+        error: errorInfo.error || "llm_call_failed",
+        message: errorInfo.message || "流式生成出错",
+        partialContent: fullContent, // 把已生成的部分也带回, 方便诊断
+      };
+    }
+
+    return {
+      ok: true,
+      content: fullContent,
+      model: doneInfo?.model,
+      modelKey: doneInfo?.modelKey,
+      displayName: doneInfo?.displayName,
+      usage: doneInfo?.usage || {},
+    };
+  } catch (err) {
     return {
       ok: false,
       error: "network_error",
       message: err.message,
     };
+  }
+}
+
+// 非流式调用(兼容/备用)
+async function llmCallNonStream({ model, password, msgs, temperature, maxTokens, responseFormat }) {
+  try {
+    const res = await fetch(LLM_PROXY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model, password, messages: msgs, temperature,
+        max_tokens: maxTokens, response_format: responseFormat,
+        stream: false,
+      }),
+    });
+    if (!res.ok) {
+      let errBody = {};
+      try { errBody = await res.json(); } catch (e) {}
+      return {
+        ok: false,
+        error: errBody.error || `http_${res.status}`,
+        message: errBody.message || res.statusText,
+        status: res.status,
+      };
+    }
+    return await res.json();
+  } catch (err) {
+    return { ok: false, error: "network_error", message: err.message };
   }
 }
 
@@ -87,6 +198,28 @@ async function llmCall({
  * 判断逻辑用 systemPrompt 中的 skill 名 (而不是 userPrompt), 因为
  * userPrompt 两个 skill 都会包含 "planning.md", 无法区分
  */
+// 为分批模式生成 mock YAML(按页码返回对应页)
+function buildMockBatchYaml(slideNums) {
+  // capsule 的几个代表 variant 循环用
+  const variants = [
+    { id: 'COV-A', role: 'cover', slots: `      slot-title: "第{N}页·封面标题"\n      slot-subtitle: "副标题示例"` },
+    { id: 'CLX-A', role: 'climax', slots: `      slot-title: "第{N}页·关键指标"\n      m-eyebrow: "→ KEY METRICS"` },
+    { id: 'S-A', role: 'support', slots: `      slot-title: "第{N}页·三大能力"` },
+    { id: 'CLO-A', role: 'closing', slots: `      slot-title: "第{N}页·总结"\n      slot-subtitle: "谢谢"` },
+  ];
+  let yaml = 'global:\n  dna: capsule\n  total_pages: ' + slideNums.length + '\npages:\n';
+  slideNums.forEach((n, i) => {
+    const v = variants[i % variants.length];
+    yaml += `  - slide: ${n}\n`;
+    yaml += `    variant_id: ${v.id}\n`;
+    yaml += `    page_role: ${v.role}\n`;
+    yaml += `    director_note: "mock 第 ${n} 页"\n`;
+    yaml += `    slots:\n`;
+    yaml += v.slots.replace(/\{N\}/g, n) + '\n';
+  });
+  return yaml;
+}
+
 function mockResponse(systemPrompt, userPrompt, messages) {
   const sp = systemPrompt || messages?.find(m => m.role === "system")?.content || "";
   const up = userPrompt || messages?.find(m => m.role === "user")?.content || "";
@@ -94,6 +227,17 @@ function mockResponse(systemPrompt, userPrompt, messages) {
   // 用 frontmatter "name: ppt-xxx" 精确匹配 (避免 description 里相互提到对方导致误判)
   // visual-planner 优先判断 (description 里也提到 content-planner, 但 name 字段是唯一的)
   if (sp.includes("name: ppt-visual-planner")) {
+    // 分批模式: 从 prompt 里解析"第 X, Y, Z 页", 只返回这几页
+    const slideMatch = up.match(/请只为上面列出的第\s*([\d,\s]+)\s*页生成/);
+    if (slideMatch) {
+      const slideNums = slideMatch[1].split(/[,，\s]+/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+      const batchYaml = buildMockBatchYaml(slideNums);
+      return {
+        ok: true, mocked: true, content: batchYaml,
+        model: "mock", modelKey: "mock", displayName: "Mock · visual-planner(分批)",
+        usage: {},
+      };
+    }
     return {
       ok: true,
       mocked: true,
