@@ -1,6 +1,5 @@
 {
   "schema_version": "1.2",
-
   "_usage": {
     "本文档作用": "描述 Archive DNA 的全部 61 个 variant。供 visual-planner skill 在为 PPT 每一页选 variant 时查询。",
     "消费方": [
@@ -22,12 +21,15 @@
       "如果所有 variant 都不合适, 在 yaml 的 review_comments 里如实说明, 不要硬塞"
     ]
   },
-
   "_type_definitions": {
     "纯文本": {
       "格式": "字符串, 不含任何 HTML 标签",
       "示例": "2025 中国新能源汽车年度观察",
-      "禁止": ["<em>...</em>", "<br>", "**markdown**"]
+      "禁止": [
+        "<em>...</em>",
+        "<br>",
+        "**markdown**"
+      ]
     },
     "富文本": {
       "格式": "字符串, 允许以下 HTML 标签",
@@ -40,29 +42,52 @@
         "<span class='unit'>...</span>": "数字后小单位"
       },
       "示例": "渗透率<em>40.9%</em>的历史性拐点",
-      "禁止": ["除上述外的 HTML 标签", "嵌套 HTML", "markdown 语法"]
+      "禁止": [
+        "除上述外的 HTML 标签",
+        "嵌套 HTML",
+        "markdown 语法"
+      ]
     },
     "组合字段": {
       "格式": "JSON 对象, 有多个固定子字段",
-      "示例": {"label": "市场规模", "value": "1285万辆"},
+      "示例": {
+        "label": "市场规模",
+        "value": "1285万辆"
+      },
       "说明": "每个子字段在 variant 的 slots 定义里详细说明"
     },
     "同质列表": {
       "格式": "JSON 数组, 每项是字符串",
-      "示例": ["渗透率突破 40%", "出口同比 +71%", "动力电池 TOP3 中国占 2"],
+      "示例": [
+        "渗透率突破 40%",
+        "出口同比 +71%",
+        "动力电池 TOP3 中国占 2"
+      ],
       "说明": "用于一组同类型简单项"
     },
     "重复列表": {
       "格式": "JSON 对象数组, 每项是一个对象",
       "示例": [
-        {"item-label": "DRIVER 01", "item-title": "渗透率拐点", "item-desc": "..."},
-        {"item-label": "DRIVER 02", "item-title": "自主份额", "item-desc": "..."}
+        {
+          "item-label": "DRIVER 01",
+          "item-title": "渗透率拐点",
+          "item-desc": "..."
+        },
+        {
+          "item-label": "DRIVER 02",
+          "item-title": "自主份额",
+          "item-desc": "..."
+        }
       ],
       "说明": "用于一组异质项, 每项含多字段。featured 项用 _featured: true 标记"
     },
     "图片": {
       "格式": "JSON 对象",
-      "示例": {"url": "https://picsum.photos/seed/cars/1280/720", "alt": "新能源车流", "image_fit": "cover"},
+      "示例": {
+        "url": "https://picsum.photos/seed/cars/1280/720",
+        "alt": "新能源车流",
+        "image_fit": "cover"
+      },
       "image_fit 枚举值": {
         "cover": "填满容器, 居中裁切, 不变形 - 适合摄影 / 风景",
         "contain": "完整显示, 周围 padding - 适合产品图 / logo",
@@ -74,14 +99,32 @@
       "格式": "JSON 对象",
       "示例": {
         "type": "line",
-        "x_labels": ["Q1", "Q2", "Q3", "Q4"],
-        "primary": {"label": "销量(万辆)", "data": [25, 32, 42, 50]}
+        "x_labels": [
+          "Q1",
+          "Q2",
+          "Q3",
+          "Q4"
+        ],
+        "primary": {
+          "label": "销量(万辆)",
+          "data": [
+            25,
+            32,
+            42,
+            50
+          ]
+        }
       },
-      "type 枚举值 (封闭)": ["line", "bar", "bar-line-combo", "doughnut", "pie"],
+      "type 枚举值 (封闭)": [
+        "line",
+        "bar",
+        "bar-line-combo",
+        "doughnut",
+        "pie"
+      ],
       "禁止": "不要用枚举外的类型, 渲染器没桥接会画空白"
     }
   },
-
   "_fallback_rules": {
     "内容项数超过最多": {
       "处理": "拆成两页, 第二页用相同 variant",
@@ -104,9 +147,7 @@
       "底线": "不能为了塞内容而违反字数限制"
     }
   },
-
   "_yaml_example_text": "# Archive DNA · visual_plan.yaml 示例\n\nglobal:\n  dna: \"archive\"\n  total_pages: 20\n  review_comments: |\n    20 页, 17 个不同 variant\n    高潮: 2 个 climax (P2 CLX-A · 40.9%, P8 CLX-C · 双数字)\n    Gallery: 1 个 (P10 H3)\n\npages:\n  - slide: 1\n    variant_id: \"COV-A\"\n    page_role: \"cover\"\n    director_note: |\n      【情绪定调】权威庄重\n      【内容载体】全出血图 + 左下文字\n      【视觉主角】slot-title-zh 中文主标\n      【空间分配】骨架默认\n      【演讲配合】无动画\n    slots:\n      slot-eyebrow: \"[ ANNUAL OBSERVATION · 2025 ]\"\n      slot-title-en: \"THE YEAR OF<br>EXECUTION\"\n      slot-title-zh: \"2025 中国新能源汽车<em>年度观察</em>\"\n      slot-cover-meta:\n        - \"DATA-DRIVEN · APRIL 2026\"\n        - \"60 PAGES · 32 CHARTS\"\n        - \"BY ARCHIVE RESEARCH\"\n      img-full:\n        url: \"https://picsum.photos/seed/ev-highway/1280/720\"\n        alt: \"新能源汽车高速车流\"\n        image_fit: \"cover\"\n\n  - slide: 4\n    variant_id: \"S-A\"\n    page_role: \"support\"\n    director_note: |\n      【情绪定调】冷静客观\n      【内容载体】左折线图 + 右 3 条增长驱动力\n      【视觉主角】左侧折线图\n      【空间分配】7:3 强调图表\n      【演讲配合】图表先出, 三条要点依次淡入\n    slots:\n      slot-title-en: \"GROWTH<br>DRIVERS\"\n      slot-title-zh: \"核心增长驱动力分析\"\n      slot-chart:\n        type: \"line\"\n        x_labels: [\"Q1\", \"Q2\", \"Q3\", \"Q4\", \"Q5\", \"Q6\", \"Q7\"]\n        primary: {label: \"月度销量(万辆)\", data: [25, 32, 38, 42, 50, 58, 65]}\n        fill: true\n      slot-item-list:\n        - item-label: \"[ DRIVER 01 ]\"\n          item-title: \"渗透率突破拐点\"\n          item-desc: \"年渗透率从 28% 跃升至 40.9%。\"\n        - item-label: \"[ DRIVER 02 ]\"\n          item-title: \"自主品牌份额\"\n          item-desc: \"TOP5 自主份额达 67%。\"\n        - item-label: \"[ DRIVER 03 ]\"\n          item-title: \"出口成第二曲线\"\n          item-desc: \"2024 年出口 127 万辆, 同比 +71%。\"\n      slot-source: \"数据来源: 中汽协, 2026.03\"\n",
-
   "dna": {
     "id": "archive",
     "name": "Archive",
@@ -126,7 +167,19 @@
       "设计工作室作品集(用 Studio)",
       "生活方式 / 慢节奏(用 Macaron)"
     ],
-    "关注词": ["咨询", "研报", "投资", "智库", "数据", "图表", "学术", "MBB", "BCG", "Bain", "Mckinsey"],
+    "关注词": [
+      "咨询",
+      "研报",
+      "投资",
+      "智库",
+      "数据",
+      "图表",
+      "学术",
+      "MBB",
+      "BCG",
+      "Bain",
+      "Mckinsey"
+    ],
     "_renderer": {
       "skeleton_file": "skeleton_demo.html",
       "preview_image": "archive_post_cleanup_61variants.png"
@@ -135,30 +188,91 @@
     "创建时间": "2026-04-25",
     "版本": "1.0"
   },
-
   "skins": [
-    {"id": "tech", "name": "Tech · 科技蓝", "is_default": true,
-     "色块预览": {"底色": "#FAFAFA", "正文色": "#0A0A0B", "品牌色": "#0066FF"}},
-    {"id": "finance", "name": "Finance · 金融金",
-     "色块预览": {"底色": "#FAFAFA", "正文色": "#0A0A0B", "品牌色": "#C9A84C"}},
-    {"id": "consulting", "name": "Consulting · 咨询蓝",
-     "色块预览": {"底色": "#FAFAFA", "正文色": "#0A0A0B", "品牌色": "#0055B8"}},
-    {"id": "business", "name": "Business · 商务红",
-     "色块预览": {"底色": "#FAFAFA", "正文色": "#0A0A0B", "品牌色": "#D6001C"}},
-    {"id": "academic", "name": "Academic · 学术深绿",
-     "色块预览": {"底色": "#FAFAFA", "正文色": "#0A0A0B", "品牌色": "#1B4332"}},
-    {"id": "medical", "name": "Medical · 医疗青绿",
-     "色块预览": {"底色": "#FAFAFA", "正文色": "#0A0A0B", "品牌色": "#00897B"}},
-    {"id": "brand", "name": "Brand · 品牌橙",
-     "色块预览": {"底色": "#FAFAFA", "正文色": "#0A0A0B", "品牌色": "#F97316"}},
-    {"id": "dark-impact", "name": "Dark Impact · 深色冲击",
-     "色块预览": {"底色": "#0A0A0B", "正文色": "#FAFAFA", "品牌色": "#5BAAFF"}},
-    {"id": "government", "name": "Government · 政府红",
-     "色块预览": {"底色": "#FAFAFA", "正文色": "#0A0A0B", "品牌色": "#A0001A"}}
+    {
+      "id": "tech",
+      "name": "Tech · 科技蓝",
+      "is_default": true,
+      "色块预览": {
+        "底色": "#FAFAFA",
+        "正文色": "#0A0A0B",
+        "品牌色": "#0066FF"
+      }
+    },
+    {
+      "id": "finance",
+      "name": "Finance · 金融金",
+      "色块预览": {
+        "底色": "#FAFAFA",
+        "正文色": "#0A0A0B",
+        "品牌色": "#C9A84C"
+      }
+    },
+    {
+      "id": "consulting",
+      "name": "Consulting · 咨询蓝",
+      "色块预览": {
+        "底色": "#FAFAFA",
+        "正文色": "#0A0A0B",
+        "品牌色": "#0055B8"
+      }
+    },
+    {
+      "id": "business",
+      "name": "Business · 商务红",
+      "色块预览": {
+        "底色": "#FAFAFA",
+        "正文色": "#0A0A0B",
+        "品牌色": "#D6001C"
+      }
+    },
+    {
+      "id": "academic",
+      "name": "Academic · 学术深绿",
+      "色块预览": {
+        "底色": "#FAFAFA",
+        "正文色": "#0A0A0B",
+        "品牌色": "#1B4332"
+      }
+    },
+    {
+      "id": "medical",
+      "name": "Medical · 医疗青绿",
+      "色块预览": {
+        "底色": "#FAFAFA",
+        "正文色": "#0A0A0B",
+        "品牌色": "#00897B"
+      }
+    },
+    {
+      "id": "brand",
+      "name": "Brand · 品牌橙",
+      "色块预览": {
+        "底色": "#FAFAFA",
+        "正文色": "#0A0A0B",
+        "品牌色": "#F97316"
+      }
+    },
+    {
+      "id": "dark-impact",
+      "name": "Dark Impact · 深色冲击",
+      "色块预览": {
+        "底色": "#0A0A0B",
+        "正文色": "#FAFAFA",
+        "品牌色": "#5BAAFF"
+      }
+    },
+    {
+      "id": "government",
+      "name": "Government · 政府红",
+      "色块预览": {
+        "底色": "#FAFAFA",
+        "正文色": "#0A0A0B",
+        "品牌色": "#A0001A"
+      }
+    }
   ],
-
   "variants": [
-
     {
       "id": "COV-A",
       "page_role": "cover",
@@ -168,21 +282,55 @@
         "需要居中仪式感大字 → 用 COV-B",
         "咨询研报风分栏 → 用 COV-C"
       ],
-      "_renderer": {"dom_selector": ".variant-cov-a"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
+      "_renderer": {
+        "dom_selector": ".variant-cov-a"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
       "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "描述": "顶部小标签", "最大字数": 40, "示例": "[ ANNUAL OBSERVATION · 2025 ]"},
-        "slot-cover-tag": {"类型": "纯文本", "描述": "封面分类 tag", "最大字数": 30, "示例": "INDUSTRY REPORT"},
-        "slot-title-en": {"类型": "富文本", "描述": "英文主标, 支持 <br>", "最大字数": 40, "示例": "THE YEAR OF<br>EXECUTION"},
-        "slot-title-zh": {"类型": "富文本", "描述": "中文主标, 支持 <em>", "最大字数": 30, "示例": "2025 中国新能源汽车<em>年度观察</em>"},
-        "slot-cover-meta": {"类型": "同质列表", "描述": "底部 meta 行(2-3 行)", "项数": "2-3", "示例": ["DATA-DRIVEN · APRIL 2026", "60 PAGES · 32 CHARTS", "BY ARCHIVE RESEARCH"]}
+        "slot-cover-text": {
+          "类型": "富文本",
+          "最大字数": 179,
+          "示例": "[ 2024 ANNUAL REPORT ]\nCHINA EV MARKETDE"
+        },
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 33,
+          "示例": "[ 2024 ANNUAL REPORT ]",
+          "描述": "顶部小标签"
+        },
+        "slot-title-en": {
+          "类型": "富文本",
+          "最大字数": 42,
+          "示例": "CHINA EV MARKETDEEP RESEARCH",
+          "描述": "英文主标, 支持 <br>"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 32,
+          "示例": "2024 年中国新能源汽车行业深度研究报告",
+          "描述": "中文主标, 支持 <em>"
+        },
+        "slot-meta": {
+          "类型": "纯文本",
+          "最大字数": 68,
+          "示例": "[ PREPARED BY RESEARCH TEAM · DECEMBER 2"
+        }
       },
       "图片占位": [
-        {"yaml key": "img-full", "数量": 1, "默认 image_fit": "cover", "描述": "全出血封面图, 用 cover 填满"}
+        {
+          "yaml key": "img-full",
+          "数量": 1,
+          "默认 image_fit": "cover",
+          "描述": "全出血封面图, 用 cover 填满"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "COV-B",
       "page_role": "cover",
@@ -192,19 +340,47 @@
         "叙事感, 左下文字 → 用 COV-A",
         "咨询分栏 → 用 COV-C"
       ],
-      "_renderer": {"dom_selector": ".variant-cov-b"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
+      "_renderer": {
+        "dom_selector": ".variant-cov-b"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
       "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "最大字数": 50, "示例": "[ 2025 ANNUAL REPORT · CHINA EV INDUSTRY ]"},
-        "slot-title-en": {"类型": "富文本", "描述": "英文主标, 居中, 支持 <br>", "最大字数": 30, "示例": "INFLECTION<br>POINT"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "结构性<em>拐点</em>"}
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 38,
+          "示例": "[ BRAND STRATEGY · 2025 ]"
+        },
+        "slot-title-en": {
+          "类型": "富文本",
+          "最大字数": 23,
+          "示例": "THE NEXTCHAPTER",
+          "描述": "英文主标, 居中, 支持 <br>"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "下一个十年的战略蓝图"
+        },
+        "slot-meta": {
+          "类型": "纯文本",
+          "最大字数": 68,
+          "示例": "[ PREPARED FOR BOARD OF DIRECTORS · Q1 2"
+        }
       },
       "图片占位": [
-        {"yaml key": "img-full", "数量": 1, "默认 image_fit": "cover"}
+        {
+          "yaml key": "img-full",
+          "数量": 1,
+          "默认 image_fit": "cover"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "COV-C",
       "page_role": "cover",
@@ -215,30 +391,50 @@
         "中心大字 → 用 COV-B"
       ],
       "_renderer": {
-        "dom_selector": ".variant-cov-c",
-        "items_dom_selector": ".meta-item",
-        "items_count": 3
+        "dom_selector": ".variant-cov-c"
       },
-      "数量约束": {"类型": "范围内", "最少": 2, "最多": 4, "默认": 3, "支持自适应": true, "对象描述": "底部 meta 行"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 4,
+        "默认": 3,
+        "支持自适应": true,
+        "对象描述": "底部 meta 行"
+      },
       "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "最大字数": 40, "示例": "[ CHINA EV · ANNUAL OBSERVATION 2025 ]"},
-        "slot-cover-tag": {"类型": "纯文本", "最大字数": 30, "示例": "STRATEGIC REPORT"},
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "EXECUTION<br>YEAR"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "执行之年<em>2025</em>"},
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 32,
+          "示例": "[ CONSULTING REPORT ]"
+        },
+        "slot-title-en": {
+          "类型": "富文本",
+          "最大字数": 45,
+          "示例": "STRATEGICTRANSFORMATIONROADMAP"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 36,
+          "示例": "战略转型路线图：从规模扩张到价值深耕的系统性重构"
+        },
         "slot-meta-item": {
-          "类型": "重复列表", "项数": "2-4",
-          "每项字段": {
-            "label": {"类型": "纯文本", "最大字数": 16, "示例": "AUTHOR"},
-            "value": {"类型": "纯文本", "最大字数": 30, "示例": "ARCHIVE RESEARCH"}
-          }
+          "类型": "纯文本",
+          "最大字数": 51,
+          "示例": "[ CLIENT: FORTUNE 500 ENTERPRISE ]"
         }
       },
       "图片占位": [
-        {"yaml key": "img-panel", "数量": 1, "默认 image_fit": "cover", "描述": "右侧 40% 图片面板"}
+        {
+          "yaml key": "img-panel",
+          "数量": 1,
+          "默认 image_fit": "cover",
+          "描述": "右侧 40% 图片面板"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "OUT-A",
       "page_role": "outline",
@@ -249,26 +445,108 @@
         "议题型横向铺陈 → 用 OUT-C"
       ],
       "_renderer": {
-        "dom_selector": ".variant-out-a",
-        "items_dom_selector": ".out-row",
-        "items_count": 5
+        "dom_selector": ".variant-out-a"
       },
-      "数量约束": {"类型": "范围内", "最少": 4, "最多": 9, "默认": 5, "支持自适应": true, "CSS 变量": "--rows", "对象描述": "目录行"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 4,
+        "最多": 9,
+        "默认": 5,
+        "支持自适应": true,
+        "CSS 变量": "--rows",
+        "对象描述": "目录行"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "CONTENTS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "目录"},
-        "slot-out-rows": {
-          "类型": "重复列表", "项数": "4-9",
-          "每项字段": {
-            "slot-n": {"类型": "纯文本", "最大字数": 6, "示例": "01"},
-            "slot-t": {"类型": "纯文本", "最大字数": 30, "示例": "市场全景"},
-            "slot-p": {"类型": "纯文本", "最大字数": 8, "示例": "P. 04"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "TABLE OF CONTENTS"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "本期报告 · 目录"
+        },
+        "slot-n1": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "CHAPTER 01"
+        },
+        "slot-t1": {
+          "类型": "纯文本",
+          "最大字数": 11,
+          "示例": "市场结构性巨变"
+        },
+        "slot-p1": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "P. 03 - 12"
+        },
+        "slot-n2": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "CHAPTER 02"
+        },
+        "slot-t2": {
+          "类型": "纯文本",
+          "最大字数": 12,
+          "示例": "三条出海路径分化"
+        },
+        "slot-p2": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "P. 13 - 22"
+        },
+        "slot-n3": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "CHAPTER 03"
+        },
+        "slot-t3": {
+          "类型": "纯文本",
+          "最大字数": 11,
+          "示例": "系统性壁垒诊断"
+        },
+        "slot-p3": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "P. 23 - 34"
+        },
+        "slot-n4": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "CHAPTER 04"
+        },
+        "slot-t4": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "2026 战略选择"
+        },
+        "slot-p4": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "P. 35 - 44"
+        },
+        "slot-n5": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "CHAPTER 05"
+        },
+        "slot-t5": {
+          "类型": "纯文本",
+          "最大字数": 11,
+          "示例": "建议与行动清单"
+        },
+        "slot-p5": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "P. 45 - 50"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "OUT-B",
       "page_role": "outline",
@@ -279,26 +557,92 @@
         "议题型横向铺陈 → 用 OUT-C"
       ],
       "_renderer": {
-        "dom_selector": ".variant-out-b",
-        "items_dom_selector": ".out-card",
-        "items_count": 4
+        "dom_selector": ".variant-out-b"
       },
-      "数量约束": {"类型": "范围内", "最少": 3, "最多": 7, "默认": 4, "支持自适应": true, "对象描述": "目录卡"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 3,
+        "最多": 7,
+        "默认": 4,
+        "支持自适应": true,
+        "对象描述": "目录卡"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "REPORT STRUCTURE"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "报告结构"},
-        "slot-out-cards": {
-          "类型": "重复列表", "项数": "3-7",
-          "每项字段": {
-            "slot-n": {"类型": "纯文本", "最大字数": 6, "示例": "01"},
-            "slot-t": {"类型": "纯文本", "最大字数": 20, "示例": "市场全景"},
-            "slot-d": {"类型": "纯文本", "最大字数": 60, "示例": "1285万辆销量背后的结构性变化与拐点信号"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 24,
+          "示例": "CHAPTER OVERVIEW"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "本期议程"
+        },
+        "slot-n1": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "CH 01"
+        },
+        "slot-t1": {
+          "类型": "纯文本",
+          "最大字数": 11,
+          "示例": "市场结构性巨变"
+        },
+        "slot-d1": {
+          "类型": "纯文本",
+          "最大字数": 48,
+          "示例": "出口量、单价、出口结构 —— 三大维度看 NEV 出海完成质变。"
+        },
+        "slot-n2": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "CH 02"
+        },
+        "slot-t2": {
+          "类型": "纯文本",
+          "最大字数": 9,
+          "示例": "三条出海路径"
+        },
+        "slot-d2": {
+          "类型": "纯文本",
+          "最大字数": 42,
+          "示例": "比亚迪 / 奇瑞 / 新势力 —— 同样出海，三种结局。"
+        },
+        "slot-n3": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "CH 03"
+        },
+        "slot-t3": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "系统性壁垒"
+        },
+        "slot-d3": {
+          "类型": "纯文本",
+          "最大字数": 44,
+          "示例": "关税 / 碳税 / 本地化 / 补贴退坡 —— 四个变量。"
+        },
+        "slot-n4": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "CH 04"
+        },
+        "slot-t4": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "2026 战略选择"
+        },
+        "slot-d4": {
+          "类型": "纯文本",
+          "最大字数": 30,
+          "示例": "本地化、合作还是收缩 —— 二选一时刻。"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "OUT-C",
       "page_role": "outline",
@@ -309,26 +653,107 @@
         "需要详细描述的双栏 → 用 OUT-B"
       ],
       "_renderer": {
-        "dom_selector": ".variant-out-c",
-        "items_dom_selector": ".out-spread-card",
-        "items_count": 5
+        "dom_selector": ".variant-out-c"
       },
-      "数量约束": {"类型": "范围内", "最少": 4, "最多": 7, "默认": 5, "支持自适应": true, "对象描述": "横向卡片"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 4,
+        "最多": 7,
+        "默认": 5,
+        "支持自适应": true,
+        "对象描述": "横向卡片"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "5 TOPICS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "5 个议题"},
-        "slot-out-spread-cards": {
-          "类型": "重复列表", "项数": "4-7",
-          "每项字段": {
-            "slot-n": {"类型": "纯文本", "最大字数": 6, "示例": "01"},
-            "slot-t": {"类型": "纯文本", "最大字数": 16, "示例": "市场拐点"},
-            "slot-d": {"类型": "纯文本", "最大字数": 30, "示例": "渗透率突破 40%"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 17,
+          "示例": "FIVE TOPICS"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "五个议题"
+        },
+        "slot-n1": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "01·"
+        },
+        "slot-t1": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "市场质变"
+        },
+        "slot-d1": {
+          "类型": "纯文本",
+          "最大字数": 17,
+          "示例": "三年 CAGR 78%"
+        },
+        "slot-n2": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "02·"
+        },
+        "slot-t2": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "路径分化"
+        },
+        "slot-d2": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "BYD / Chery / 新势力"
+        },
+        "slot-n3": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "03·"
+        },
+        "slot-t3": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "系统壁垒"
+        },
+        "slot-d3": {
+          "类型": "纯文本",
+          "最大字数": 20,
+          "示例": "关税 + 碳税 + 本地化"
+        },
+        "slot-n4": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "04·"
+        },
+        "slot-t4": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "战略选择"
+        },
+        "slot-d4": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "本地化 vs 合作 vs 收缩"
+        },
+        "slot-n5": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "05·"
+        },
+        "slot-t5": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "行动建议"
+        },
+        "slot-d5": {
+          "类型": "纯文本",
+          "最大字数": 12,
+          "示例": "90 天关键动作"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CB-A",
       "page_role": "chapter_break",
@@ -338,22 +763,47 @@
         "全出血图 + 左下叙事文字 → 用 CB-B",
         "无图纯文字 → 用 CB-C/D/E"
       ],
-      "_renderer": {"dom_selector": ".variant-cb-a"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
+      "_renderer": {
+        "dom_selector": ".variant-cb-a"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
       "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "最大字数": 30, "示例": "[ CHAPTER 02 ]"},
-        "slot-cb-tag": {"类型": "纯文本", "最大字数": 30, "示例": "MARKET STRUCTURE"},
-        "slot-chapter-num": {"类型": "纯文本", "描述": "巨型章节号", "最大字数": 4, "示例": "02"},
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "MARKET<br>STRUCTURE"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "市场<em>结构</em>"},
-        "slot-insight": {"类型": "纯文本", "最大字数": 60, "示例": "结构性变化背后的三个信号"}
+        "slot-chapter-num": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "01",
+          "描述": "巨型章节号"
+        },
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "[ CHAPTER ONE ]"
+        },
+        "slot-title-en": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "MARKET SCALE& GROWTH"
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "从 5% 到 40%，中国用了五年"
+        }
       },
       "图片占位": [
-        {"yaml key": "img-full", "数量": 1, "默认 image_fit": "cover"}
+        {
+          "yaml key": "img-full",
+          "数量": 1,
+          "默认 image_fit": "cover"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CB-B",
       "page_role": "chapter_break",
@@ -363,21 +813,41 @@
         "居中庄重 → 用 CB-A",
         "无图 → 用 CB-C/D/E"
       ],
-      "_renderer": {"dom_selector": ".variant-cb-b"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
+      "_renderer": {
+        "dom_selector": ".variant-cb-b"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
       "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "最大字数": 30, "示例": "[ CHAPTER 03 · COMPETITION ]"},
-        "slot-cb-tag": {"类型": "纯文本", "最大字数": 30, "示例": "COMPETITIVE LANDSCAPE"},
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "WHO WINS<br>THE RACE"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "谁在<em>领跑</em>"},
-        "slot-insight": {"类型": "纯文本", "最大字数": 80, "示例": "TOP5 自主品牌份额 67%, 集中度持续提升"}
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "[ CHAPTER TWO ]"
+        },
+        "slot-title-en": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "COMPETITIVELANDSCAPE"
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 29,
+          "示例": "一超多强格局已定，自主品牌份额 82%"
+        }
       },
       "图片占位": [
-        {"yaml key": "img-full", "数量": 1, "默认 image_fit": "cover"}
+        {
+          "yaml key": "img-full",
+          "数量": 1,
+          "默认 image_fit": "cover"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CB-C",
       "page_role": "chapter_break",
@@ -388,19 +858,40 @@
         "大字版冲击 → 用 CB-D",
         "侧栏数字 → 用 CB-E"
       ],
-      "_renderer": {"dom_selector": ".variant-cb-c"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
-      "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "最大字数": 30, "示例": "[ CHAPTER 04 ]"},
-        "slot-cb-tag": {"类型": "纯文本", "最大字数": 30, "示例": "POLICY DYNAMICS"},
-        "slot-chapter-num": {"类型": "纯文本", "描述": "极大水印数字", "最大字数": 4, "示例": "04"},
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "POLICY<br>DYNAMICS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "政策<em>动向</em>"},
-        "slot-insight": {"类型": "纯文本", "最大字数": 60, "示例": "补贴退坡后的市场化竞争"}
+      "_renderer": {
+        "dom_selector": ".variant-cb-c"
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-chapter-num": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "03",
+          "描述": "极大水印数字"
+        },
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "[ CHAPTER THREE ]"
+        },
+        "slot-title-en": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "TECHNOLOGYDISRUPTION"
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "固态电池量产，下一个颠覆点已经到来"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CB-D",
       "page_role": "chapter_break",
@@ -410,17 +901,30 @@
         "需要章节号 → 用 CB-A/B/C",
         "侧栏数字 → 用 CB-E"
       ],
-      "_renderer": {"dom_selector": ".variant-cb-d"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
-      "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "最大字数": 30, "示例": "[ TURNING POINT ]"},
-        "slot-cb-tag": {"类型": "纯文本", "最大字数": 30, "示例": "ONE BIG CALL"},
-        "slot-title-en": {"类型": "富文本", "描述": "可用 <span class='outline-word'>X</span> 做空心描边", "最大字数": 30, "示例": "<span class='outline-word'>INFLECTION</span><br>POINT"},
-        "slot-insight": {"类型": "纯文本", "最大字数": 80, "示例": "我们认为 2025 是不可逆转的拐点之年"}
+      "_renderer": {
+        "dom_selector": ".variant-cb-d"
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 24,
+          "示例": "[ CHAPTER FOUR ]"
+        },
+        "slot-title-en": {
+          "类型": "富文本",
+          "最大字数": 23,
+          "示例": "THETURNINGPOINT",
+          "描述": "可用 <span class='outline-word'>X</span> 做空心描边"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CB-E",
       "page_role": "chapter_break",
@@ -430,20 +934,45 @@
         "全出血图 → 用 CB-A/B",
         "水印数字 → 用 CB-C"
       ],
-      "_renderer": {"dom_selector": ".variant-cb-e"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
-      "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "最大字数": 30, "示例": "[ CHAPTER 05 ]"},
-        "slot-cb-tag": {"类型": "纯文本", "最大字数": 30, "示例": "OUTLOOK 2026"},
-        "slot-cb-side-num": {"类型": "纯文本", "描述": "侧栏竖排章节号", "最大字数": 4, "示例": "05"},
-        "slot-cb-side-num-text": {"类型": "纯文本", "描述": "侧栏数字下方文字", "最大字数": 30, "示例": "OUTLOOK"},
-        "slot-chapter-label": {"类型": "纯文本", "最大字数": 30, "示例": "FORWARD LOOK"},
-        "slot-title-en": {"类型": "富文本", "最大字数": 40, "示例": "WHAT'S NEXT<br>FOR 2026"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 40, "示例": "2026 的<em>关键变量</em>是什么?"}
+      "_renderer": {
+        "dom_selector": ".variant-cb-e"
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-cb-side-num": {
+          "类型": "纯文本",
+          "最大字数": 18,
+          "示例": "Chapter · 05",
+          "描述": "侧栏竖排章节号"
+        },
+        "slot-chapter-num": {
+          "类型": "纯文本",
+          "最大字数": 18,
+          "示例": "Chapter · 05"
+        },
+        "slot-chapter-label": {
+          "类型": "纯文本",
+          "最大字数": 39,
+          "示例": "[ CHAPTER FIVE · OUTLOOK ]"
+        },
+        "slot-title-en": {
+          "类型": "富文本",
+          "最大字数": 23,
+          "示例": "FUTURESCENARIOS"
+        },
+        "slot-question": {
+          "类型": "纯文本",
+          "最大字数": 81,
+          "示例": "在政策退坡、竞争加剧、技术迭代三重压力下，谁能在下一轮洗牌中存活？这一章，我们用"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLX-A",
       "page_role": "climax",
@@ -455,16 +984,45 @@
         "前后对比 → 用 CLX-D",
         "数字作背景 → 用 CLX-E"
       ],
-      "_renderer": {"dom_selector": ".variant-clx-a"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
-      "slots": {
-        "slot-corner-label": {"类型": "纯文本", "最大字数": 30, "示例": "[ HEADLINE NUMBER · 2025 ]"},
-        "slot-tyrant-number": {"类型": "富文本", "描述": "极大主数字, 含 <span class='unit'>", "最大字数": 12, "示例": "40.9<span class='unit'>%</span>"},
-        "slot-caption": {"类型": "富文本", "描述": "底部说明", "最大字数": 60, "示例": "新能源乘用车年度<em>渗透率</em>"}
+      "_renderer": {
+        "dom_selector": ".variant-clx-a"
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-number": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "40.9%"
+        },
+        "slot-caption": {
+          "类型": "富文本",
+          "最大字数": 147,
+          "示例": "[ MARKET SHARE · Q4 2024 · YOY +12.3PP ]",
+          "描述": "底部说明"
+        },
+        "slot-corner-label": {
+          "类型": "纯文本",
+          "最大字数": 33,
+          "示例": "MARKET DOMINANCE\n市场统治力"
+        },
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 24,
+          "示例": "MARKET DOMINANCE"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "市场统治力"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLX-B",
       "page_role": "climax",
@@ -474,17 +1032,40 @@
         "极简孤立大数字 → 用 CLX-A",
         "双数字 → 用 CLX-C"
       ],
-      "_renderer": {"dom_selector": ".variant-clx-b"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
-      "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "THE CLIFF"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "悬崖式拐点"},
-        "slot-cliff-number": {"类型": "富文本", "描述": "120px 大数字", "最大字数": 12, "示例": "+71<span class='unit'>%</span>"},
-        "slot-caption": {"类型": "富文本", "描述": "情绪化解读", "最大字数": 80, "示例": "2024 出口 127 万辆, 同比 <em>+71%</em>, 我们正站在第二曲线的起点"}
+      "_renderer": {
+        "dom_selector": ".variant-clx-b"
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-caption": {
+          "类型": "纯文本",
+          "最大字数": 80,
+          "示例": "THE TURNING POINT\n这不是一个普通的数字。这是我们用三年时间，从",
+          "描述": "情绪化解读"
+        },
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "THE TURNING POINT"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 53,
+          "示例": "这不是一个普通的数字。这是我们用三年时间，从 0 开始建立起来的壁垒。"
+        },
+        "slot-number": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "40.9%"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLX-C",
       "page_role": "climax",
@@ -496,25 +1077,45 @@
         "数字作背景 → 用 CLX-E"
       ],
       "_renderer": {
-        "dom_selector": ".variant-clx-c",
-        "items_dom_selector": ".star-number",
-        "items_count": 2
+        "dom_selector": ".variant-clx-c"
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "对峙数字组"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "对峙数字组"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "TWO SIDES"},
-        "slot-stars": {
-          "类型": "重复列表", "项数": 2,
-          "每项字段": {
-            "slot-star-number": {"类型": "富文本", "描述": "大数字 + unit", "最大字数": 12, "示例": "40.9<span class='unit'>%</span>"},
-            "slot-star-label": {"类型": "纯文本", "最大字数": 20, "示例": "CHINA"},
-            "slot-star-desc": {"类型": "富文本", "最大字数": 60, "示例": "中国渗透率<em>领先</em>全球"}
-          }
+        "slot-star-a": {
+          "类型": "富文本",
+          "最大字数": 60,
+          "示例": "40.9%\n[ MARKET SHARE · US ]\n北美市场占有率，行业第一"
+        },
+        "slot-star-number": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "40.9%"
+        },
+        "slot-star-label": {
+          "类型": "纯文本",
+          "最大字数": 32,
+          "示例": "[ MARKET SHARE · US ]"
+        },
+        "slot-star-desc": {
+          "类型": "纯文本",
+          "最大字数": 18,
+          "示例": "北美市场占有率，行业第一"
+        },
+        "slot-star-b": {
+          "类型": "富文本",
+          "最大字数": 57,
+          "示例": "17.1%\n[ MARKET SHARE · EU ]\n欧洲市场，下一个战场"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLX-D",
       "page_role": "climax",
@@ -525,25 +1126,45 @@
         "双方对峙 → 用 CLX-C"
       ],
       "_renderer": {
-        "dom_selector": ".variant-clx-d",
-        "items_dom_selector": ".cli-side",
-        "items_count": 2
+        "dom_selector": ".variant-clx-d"
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "前后对比块"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "前后对比块"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "BEFORE / AFTER"},
-        "slot-cli-sides": {
-          "类型": "重复列表", "项数": 2,
-          "每项字段": {
-            "slot-cli-tag": {"类型": "纯文本", "最大字数": 20, "示例": "[ 2022 ]"},
-            "slot-cli-number": {"类型": "富文本", "最大字数": 12, "示例": "12<span class='unit'>万</span>"},
-            "slot-cli-label": {"类型": "纯文本", "最大字数": 30, "示例": "出口量"}
-          }
+        "slot-side-a": {
+          "类型": "富文本",
+          "最大字数": 36,
+          "示例": "[ 2022 ]\n12%\n用户满意度每季度在救火"
+        },
+        "slot-cli-tag": {
+          "类型": "纯文本",
+          "最大字数": 12,
+          "示例": "[ 2022 ]"
+        },
+        "slot-cli-number": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "12%"
+        },
+        "slot-cli-label": {
+          "类型": "富文本",
+          "最大字数": 17,
+          "示例": "用户满意度每季度在救火"
+        },
+        "slot-side-b": {
+          "类型": "富文本",
+          "最大字数": 36,
+          "示例": "[ 2024 ]\n94%\n用户满意度系统自我运转"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLX-E",
       "page_role": "climax",
@@ -553,18 +1174,40 @@
         "纯数字主角 → 用 CLX-A",
         "双数字对峙 → 用 CLX-C"
       ],
-      "_renderer": {"dom_selector": ".variant-clx-e"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
-      "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "最大字数": 30, "示例": "[ MOMENTUM 2025 ]"},
-        "slot-fg-tag": {"类型": "纯文本", "最大字数": 30, "示例": "INFLECTION POINT"},
-        "slot-bg-number": {"类型": "富文本", "描述": "背景大数字, 占满", "最大字数": 12, "示例": "1285"},
-        "slot-headline": {"类型": "富文本", "最大字数": 50, "示例": "<em>1285 万辆</em> 改变了什么?"},
-        "slot-fg-desc": {"类型": "富文本", "最大字数": 100, "示例": "全球第一大单一市场, <strong>占全球 65%</strong>"}
+      "_renderer": {
+        "dom_selector": ".variant-clx-e"
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-bg-number": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "40.9",
+          "描述": "背景大数字, 占满"
+        },
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 35,
+          "示例": "[ THE MOMENT OF TRUTH ]"
+        },
+        "slot-headline": {
+          "类型": "富文本",
+          "最大字数": 14,
+          "示例": "这个数字改变了一切"
+        },
+        "slot-desc": {
+          "类型": "纯文本",
+          "最大字数": 102,
+          "示例": "40.9% 的市场占有率，不只是一个季度的成绩。它是三年战略投入的结晶，是团队 "
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "S-A",
       "page_role": "support",
@@ -579,30 +1222,73 @@
         "纯图表主角 → 用 S-G"
       ],
       "_renderer": {
-        "dom_selector": ".variant-s-a",
-        "items_dom_selector": ".item",
-        "items_count": 3
+        "dom_selector": ".variant-s-a"
       },
-      "数量约束": {"类型": "范围内", "最少": 2, "最多": 4, "默认": 3, "支持自适应": true, "对象描述": "右侧要点列表"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 4,
+        "默认": 3,
+        "支持自适应": true,
+        "对象描述": "右侧要点列表"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "GROWTH<br>DRIVERS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "核心增长驱动力"},
-        "slot-item-list": {
-          "类型": "重复列表", "项数": "2-4",
-          "每项字段": {
-            "slot-item-label": {"类型": "纯文本", "最大字数": 24, "示例": "[ DRIVER 01 ]"},
-            "slot-item-title": {"类型": "纯文本", "最大字数": 20, "示例": "渗透率突破拐点"},
-            "slot-item-desc": {"类型": "富文本", "最大字数": 80, "示例": "年渗透率从 28% 跃升至 <em>40.9%</em>"}
-          }
+        "slot-chart": {
+          "类型": "纯文本",
+          "最大字数": 38,
+          "示例": "[ CHART · REVENUE TREND ]"
         },
-        "slot-source": {"类型": "纯文本", "描述": "数据来源", "最大字数": 50, "示例": "数据: 中汽协 2026.03"}
+        "slot-chart-label": {
+          "类型": "纯文本",
+          "最大字数": 38,
+          "示例": "[ CHART · REVENUE TREND ]"
+        },
+        "slot-item-list": {
+          "类型": "富文本",
+          "最大字数": 300,
+          "示例": "GROWTHDRIVERS\n核心增长驱动力分析\n\n[ DRIVER 01 ]\n用"
+        },
+        "slot-title-en": {
+          "类型": "富文本",
+          "最大字数": 20,
+          "示例": "GROWTHDRIVERS"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "核心增长驱动力分析"
+        },
+        "slot-item-label": {
+          "类型": "纯文本",
+          "最大字数": 20,
+          "示例": "[ DRIVER 01 ]"
+        },
+        "slot-item-title": {
+          "类型": "纯文本",
+          "最大字数": 9,
+          "示例": "用户规模扩张"
+        },
+        "slot-item-desc": {
+          "类型": "纯文本",
+          "最大字数": 60,
+          "示例": "新用户获取成本下降 34%，月活跃用户突破 1200 万，同比增长 2.3 倍。"
+        }
       },
       "图表占位": [
-        {"yaml key": "slot-chart", "支持类型": ["line", "bar", "bar-line-combo"], "默认类型": "line"}
+        {
+          "yaml key": "slot-chart",
+          "支持类型": [
+            "line",
+            "bar",
+            "bar-line-combo"
+          ],
+          "默认类型": "line"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "S-B",
       "page_role": "support",
@@ -612,21 +1298,65 @@
         "图表是主角 → 用 S-G",
         "图表 + 要点 → 用 S-A"
       ],
-      "_renderer": {"dom_selector": ".variant-s-b"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
+      "_renderer": {
+        "dom_selector": ".variant-s-b"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "WARNING<br>SIGNAL"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "警示信号"},
-        "slot-warning-number": {"类型": "富文本", "最大字数": 12, "示例": "6"},
-        "slot-accent-unit": {"类型": "纯文本", "最大字数": 8, "示例": "%"},
-        "slot-warning-text": {"类型": "富文本", "最大字数": 100, "示例": "中小厂商<em>滞销率</em>持续升高, 行业集中度加速"}
+        "slot-chart-bg": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": ""
+        },
+        "slot-chart": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": ""
+        },
+        "slot-warning-text": {
+          "类型": "富文本",
+          "最大字数": 77,
+          "示例": "78%\nAUTOMATION COVERAGE\n核心流程自动化覆盖率已达到警戒线"
+        },
+        "slot-number": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "78%"
+        },
+        "slot-accent-unit": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "%"
+        },
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 29,
+          "示例": "AUTOMATION COVERAGE"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 41,
+          "示例": "核心流程自动化覆盖率已达到警戒线，人工干预窗口正在关闭"
+        }
       },
       "图表占位": [
-        {"yaml key": "slot-chart-bg", "支持类型": ["line", "bar"], "默认类型": "line", "描述": "背景氛围图"}
+        {
+          "yaml key": "slot-chart-bg",
+          "支持类型": [
+            "line",
+            "bar"
+          ],
+          "默认类型": "line",
+          "描述": "背景氛围图"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "S-C",
       "page_role": "support",
@@ -637,26 +1367,56 @@
         "4 等权要点 → 用 S-D"
       ],
       "_renderer": {
-        "dom_selector": ".variant-s-c",
-        "items_dom_selector": ".evidence-item",
-        "items_count": 3
+        "dom_selector": ".variant-s-c"
       },
-      "数量约束": {"类型": "严格固定", "数量": 3, "支持自适应": false, "对象描述": "证据卡"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 3,
+        "支持自适应": false,
+        "对象描述": "证据卡"
+      },
       "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "最大字数": 30, "示例": "[ KEY CONCLUSION ]"},
-        "slot-hero-conclusion": {"类型": "富文本", "描述": "超大结论句", "最大字数": 50, "示例": "拐点已至, 第二曲线<em>正在形成</em>"},
+        "slot-hero-zone": {
+          "类型": "富文本",
+          "最大字数": 36,
+          "示例": "我们不是在追赶市场，我们已经领先了整整两个周期。"
+        },
+        "slot-hero-conclusion": {
+          "类型": "富文本",
+          "最大字数": 36,
+          "示例": "我们不是在追赶市场，我们已经领先了整整两个周期。",
+          "描述": "超大结论句"
+        },
         "slot-evidence-area": {
-          "类型": "重复列表", "项数": 3,
-          "每项字段": {
-            "slot-evidence-number": {"类型": "富文本", "最大字数": 10, "示例": "40.9<span class='unit'>%</span>"},
-            "slot-evidence-label": {"类型": "纯文本", "最大字数": 30, "示例": "[ EVIDENCE 01 ]"},
-            "slot-evidence-desc": {"类型": "富文本", "最大字数": 80, "示例": "渗透率<em>突破</em>主流门槛"}
-          }
+          "类型": "纯文本",
+          "最大字数": 201,
+          "示例": "2.3×\n[ USER GROWTH ]\n月活用户同比增长倍数，远超行业均值 0"
+        },
+        "slot-evidence-item": {
+          "类型": "纯文本",
+          "最大字数": 65,
+          "示例": "2.3×\n[ USER GROWTH ]\n月活用户同比增长倍数，远超行业均值 0"
+        },
+        "slot-evidence-number": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "2.3×"
+        },
+        "slot-evidence-label": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "[ USER GROWTH ]"
+        },
+        "slot-evidence-desc": {
+          "类型": "纯文本",
+          "最大字数": 33,
+          "示例": "月活用户同比增长倍数，远超行业均值 0.8×"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "S-D",
       "page_role": "support",
@@ -667,27 +1427,50 @@
         "6 条 → 用 S-E 或 S-F"
       ],
       "_renderer": {
-        "dom_selector": ".variant-s-d",
-        "items_dom_selector": ".enum-item",
-        "items_count": 4
+        "dom_selector": ".variant-s-d"
       },
-      "数量约束": {"类型": "严格固定", "数量": 4, "支持自适应": false, "对象描述": "论据项"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 4,
+        "支持自适应": false,
+        "对象描述": "论据项"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "FOUR<br>PILLARS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "四大支柱"},
-        "slot-enum-items": {
-          "类型": "重复列表", "项数": 4,
-          "每项字段": {
-            "slot-enum-index": {"类型": "纯文本", "最大字数": 4, "示例": "01"},
-            "slot-enum-label": {"类型": "纯文本", "最大字数": 30, "示例": "[ PILLAR 01 ]"},
-            "slot-enum-title": {"类型": "纯文本", "最大字数": 16, "示例": "市场规模"},
-            "slot-enum-desc": {"类型": "富文本", "最大字数": 80, "示例": "<strong>1285 万辆</strong>, 全球第一大市场"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "CORE PRINCIPLES"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "我们做出这个决策的四个核心依据"
+        },
+        "slot-enum-item": {
+          "类型": "纯文本",
+          "最大字数": 98,
+          "示例": "01\n[ MARKET SIGNAL ]\n市场时机窗口正在关闭\n竞争对手的融资速"
+        },
+        "slot-enum-label": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "[ MARKET SIGNAL ]"
+        },
+        "slot-enum-title": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "市场时机窗口正在关闭"
+        },
+        "slot-enum-desc": {
+          "类型": "纯文本",
+          "最大字数": 50,
+          "示例": "竞争对手的融资速度加快，未来 18 个月将是建立壁垒的最后窗口期。"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "S-E",
       "page_role": "support",
@@ -698,27 +1481,58 @@
         "结论 + 6 发现 → 用 S-F"
       ],
       "_renderer": {
-        "dom_selector": ".variant-s-e",
-        "items_dom_selector": ".point-item",
-        "items_count": 6
+        "dom_selector": ".variant-s-e"
       },
-      "数量约束": {"类型": "范围内", "最少": 4, "最多": 6, "默认": 6, "支持自适应": true, "对象描述": "要点项"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 4,
+        "最多": 6,
+        "默认": 6,
+        "支持自适应": true,
+        "对象描述": "要点项"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "SIX KEY<br>POINTS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "6 个核心要点"},
-        "slot-point-items": {
-          "类型": "重复列表", "项数": "4-6",
-          "每项字段": {
-            "slot-point-label": {"类型": "纯文本", "最大字数": 20, "示例": "[ POINT 01 ]"},
-            "slot-point-title": {"类型": "纯文本", "最大字数": 14, "示例": "市场拐点"},
-            "slot-point-desc": {"类型": "富文本", "最大字数": 60, "示例": "渗透率突破 40%"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 18,
+          "示例": "KEY FINDINGS"
         },
-        "slot-insight": {"类型": "纯文本", "描述": "底部 insight bar", "最大字数": 80, "示例": "6 个变化指向同一个结论 — 拐点已至"}
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 29,
+          "示例": "本章核心发现：六个不可忽视的结构性变化"
+        },
+        "slot-point-item": {
+          "类型": "纯文本",
+          "最大字数": 113,
+          "示例": "[ FINDING 01 ]\n渗透率拐点已过\n2023 年 12 月，新能源乘用"
+        },
+        "slot-point-label": {
+          "类型": "纯文本",
+          "最大字数": 21,
+          "示例": "[ FINDING 01 ]"
+        },
+        "slot-point-title": {
+          "类型": "纯文本",
+          "最大字数": 11,
+          "示例": "渗透率拐点已过"
+        },
+        "slot-point-desc": {
+          "类型": "纯文本",
+          "最大字数": 78,
+          "示例": "2023 年 12 月，新能源乘用车月度渗透率首次突破 40%，标志着从早期采用"
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 56,
+          "示例": "[ CORE INSIGHT ] 结构性变化已经完成，行业进入质量竞争阶段",
+          "描述": "底部 insight bar"
+        }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "S-F",
       "page_role": "support",
@@ -729,26 +1543,53 @@
         "1 结论 + 3 证据 → 用 S-C"
       ],
       "_renderer": {
-        "dom_selector": ".variant-s-f",
-        "items_dom_selector": ".finding-item",
-        "items_count": 6
+        "dom_selector": ".variant-s-f"
       },
-      "数量约束": {"类型": "范围内", "最少": 4, "最多": 7, "默认": 6, "支持自适应": true, "对象描述": "支撑发现"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 4,
+        "最多": 7,
+        "默认": 6,
+        "支持自适应": true,
+        "对象描述": "支撑发现"
+      },
       "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "最大字数": 30, "示例": "[ TOP-DOWN VIEW ]"},
-        "slot-conclusion": {"类型": "富文本", "描述": "顶部大结论", "最大字数": 50, "示例": "<em>2025 是不可逆转的拐点</em>"},
-        "slot-findings": {
-          "类型": "重复列表", "项数": "4-7",
-          "每项字段": {
-            "slot-finding-num": {"类型": "纯文本", "最大字数": 6, "示例": "01"},
-            "slot-finding-title": {"类型": "纯文本", "最大字数": 16, "示例": "渗透率"},
-            "slot-finding-desc": {"类型": "富文本", "最大字数": 80, "示例": "40.9% 突破<strong>主流门槛</strong>"}
-          }
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 29,
+          "示例": "KEY FINDINGS · 核心发现"
+        },
+        "slot-conclusion": {
+          "类型": "纯文本",
+          "最大字数": 56,
+          "示例": "自主品牌在新能源赛道已建立不可逆的竞争优势，合资品牌的反攻窗口正在快速关闭",
+          "描述": "顶部大结论"
+        },
+        "slot-finding-item": {
+          "类型": "纯文本",
+          "最大字数": 90,
+          "示例": "[ 01 ]\n市场份额加速集中\nTOP5 自主品牌合计市占率从2022年的43%"
+        },
+        "slot-finding-num": {
+          "类型": "纯文本",
+          "最大字数": 9,
+          "示例": "[ 01 ]"
+        },
+        "slot-finding-title": {
+          "类型": "纯文本",
+          "最大字数": 12,
+          "示例": "市场份额加速集中"
+        },
+        "slot-finding-desc": {
+          "类型": "纯文本",
+          "最大字数": 66,
+          "示例": "TOP5 自主品牌合计市占率从2022年的43%升至2024年的67%，头部效应"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "S-G",
       "page_role": "support",
@@ -758,21 +1599,65 @@
         "图表 + 要点 → 用 S-A",
         "图表作氛围 → 用 S-B"
       ],
-      "_renderer": {"dom_selector": ".variant-s-g"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
+      "_renderer": {
+        "dom_selector": ".variant-s-g"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
       "slots": {
-        "slot-fig-id": {"类型": "纯文本", "描述": "FIG # 编号", "最大字数": 16, "示例": "FIG. 04"},
-        "slot-chart-title": {"类型": "富文本", "描述": "图表主标题", "最大字数": 40, "示例": "中国新能源车<em>渗透率</em>变化(2018-2025)"},
-        "slot-chart-unit": {"类型": "纯文本", "最大字数": 16, "示例": "Unit: %"},
-        "slot-chart-note": {"类型": "富文本", "描述": "图注", "最大字数": 100, "示例": "<strong>2025 Q4</strong> 单月渗透率突破 52.3%"},
-        "slot-source": {"类型": "纯文本", "最大字数": 50, "示例": "数据: 中汽协, 整理: Archive Research 2026.03"}
+        "slot-fig-id": {
+          "类型": "纯文本",
+          "最大字数": 21,
+          "示例": "FIGURE 3 · 图表3",
+          "描述": "FIG # 编号"
+        },
+        "slot-chart-title": {
+          "类型": "纯文本",
+          "最大字数": 44,
+          "示例": "中国新能源乘用车月度销量及渗透率趋势（2022–2024）",
+          "描述": "图表主标题"
+        },
+        "slot-chart-unit": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "单位：万辆 / %"
+        },
+        "slot-chart": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": ""
+        },
+        "slot-chart-note": {
+          "类型": "富文本",
+          "最大字数": 111,
+          "示例": "[ 图注 ] 柱状图表示当月新能源乘用车销量（左轴），折线表示当月新能源渗透率（",
+          "描述": "图注"
+        },
+        "slot-source": {
+          "类型": "纯文本",
+          "最大字数": 95,
+          "示例": "¹ 数据来源：乘联会月度销量统计，2022年1月–2024年12月  |  ² "
+        }
       },
       "图表占位": [
-        {"yaml key": "slot-chart", "支持类型": ["line", "bar", "bar-line-combo", "doughnut", "pie"], "默认类型": "line"}
+        {
+          "yaml key": "slot-chart",
+          "支持类型": [
+            "line",
+            "bar",
+            "bar-line-combo",
+            "doughnut",
+            "pie"
+          ],
+          "默认类型": "line"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CMP-A",
       "page_role": "comparison",
@@ -785,26 +1670,52 @@
         "多维评分 → 用 CMP-E"
       ],
       "_renderer": {
-        "dom_selector": ".variant-cmp-a",
-        "items_dom_selector": ".bento-cell",
-        "items_count": 3
+        "dom_selector": ".variant-cmp-a"
       },
-      "数量约束": {"类型": "范围内", "最少": 2, "最多": 4, "默认": 3, "支持自适应": true, "对象描述": "Bento 对比块"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 4,
+        "默认": 3,
+        "支持自适应": true,
+        "对象描述": "Bento 对比块"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "TOP 3<br>BRANDS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "TOP 3 自主品牌"},
-        "slot-bento-cells": {
-          "类型": "重复列表", "项数": "2-4",
-          "每项字段": {
-            "slot-cell-tag": {"类型": "纯文本", "最大字数": 20, "示例": "[ #1 ]"},
-            "slot-cell-number": {"类型": "富文本", "最大字数": 12, "示例": "175<span class='unit'>万</span>"},
-            "slot-cell-label": {"类型": "纯文本", "最大字数": 20, "示例": "比亚迪"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "MARKET POSITION"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 18,
+          "示例": "三大竞争对手核心指标对比"
+        },
+        "slot-cell-ghost-label": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "A"
+        },
+        "slot-cell-tag": {
+          "类型": "纯文本",
+          "最大字数": 9,
+          "示例": "[ US ]"
+        },
+        "slot-cell-number": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "40.9%"
+        },
+        "slot-cell-label": {
+          "类型": "富文本",
+          "最大字数": 21,
+          "示例": "市场占有率连续 3 季度增长"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CMP-B",
       "page_role": "comparison",
@@ -816,35 +1727,60 @@
         "二选一 → 用 CMP-D"
       ],
       "_renderer": {
-        "dom_selector": ".variant-cmp-b",
-        "items_dom_selector": ".minor-cell",
-        "items_count": 2
+        "dom_selector": ".variant-cmp-b"
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "副 cell(主 hero cell 单独)"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "副 cell(主 hero cell 单独)"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "LEADER<br>VS REST"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "领先者 vs 追随者"},
-        "slot-hero-cell": {
-          "类型": "组合字段",
-          "子字段": {
-            "slot-hero-tag": {"类型": "纯文本", "最大字数": 20, "示例": "[ LEADER ]"},
-            "slot-hero-name": {"类型": "纯文本", "最大字数": 20, "示例": "比亚迪"},
-            "slot-hero-number": {"类型": "富文本", "最大字数": 12, "示例": "175<span class='unit'>万</span>"},
-            "slot-hero-desc": {"类型": "富文本", "最大字数": 80, "示例": "<strong>同比 +41%</strong>, 占自主份额第一"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 33,
+          "示例": "THE LEADER VS THE REST"
         },
-        "slot-minor-cells": {
-          "类型": "重复列表", "项数": 2,
-          "每项字段": {
-            "slot-minor-tag": {"类型": "纯文本", "最大字数": 20, "示例": "[ #2 ]"},
-            "slot-minor-name": {"类型": "纯文本", "最大字数": 16, "示例": "吉利"},
-            "slot-minor-number": {"类型": "富文本", "最大字数": 10, "示例": "85<span class='unit'>万</span>"}
-          }
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "头部效应已经形成，差距还在扩大"
+        },
+        "slot-hero-tag": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "[ MARKET LEADER ]"
+        },
+        "slot-hero-number": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "40.9%"
+        },
+        "slot-hero-desc": {
+          "类型": "纯文本",
+          "最大字数": 69,
+          "示例": "我们的市场占有率，是第二名的 1.44 倍，是第三名的 2.39 倍。这不是领先"
+        },
+        "slot-minor-tag": {
+          "类型": "纯文本",
+          "最大字数": 21,
+          "示例": "[ CHALLENGER ]"
+        },
+        "slot-minor-number": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "28.3%"
+        },
+        "slot-minor-desc": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "第二名，增速放缓，进入防御态势"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CMP-C",
       "page_role": "comparison",
@@ -856,27 +1792,40 @@
         "二选一 → 用 CMP-D"
       ],
       "_renderer": {
-        "dom_selector": ".variant-cmp-c",
-        "items_dom_selector": ".axis-side",
-        "items_count": 2
+        "dom_selector": ".variant-cmp-c"
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "axis 两侧"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "axis 两侧"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "THEN<br>VS NOW"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "2022 vs 2024"},
-        "slot-axis-sides": {
-          "类型": "重复列表", "项数": 2,
-          "每项字段": {
-            "slot-axis-tag": {"类型": "纯文本", "最大字数": 20, "示例": "[ 2022 ]"},
-            "slot-axis-word": {"类型": "富文本", "最大字数": 20, "示例": "<em>启动期</em>"},
-            "slot-axis-number": {"类型": "富文本", "最大字数": 12, "示例": "28<span class='unit'>%</span>"},
-            "slot-axis-desc": {"类型": "富文本", "最大字数": 60, "示例": "渗透率刚突破 25%"}
-          }
+        "slot-axis-tag": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "[ BEFORE · 2022 ]"
+        },
+        "slot-axis-number": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "12%"
+        },
+        "slot-axis-desc": {
+          "类型": "纯文本",
+          "最大字数": 54,
+          "示例": "碎片化的产品线，低效的团队协作，用户满意度仅 12%，每个季度都在救火。"
+        },
+        "slot-axis-label": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "VS"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CMP-D",
       "page_role": "comparison",
@@ -888,26 +1837,30 @@
         "多维评分 → 用 CMP-E"
       ],
       "_renderer": {
-        "dom_selector": ".variant-cmp-d",
-        "items_dom_selector": ".decision-side",
-        "items_count": 2
+        "dom_selector": ".variant-cmp-d"
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "二选一两侧"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "二选一两侧"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "ONE OR<br>THE OTHER"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "二选一"},
-        "slot-decision-sides": {
-          "类型": "重复列表", "项数": 2,
-          "每项字段": {
-            "slot-side-tag": {"类型": "纯文本", "最大字数": 20, "示例": "[ OLD WAY ]"},
-            "slot-side-title": {"类型": "纯文本", "最大字数": 30, "示例": "传统燃油车"},
-            "slot-side-points": {"类型": "同质列表", "项数": "3-6", "示例": ["供应链成熟", "用户认知强", "维保便捷", "残值稳定"]}
-          }
+        "slot-side-tag": {
+          "类型": "纯文本",
+          "最大字数": 24,
+          "示例": "[ OLD APPROACH ]"
+        },
+        "slot-side-title": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "FRAGMENTED"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CMP-E",
       "page_role": "comparison",
@@ -918,33 +1871,69 @@
         "二选一 → 用 CMP-D"
       ],
       "_renderer": {
-        "dom_selector": ".variant-cmp-e",
-        "items_dom_selector": ".scorecard tbody tr",
-        "items_count": 4
+        "dom_selector": ".variant-cmp-e"
       },
-      "数量约束": {"类型": "范围内", "最少": 3, "最多": 8, "默认": 4, "支持自适应": true, "CSS 变量": "--rows", "对象描述": "评分行"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 3,
+        "最多": 8,
+        "默认": 4,
+        "支持自适应": true,
+        "CSS 变量": "--rows",
+        "对象描述": "评分行"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "SCORECARD"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "多维评分卡"},
-        "slot-col-a": {"类型": "纯文本", "描述": "第 1 列对象名", "最大字数": 16, "示例": "比亚迪"},
-        "slot-col-b": {"类型": "纯文本", "最大字数": 16, "示例": "吉利"},
-        "slot-col-c": {"类型": "纯文本", "最大字数": 16, "示例": "理想"},
-        "slot-table-rows": {
-          "类型": "重复列表", "项数": "3-8",
-          "每项字段": {
-            "dimension": {"类型": "纯文本", "最大字数": 20, "示例": "技术能力"},
-            "value-a": {"类型": "纯文本", "最大字数": 10, "示例": "★★★★★"},
-            "value-b": {"类型": "纯文本", "最大字数": 10, "示例": "★★★★"},
-            "value-c": {"类型": "纯文本", "最大字数": 10, "示例": "★★★"},
-            "insight": {"类型": "富文本", "最大字数": 60, "示例": "<em>比亚迪</em>领先"}
-          }
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 44,
+          "示例": "COMPETITIVE SCORECARD · 竞争力评分"
         },
-        "slot-source": {"类型": "纯文本", "最大字数": 50, "示例": "数据来源: Archive Research"},
-        "slot-insight": {"类型": "纯文本", "最大字数": 80, "示例": "综合评分: 比亚迪领先 5 个维度中的 4 个"}
+        "slot-title": {
+          "类型": "纯文本",
+          "最大字数": 17,
+          "示例": "四大维度竞争力对比矩阵"
+        },
+        "slot-subtitle": {
+          "类型": "纯文本",
+          "最大字数": 47,
+          "示例": "基于市场份额、技术成熟度、品牌溢价、增长潜力四个维度的横向评估"
+        },
+        "slot-table": {
+          "类型": "纯文本",
+          "最大字数": 207,
+          "示例": "评估维度\n品牌 A\n品牌 B\n品牌 C\n关键洞察\n\n\n\n\n市场份额\n40.9%\n"
+        },
+        "slot-col-a": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "品牌 A",
+          "描述": "第 1 列对象名"
+        },
+        "slot-col-b": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "品牌 B"
+        },
+        "slot-col-c": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "品牌 C"
+        },
+        "slot-source": {
+          "类型": "纯文本",
+          "最大字数": 35,
+          "示例": "数据来源：各公司年报、行业研究报告，2024年"
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 59,
+          "示例": "[ CORE INSIGHT ] 品牌 A 在四个维度全面领先，竞争壁垒已形成"
+        }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "INS-A",
       "page_role": "insight",
@@ -955,15 +1944,31 @@
         "金句 + 补充 → 用 INS-C",
         "数据金句 → 用 INS-D"
       ],
-      "_renderer": {"dom_selector": ".variant-ins-a"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
-      "slots": {
-        "slot-quote": {"类型": "富文本", "描述": "巨大金句", "最大字数": 50, "示例": "<em>拐点</em>不是预测, 是<em>已经发生</em>。"},
-        "slot-attr": {"类型": "富文本", "描述": "署名", "最大字数": 40, "示例": "— ARCHIVE RESEARCH, 2026"}
+      "_renderer": {
+        "dom_selector": ".variant-ins-a"
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-quote": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "不是最快的赢了，而是最先看清方向的赢了。",
+          "描述": "巨大金句"
+        },
+        "slot-attr": {
+          "类型": "纯文本",
+          "最大字数": 50,
+          "示例": "[ STRATEGIC INSIGHT · CHAPTER 3 ]",
+          "描述": "署名"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "INS-B",
       "page_role": "insight",
@@ -973,16 +1978,34 @@
         "自主张观点 → 用 INS-A",
         "金句 + 补充 → 用 INS-C"
       ],
-      "_renderer": {"dom_selector": ".variant-ins-b"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
-      "slots": {
-        "slot-ins-tag": {"类型": "纯文本", "最大字数": 30, "示例": "[ EXECUTIVE VIEW ]"},
-        "slot-quote": {"类型": "富文本", "最大字数": 120, "示例": "这不是<em>趋势</em>, 这是<em>结构性变化</em>。"},
-        "slot-attr": {"类型": "富文本", "最大字数": 50, "示例": "<strong>王传福</strong> · 比亚迪董事长"}
+      "_renderer": {
+        "dom_selector": ".variant-ins-b"
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-ins-tag": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "[ CORE BELIEF ]"
+        },
+        "slot-quote": {
+          "类型": "富文本",
+          "最大字数": 35,
+          "示例": "规模是结果，不是目标。真正的目标是不可替代性。"
+        },
+        "slot-attr": {
+          "类型": "纯文本",
+          "最大字数": 53,
+          "示例": "[ FOUNDER'S PRINCIPLE · EST. 2019 ]"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "INS-C",
       "page_role": "insight",
@@ -992,16 +2015,37 @@
         "单句金句 → 用 INS-A",
         "带引号 → 用 INS-B"
       ],
-      "_renderer": {"dom_selector": ".variant-ins-c"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
-      "slots": {
-        "slot-ins-line-1": {"类型": "富文本", "描述": "大字主张", "最大字数": 40, "示例": "<em>渗透率</em>不是终点。"},
-        "slot-ins-line-2": {"类型": "富文本", "描述": "中字论据", "最大字数": 60, "示例": "终点是<em>结构性的成本优势</em>。"},
-        "slot-ins-line-3": {"类型": "富文本", "描述": "小字结论", "最大字数": 80, "示例": "这意味着燃油车的退出会比预期更快。"}
+      "_renderer": {
+        "dom_selector": ".variant-ins-c"
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-ins-line-1": {
+          "类型": "富文本",
+          "描述": "大字主张",
+          "最大字数": 40,
+          "示例": "<em>渗透率</em>不是终点。"
+        },
+        "slot-ins-line-2": {
+          "类型": "富文本",
+          "描述": "中字论据",
+          "最大字数": 60,
+          "示例": "终点是<em>结构性的成本优势</em>。"
+        },
+        "slot-ins-line-3": {
+          "类型": "富文本",
+          "描述": "小字结论",
+          "最大字数": 80,
+          "示例": "这意味着燃油车的退出会比预期更快。"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "INS-D",
       "page_role": "insight",
@@ -1011,18 +2055,45 @@
         "纯金句 → 用 INS-A/B/C",
         "孤立大数字(climax)→ 用 CLX-A"
       ],
-      "_renderer": {"dom_selector": ".variant-ins-d"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
-      "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "最大字数": 30, "示例": "[ INSIGHT · 2025 ]"},
-        "slot-number": {"类型": "富文本", "描述": "大字数字, 含 <span class='unit'>", "最大字数": 12, "示例": "65<span class='unit'>%</span>"},
-        "slot-label": {"类型": "纯文本", "最大字数": 30, "示例": "OF GLOBAL EV MARKET"},
-        "slot-context": {"类型": "富文本", "最大字数": 100, "示例": "<em>中国</em>占全球新能源市场的 <strong>65%</strong>"},
-        "slot-source": {"类型": "纯文本", "最大字数": 50, "示例": "数据: IEA 全球电动车展望 2026"}
+      "_renderer": {
+        "dom_selector": ".variant-ins-d"
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 29,
+          "示例": "CORE INSIGHT · 核心洞察"
+        },
+        "slot-number": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "40.9%",
+          "描述": "大字数字, 含 <span class='unit'>"
+        },
+        "slot-label": {
+          "类型": "纯文本",
+          "最大字数": 27,
+          "示例": "新能源乘用车渗透率，首次突破 40%"
+        },
+        "slot-context": {
+          "类型": "纯文本",
+          "最大字数": 89,
+          "示例": "这一数字标志着中国新能源汽车市场从\"政策驱动\"向\"市场驱动\"的历史性转变。消费者"
+        },
+        "slot-source": {
+          "类型": "纯文本",
+          "最大字数": 29,
+          "示例": "¹ 数据来源：乘联会，2024年12月"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "H1",
       "page_role": "gallery",
@@ -1035,20 +2106,42 @@
         "5 张 → 用 H5",
         "图 + 多条文字 → 用 GC-A/B"
       ],
-      "_renderer": {"dom_selector": ".variant-h1"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
+      "_renderer": {
+        "dom_selector": ".variant-h1"
+      },
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
       "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "最大字数": 30, "示例": "[ HERO IMAGE ]"},
-        "slot-h1-tag": {"类型": "纯文本", "最大字数": 30, "示例": "MARKET LEADER"},
-        "slot-title": {"类型": "富文本", "最大字数": 50, "示例": "比亚迪<em>2025 旗舰</em>车型"},
-        "slot-h1-title": {"类型": "纯文本", "最大字数": 30, "示例": "汉 EV"}
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 38,
+          "示例": "[ PRODUCT LAUNCH · 2024 ]"
+        },
+        "slot-title": {
+          "类型": "富文本",
+          "最大字数": 35,
+          "示例": "比亚迪仰望 U90-100km/h 2.36秒"
+        },
+        "slot-subtitle": {
+          "类型": "纯文本",
+          "最大字数": 63,
+          "示例": "中国超跑的第一次，也是全球电动超跑的新标杆。四电机独立驱动，最大功率 1100k"
+        }
       },
       "图片占位": [
-        {"yaml key": "img-full", "数量": 1, "默认 image_fit": "cover", "描述": "全屏主图"}
+        {
+          "yaml key": "img-full",
+          "数量": 1,
+          "默认 image_fit": "cover",
+          "描述": "全屏主图"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "H2",
       "page_role": "gallery",
@@ -1059,28 +2152,48 @@
         "3+ 张 → 用 H3/H4/H5"
       ],
       "_renderer": {
-        "dom_selector": ".variant-h2",
-        "items_dom_selector": ".img-cell",
-        "items_count": 2
+        "dom_selector": ".variant-h2"
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "图片 cell"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "图片 cell"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "TWO BRANDS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "两个品牌"},
-        "slot-img-captions": {
-          "类型": "重复列表", "项数": 2,
-          "每项字段": {
-            "slot-img-caption-title": {"类型": "纯文本", "最大字数": 20, "示例": "比亚迪 汉 EV"},
-            "slot-img-caption-sub": {"类型": "纯文本", "最大字数": 30, "示例": "续航 605 公里"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 27,
+          "示例": "PRODUCT COMPARISON"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 20,
+          "示例": "两款旗舰车型的设计语言对比"
+        },
+        "slot-img-caption-title": {
+          "类型": "纯文本",
+          "最大字数": 12,
+          "示例": "比亚迪 汉 EV"
+        },
+        "slot-img-caption-sub": {
+          "类型": "纯文本",
+          "最大字数": 48,
+          "示例": "Dragon Face 3.0 设计语言，售价 20.98 万起"
         }
       },
       "图片占位": [
-        {"yaml key": "img-cells", "数量": 2, "默认 image_fit": "cover", "描述": "并排 2 张图(数组)"}
+        {
+          "yaml key": "img-cells",
+          "数量": 2,
+          "默认 image_fit": "cover",
+          "描述": "并排 2 张图(数组)"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "H3",
       "page_role": "gallery",
@@ -1090,28 +2203,47 @@
         "数量 ≠ 3 → 用 H1/H2/H4/H5"
       ],
       "_renderer": {
-        "dom_selector": ".variant-h3",
-        "items_dom_selector": ".img-cell",
-        "items_count": 3
+        "dom_selector": ".variant-h3"
       },
-      "数量约束": {"类型": "严格固定", "数量": 3, "支持自适应": false, "对象描述": "图片 cell"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 3,
+        "支持自适应": false,
+        "对象描述": "图片 cell"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "TOP 3<br>BRANDS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "TOP 3 自主品牌"},
-        "slot-img-captions": {
-          "类型": "重复列表", "项数": 3,
-          "每项字段": {
-            "slot-img-caption-title": {"类型": "纯文本", "最大字数": 20, "示例": "比亚迪"},
-            "slot-img-caption-sub": {"类型": "纯文本", "最大字数": 30, "示例": "市占率 18%"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "THREE GENERATIONS"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "三代产品的设计演进"
+        },
+        "slot-img-caption-title": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "第一代（2019）"
+        },
+        "slot-img-caption-sub": {
+          "类型": "纯文本",
+          "最大字数": 18,
+          "示例": "探索期，续航 400km"
         }
       },
       "图片占位": [
-        {"yaml key": "img-cells", "数量": 3, "默认 image_fit": "cover"}
+        {
+          "yaml key": "img-cells",
+          "数量": 3,
+          "默认 image_fit": "cover"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "H4",
       "page_role": "gallery",
@@ -1122,28 +2254,47 @@
         "5 张 → 用 H5"
       ],
       "_renderer": {
-        "dom_selector": ".variant-h4",
-        "items_dom_selector": ".img-cell",
-        "items_count": 4
+        "dom_selector": ".variant-h4"
       },
-      "数量约束": {"类型": "严格固定", "数量": 4, "支持自适应": false, "对象描述": "图片 cell"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 4,
+        "支持自适应": false,
+        "对象描述": "图片 cell"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "FOUR<br>FORCES"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "四大势力"},
-        "slot-img-captions": {
-          "类型": "重复列表", "项数": 4,
-          "每项字段": {
-            "slot-img-caption-title": {"类型": "纯文本", "最大字数": 20, "示例": "传统车企"},
-            "slot-img-caption-sub": {"类型": "纯文本", "最大字数": 30, "示例": "比亚迪 / 吉利"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 18,
+          "示例": "FOUR MARKETS"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 17,
+          "示例": "四个核心市场的产品布局"
+        },
+        "slot-img-caption-title": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "中国市场"
+        },
+        "slot-img-caption-sub": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "市场份额 40.9%"
         }
       },
       "图片占位": [
-        {"yaml key": "img-cells", "数量": 4, "默认 image_fit": "cover"}
+        {
+          "yaml key": "img-cells",
+          "数量": 4,
+          "默认 image_fit": "cover"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "H5",
       "page_role": "gallery",
@@ -1153,28 +2304,59 @@
         "数量 ≠ 5 → 用 H1-H4"
       ],
       "_renderer": {
-        "dom_selector": ".variant-h5",
-        "items_dom_selector": ".img-side-cell",
-        "items_count": 4
+        "dom_selector": ".variant-h5"
       },
-      "数量约束": {"类型": "严格固定", "数量": 4, "支持自适应": false, "对象描述": "侧图 cell(主图单独)"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 4,
+        "支持自适应": false,
+        "对象描述": "侧图 cell(主图单独)"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "FIVE PRODUCT<br>LINES"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "五大产品线"},
-        "slot-img-side-titles": {
-          "类型": "重复列表", "项数": 4,
-          "每项字段": {
-            "slot-img-side-title": {"类型": "纯文本", "最大字数": 20, "示例": "汉 EV"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "PRODUCT ECOSYSTEM"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "完整的产品生态矩阵"
+        },
+        "slot-img-main-title": {
+          "类型": "纯文本",
+          "最大字数": 20,
+          "示例": "旗舰车型：比亚迪仰望 U9"
+        },
+        "slot-img-main-sub": {
+          "类型": "纯文本",
+          "最大字数": 35,
+          "示例": "品牌形象标杆，技术展示窗口，限量 3000 台"
+        },
+        "slot-img-side-title": {
+          "类型": "纯文本",
+          "最大字数": 12,
+          "示例": "海豹 06 GT"
         }
       },
       "图片占位": [
-        {"yaml key": "img-main", "数量": 1, "默认 image_fit": "cover", "描述": "主图"},
-        {"yaml key": "img-side-cells", "数量": 4, "默认 image_fit": "cover", "描述": "侧图数组"}
+        {
+          "yaml key": "img-main",
+          "数量": 1,
+          "默认 image_fit": "cover",
+          "描述": "主图"
+        },
+        {
+          "yaml key": "img-side-cells",
+          "数量": 4,
+          "默认 image_fit": "cover",
+          "描述": "侧图数组"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "GC-2",
       "page_role": "gallery",
@@ -1185,29 +2367,62 @@
         "3 对象 → 用 GC-3"
       ],
       "_renderer": {
-        "dom_selector": ".variant-gc-2",
-        "items_dom_selector": ".c2-cell",
-        "items_count": 2
+        "dom_selector": ".variant-gc-2"
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "图文对"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "图文对"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "TWO STRATEGIES"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "两种策略"},
-        "slot-c2-texts": {
-          "类型": "重复列表", "项数": 2,
-          "每项字段": {
-            "slot-c2-text-label": {"类型": "纯文本", "最大字数": 20, "示例": "[ STRATEGY 01 ]"},
-            "slot-c2-text-title": {"类型": "纯文本", "最大字数": 16, "示例": "下沉市场"},
-            "slot-c2-text-desc": {"类型": "富文本", "最大字数": 80, "示例": "聚焦三四线, <em>高性价比</em>策略"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "TWO KEY PLAYERS"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 17,
+          "示例": "两大核心玩家的战略对比"
+        },
+        "slot-c2-text": {
+          "类型": "纯文本",
+          "最大字数": 113,
+          "示例": "[ MARKET LEADER ]\n比亚迪：垂直整合的制造帝国\n从电池到整车，全"
+        },
+        "slot-c2-text-label": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "[ MARKET LEADER ]"
+        },
+        "slot-c2-text-title": {
+          "类型": "纯文本",
+          "最大字数": 20,
+          "示例": "比亚迪：垂直整合的制造帝国"
+        },
+        "slot-c2-text-desc": {
+          "类型": "纯文本",
+          "最大字数": 65,
+          "示例": "从电池到整车，全产业链自研自产，成本优势无可复制。2024 年销量突破 400 "
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 57,
+          "示例": "[ KEY INSIGHT ] 两种截然不同的路径，都在验证中国模式的可行性"
         }
       },
       "图片占位": [
-        {"yaml key": "c2-imgs", "数量": 2, "默认 image_fit": "cover"}
+        {
+          "yaml key": "c2-imgs",
+          "数量": 2,
+          "默认 image_fit": "cover"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "GC-3",
       "page_role": "gallery",
@@ -1218,29 +2433,62 @@
         "纯图 → 用 H3"
       ],
       "_renderer": {
-        "dom_selector": ".variant-gc-3",
-        "items_dom_selector": ".c3-cell",
-        "items_count": 3
+        "dom_selector": ".variant-gc-3"
       },
-      "数量约束": {"类型": "严格固定", "数量": 3, "支持自适应": false, "对象描述": "图文对"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 3,
+        "支持自适应": false,
+        "对象描述": "图文对"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "THREE PATHS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "三条路径"},
-        "slot-c3-texts": {
-          "类型": "重复列表", "项数": 3,
-          "每项字段": {
-            "slot-c3-text-label": {"类型": "纯文本", "最大字数": 20, "示例": "[ PATH 01 ]"},
-            "slot-c3-text-title": {"类型": "纯文本", "最大字数": 16, "示例": "纯电"},
-            "slot-c3-text-desc": {"类型": "富文本", "最大字数": 80, "示例": "BEV 路线, <em>主流</em>选择"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 21,
+          "示例": "THREE SEGMENTS"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 17,
+          "示例": "三个价格区间的市场格局"
+        },
+        "slot-c3-text": {
+          "类型": "纯文本",
+          "最大字数": 90,
+          "示例": "[ ENTRY · 10-20万 ]\n大众化市场\n比亚迪海鸥、五菱宏光 MINI"
+        },
+        "slot-c3-text-label": {
+          "类型": "纯文本",
+          "最大字数": 27,
+          "示例": "[ ENTRY · 10-20万 ]"
+        },
+        "slot-c3-text-title": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "大众化市场"
+        },
+        "slot-c3-text-desc": {
+          "类型": "纯文本",
+          "最大字数": 53,
+          "示例": "比亚迪海鸥、五菱宏光 MINI EV 主导，价格战最激烈，但规模最大。"
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 56,
+          "示例": "[ KEY INSIGHT ] 中国品牌已经完成从低端到高端的全价格段覆盖"
         }
       },
       "图片占位": [
-        {"yaml key": "c3-imgs", "数量": 3, "默认 image_fit": "cover"}
+        {
+          "yaml key": "c3-imgs",
+          "数量": 3,
+          "默认 image_fit": "cover"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "GC-A",
       "page_role": "gallery",
@@ -1252,29 +2500,75 @@
         "多图佐证 1 结论 → 用 GC-D"
       ],
       "_renderer": {
-        "dom_selector": ".variant-gc-a",
-        "items_dom_selector": ".text-item",
-        "items_count": 3
+        "dom_selector": ".variant-gc-a"
       },
-      "数量约束": {"类型": "范围内", "最少": 2, "最多": 4, "默认": 3, "支持自适应": true, "对象描述": "文字要点"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 4,
+        "默认": 3,
+        "支持自适应": true,
+        "对象描述": "文字要点"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "FACTORY<br>UPGRADE"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "工厂升级"},
-        "slot-text-items": {
-          "类型": "重复列表", "项数": "2-4",
-          "每项字段": {
-            "slot-text-item-label": {"类型": "纯文本", "最大字数": 20, "示例": "[ POINT 01 ]"},
-            "slot-text-item-title": {"类型": "纯文本", "最大字数": 16, "示例": "智能化"},
-            "slot-text-item-desc": {"类型": "富文本", "最大字数": 80, "示例": "AI 视觉<em>全检</em>"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "PRODUCT DEEP DIVE"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 12,
+          "示例": "旗舰产品深度解析"
+        },
+        "slot-img-panel-title": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "比亚迪 仰望 U8"
+        },
+        "slot-img-panel-sub": {
+          "类型": "纯文本",
+          "最大字数": 24,
+          "示例": "越野旗舰，易四方技术，水上漂功能"
+        },
+        "slot-text-item": {
+          "类型": "纯文本",
+          "最大字数": 72,
+          "示例": "[ TECHNOLOGY ]\n易四方平台\n四电机独立驱动，毫秒级扭矩响应，原地掉"
+        },
+        "slot-text-item-label": {
+          "类型": "纯文本",
+          "最大字数": 21,
+          "示例": "[ TECHNOLOGY ]"
+        },
+        "slot-text-item-title": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "易四方平台"
+        },
+        "slot-text-item-desc": {
+          "类型": "纯文本",
+          "最大字数": 41,
+          "示例": "四电机独立驱动，毫秒级扭矩响应，原地掉头半径 0 米。"
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 59,
+          "示例": "[ KEY INSIGHT ] 仰望 U8 证明了中国品牌在豪华市场的突破能力"
         }
       },
       "图片占位": [
-        {"yaml key": "img-panel", "数量": 1, "默认 image_fit": "cover", "描述": "左侧主图"}
+        {
+          "yaml key": "img-panel",
+          "数量": 1,
+          "默认 image_fit": "cover",
+          "描述": "左侧主图"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "GC-B",
       "page_role": "gallery",
@@ -1284,29 +2578,65 @@
         "图在左 → 用 GC-A"
       ],
       "_renderer": {
-        "dom_selector": ".variant-gc-b",
-        "items_dom_selector": ".text-item",
-        "items_count": 3
+        "dom_selector": ".variant-gc-b"
       },
-      "数量约束": {"类型": "范围内", "最少": 2, "最多": 4, "默认": 3, "支持自适应": true, "对象描述": "文字要点"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 4,
+        "默认": 3,
+        "支持自适应": true,
+        "对象描述": "文字要点"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "USER<br>VOICE"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "用户之声"},
-        "slot-text-items": {
-          "类型": "重复列表", "项数": "2-4",
-          "每项字段": {
-            "slot-text-item-label": {"类型": "纯文本", "最大字数": 20, "示例": "[ VOICE 01 ]"},
-            "slot-text-item-title": {"类型": "纯文本", "最大字数": 16, "示例": "续航"},
-            "slot-text-item-desc": {"类型": "富文本", "最大字数": 80, "示例": "实际表现<em>低于预期</em>"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 24,
+          "示例": "CHARGING NETWORK"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "充电基础设施建设进展"
+        },
+        "slot-text-item": {
+          "类型": "纯文本",
+          "最大字数": 92,
+          "示例": "[ SCALE ]\n900 万个充电桩\n截至 2024 年 Q3，全国公共充电桩"
+        },
+        "slot-text-item-label": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "[ SCALE ]"
+        },
+        "slot-text-item-title": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "900 万个充电桩"
+        },
+        "slot-text-item-desc": {
+          "类型": "纯文本",
+          "最大字数": 62,
+          "示例": "截至 2024 年 Q3，全国公共充电桩数量突破 900 万个，同比增长 54%"
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 57,
+          "示例": "[ KEY INSIGHT ] 充电基础设施已不再是新能源汽车普及的主要障碍"
         }
       },
       "图片占位": [
-        {"yaml key": "img-panel", "数量": 1, "默认 image_fit": "cover", "描述": "右侧主图"}
+        {
+          "yaml key": "img-panel",
+          "数量": 1,
+          "默认 image_fit": "cover",
+          "描述": "右侧主图"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "GC-C",
       "page_role": "gallery",
@@ -1317,29 +2647,58 @@
         "多图佐证 → 用 GC-D"
       ],
       "_renderer": {
-        "dom_selector": ".variant-gc-c",
-        "items_dom_selector": ".text-col",
-        "items_count": 2
+        "dom_selector": ".variant-gc-c"
       },
-      "数量约束": {"类型": "严格固定", "数量": 2, "支持自适应": false, "对象描述": "文字列"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 2,
+        "支持自适应": false,
+        "对象描述": "文字列"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "MARKET<br>VIEW"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "市场全景"},
-        "slot-text-cols": {
-          "类型": "重复列表", "项数": 2,
-          "每项字段": {
-            "slot-text-item-label": {"类型": "纯文本", "最大字数": 20, "示例": "[ NORTH ]"},
-            "slot-text-item-title": {"类型": "纯文本", "最大字数": 16, "示例": "北方市场"},
-            "slot-text-item-desc": {"类型": "富文本", "最大字数": 100, "示例": "渗透率 <strong>32%</strong>, 低于全国均值"}
-          }
+        "slot-img-top-label": {
+          "类型": "纯文本",
+          "最大字数": 41,
+          "示例": "[ FACTORY TOUR · SHENZHEN ]"
+        },
+        "slot-text-item": {
+          "类型": "纯文本",
+          "最大字数": 92,
+          "示例": "[ CAPACITY ]\n年产能 300 万辆\n深圳坪山工厂年产能达到 300 "
+        },
+        "slot-text-item-label": {
+          "类型": "纯文本",
+          "最大字数": 18,
+          "示例": "[ CAPACITY ]"
+        },
+        "slot-text-item-title": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "年产能 300 万辆"
+        },
+        "slot-text-item-desc": {
+          "类型": "纯文本",
+          "最大字数": 56,
+          "示例": "深圳坪山工厂年产能达到 300 万辆，是全球最大的新能源汽车生产基地之一。"
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 51,
+          "示例": "[ KEY INSIGHT ] 制造能力是中国新能源汽车最深的护城河"
         }
       },
       "图片占位": [
-        {"yaml key": "img-panel", "数量": 1, "默认 image_fit": "cover", "描述": "顶部宽图"}
+        {
+          "yaml key": "img-panel",
+          "数量": 1,
+          "默认 image_fit": "cover",
+          "描述": "顶部宽图"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "GC-D",
       "page_role": "gallery",
@@ -1350,28 +2709,54 @@
         "纯图 → 用 H1-H5"
       ],
       "_renderer": {
-        "dom_selector": ".variant-gc-d",
-        "items_dom_selector": ".img-cell",
-        "items_count": 3
+        "dom_selector": ".variant-gc-d"
       },
-      "数量约束": {"类型": "范围内", "最少": 2, "最多": 4, "默认": 3, "支持自适应": true, "对象描述": "图证据"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 4,
+        "默认": 3,
+        "支持自适应": true,
+        "对象描述": "图证据"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "THREE<br>SIGNALS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "三个信号"},
-        "slot-img-cell-captions": {
-          "类型": "重复列表", "项数": "2-4",
-          "每项字段": {
-            "slot-img-cell-title": {"类型": "纯文本", "最大字数": 20, "示例": "工厂"},
-            "slot-img-cell-sub": {"类型": "纯文本", "最大字数": 30, "示例": "智能化升级"}
-          }
+        "slot-title-en": {
+          "类型": "富文本",
+          "最大字数": 20,
+          "示例": "三个关键技术决定下一个十年"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 74,
+          "示例": "固态电池、端到端智驾、800V 高压平台——这三项技术的商业化进度，将决定谁能在"
+        },
+        "slot-img-cell-title": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "固态电池"
+        },
+        "slot-img-cell-sub": {
+          "类型": "纯文本",
+          "最大字数": 33,
+          "示例": "2027 年量产，能量密度 500Wh/kg"
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 53,
+          "示例": "[ KEY INSIGHT ] 技术代际领先是中国企业最重要的竞争壁垒"
         }
       },
       "图片占位": [
-        {"yaml key": "img-cells", "数量": 3, "默认 image_fit": "cover"}
+        {
+          "yaml key": "img-cells",
+          "数量": 3,
+          "默认 image_fit": "cover"
+        }
       ],
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "TL-A",
       "page_role": "timeline",
@@ -1383,26 +2768,43 @@
         "阶段展开带子项 → 用 TL-D"
       ],
       "_renderer": {
-        "dom_selector": ".variant-tl-a",
-        "items_dom_selector": ".tl-node",
-        "items_count": 5
+        "dom_selector": ".variant-tl-a"
       },
-      "数量约束": {"类型": "范围内", "最少": 3, "最多": 7, "默认": 5, "支持自适应": true, "CSS 变量": "--cols", "对象描述": "时间节点"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 3,
+        "最多": 7,
+        "默认": 5,
+        "支持自适应": true,
+        "CSS 变量": "--cols",
+        "对象描述": "时间节点"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "POLICY<br>TIMELINE"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "政策时间线"},
-        "slot-tl-nodes": {
-          "类型": "重复列表", "项数": "3-7",
-          "每项字段": {
-            "year": {"类型": "纯文本", "最大字数": 8, "示例": "2018"},
-            "slot-tl-title": {"类型": "纯文本", "最大字数": 16, "示例": "补贴退坡"},
-            "slot-tl-desc": {"类型": "富文本", "最大字数": 60, "示例": "补贴<em>下降</em> 30%"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "GROWTH MILESTONES"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 24,
+          "示例": "中国新能源汽车行业五年关键里程碑"
+        },
+        "slot-tl-title": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "政策驱动期"
+        },
+        "slot-tl-desc": {
+          "类型": "纯文本",
+          "最大字数": 45,
+          "示例": "双积分政策落地，新能源渗透率 5.4%，市场处于政策驱动阶段"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "TL-B",
       "page_role": "timeline",
@@ -1414,28 +2816,57 @@
         "甘特图 → 用 TL-D"
       ],
       "_renderer": {
-        "dom_selector": ".variant-tl-b",
-        "items_dom_selector": ".phase-block",
-        "items_count": 3
+        "dom_selector": ".variant-tl-b"
       },
-      "数量约束": {"类型": "范围内", "最少": 2, "最多": 4, "默认": 3, "支持自适应": true, "对象描述": "阶段块"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 4,
+        "默认": 3,
+        "支持自适应": true,
+        "对象描述": "阶段块"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "THREE<br>PHASES"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "三大阶段"},
-        "slot-phase-blocks": {
-          "类型": "重复列表", "项数": "2-4",
-          "每项字段": {
-            "slot-phase-num": {"类型": "纯文本", "最大字数": 4, "示例": "01"},
-            "slot-phase-tag": {"类型": "纯文本", "最大字数": 30, "示例": "[ PHASE 01 ]"},
-            "slot-phase-title": {"类型": "纯文本", "最大字数": 16, "示例": "启动期"},
-            "slot-phase-period": {"类型": "纯文本", "最大字数": 20, "示例": "2014 - 2018"},
-            "slot-phase-items": {"类型": "同质列表", "项数": "2-4", "示例": ["补贴启动", "首批车型上市", "充电桩布局"]}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 18,
+          "示例": "THREE PHASES"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 30,
+          "示例": "行业发展的三个阶段：从政策驱动到全球竞争"
+        },
+        "slot-phase-num": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "01"
+        },
+        "slot-phase-tag": {
+          "类型": "纯文本",
+          "最大字数": 38,
+          "示例": "[ PHASE ONE · 2019—2021 ]"
+        },
+        "slot-phase-title": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "政策驱动期"
+        },
+        "slot-phase-period": {
+          "类型": "纯文本",
+          "最大字数": 17,
+          "示例": "2019 — 2021"
+        },
+        "slot-phase-item": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "双积分政策强制推动"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "TL-C",
       "page_role": "timeline",
@@ -1447,26 +2878,53 @@
         "甘特图 → 用 TL-D"
       ],
       "_renderer": {
-        "dom_selector": ".variant-tl-c",
-        "items_dom_selector": ".year-item",
-        "items_count": 8
+        "dom_selector": ".variant-tl-c"
       },
-      "数量约束": {"类型": "范围内", "最少": 5, "最多": 12, "默认": 8, "支持自适应": true, "CSS 变量": "--rows", "对象描述": "年份项"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 5,
+        "最多": 12,
+        "默认": 8,
+        "支持自适应": true,
+        "CSS 变量": "--rows",
+        "对象描述": "年份项"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "FULL<br>HISTORY"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "完整历程"},
-        "slot-year-items": {
-          "类型": "重复列表", "项数": "5-12",
-          "每项字段": {
-            "slot-year-item": {"类型": "纯文本", "最大字数": 8, "示例": "2014"},
-            "slot-event-title": {"类型": "纯文本", "最大字数": 16, "示例": "补贴启动"},
-            "slot-event-desc": {"类型": "富文本", "最大字数": 60, "示例": "国务院发布<em>新能源汽车产业规划</em>"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "KEY EVENTS"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 20,
+          "示例": "改变行业格局的八个关键事件"
+        },
+        "slot-year-item": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "2019"
+        },
+        "slot-event-item": {
+          "类型": "纯文本",
+          "最大字数": 51,
+          "示例": "特斯拉上海超级工厂投产\n国产化带来鲶鱼效应，倒逼自主品牌加速研发投入"
+        },
+        "slot-event-title": {
+          "类型": "纯文本",
+          "最大字数": 17,
+          "示例": "特斯拉上海超级工厂投产"
+        },
+        "slot-event-desc": {
+          "类型": "纯文本",
+          "最大字数": 33,
+          "示例": "国产化带来鲶鱼效应，倒逼自主品牌加速研发投入"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "TL-D",
       "page_role": "timeline",
@@ -1477,25 +2935,47 @@
         "分阶段 → 用 TL-B"
       ],
       "_renderer": {
-        "dom_selector": ".variant-tl-d",
-        "items_dom_selector": ".gantt-row",
-        "items_count": 4
+        "dom_selector": ".variant-tl-d"
       },
-      "数量约束": {"类型": "范围内", "最少": 3, "最多": 7, "默认": 4, "支持自适应": true, "对象描述": "甘特行"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 3,
+        "最多": 7,
+        "默认": 4,
+        "支持自适应": true,
+        "对象描述": "甘特行"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "ROADMAP<br>2026"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "2026 路线图"},
-        "slot-gantt-rows": {
-          "类型": "重复列表", "项数": "3-7",
-          "每项字段": {
-            "name": {"类型": "纯文本", "最大字数": 16, "示例": "技术研发"},
-            "bar": {"类型": "组合字段", "子字段": {"start": {"示例": "1"}, "end": {"示例": "3"}, "label": {"示例": "电池升级"}}}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 41,
+          "示例": "STRATEGIC ROADMAP 2024—2025"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 29,
+          "示例": "战略执行路线图：四大核心任务的时间安排"
+        },
+        "slot-gantt-header-label": {
+          "类型": "纯文本",
+          "最大字数": 21,
+          "示例": "[ INITIATIVE ]"
+        },
+        "slot-gantt-task-label": {
+          "类型": "富文本",
+          "最大字数": 21,
+          "示例": "智能驾驶升级NOA 全国开放"
+        },
+        "slot-gantt-bar-label": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "研发"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "PRC-A",
       "page_role": "process",
@@ -1508,26 +2988,48 @@
         "树状 → 用 PRC-E"
       ],
       "_renderer": {
-        "dom_selector": ".variant-prc-a",
-        "items_dom_selector": ".flow-step",
-        "items_count": 4
+        "dom_selector": ".variant-prc-a"
       },
-      "数量约束": {"类型": "范围内", "最少": 3, "最多": 5, "默认": 4, "支持自适应": true, "CSS 变量": "--cols", "对象描述": "流程步"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 3,
+        "最多": 5,
+        "默认": 4,
+        "支持自适应": true,
+        "CSS 变量": "--cols",
+        "对象描述": "流程步"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "VALUE<br>CHAIN"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "价值链"},
-        "slot-flow-steps": {
-          "类型": "重复列表", "项数": "3-5",
-          "每项字段": {
-            "slot-flow-num": {"类型": "纯文本", "最大字数": 4, "示例": "01"},
-            "slot-flow-title": {"类型": "纯文本", "最大字数": 16, "示例": "原材料"},
-            "slot-flow-desc": {"类型": "富文本", "最大字数": 60, "示例": "锂 / 钴 / 镍"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "OUR METHODOLOGY"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "研究方法论：四步系统性分析框架"
+        },
+        "slot-flow-num": {
+          "类型": "纯文本",
+          "最大字数": 9,
+          "示例": "[ 01 ]"
+        },
+        "slot-flow-title": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "数据采集"
+        },
+        "slot-flow-desc": {
+          "类型": "纯文本",
+          "最大字数": 54,
+          "示例": "整合 CAAM、乘联会、海关总署等 12 个权威数据源，建立统一数据底座"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "PRC-B",
       "page_role": "process",
@@ -1538,26 +3040,47 @@
         "循环 → 用 PRC-C"
       ],
       "_renderer": {
-        "dom_selector": ".variant-prc-b",
-        "items_dom_selector": ".step-row",
-        "items_count": 4
+        "dom_selector": ".variant-prc-b"
       },
-      "数量约束": {"类型": "范围内", "最少": 4, "最多": 7, "默认": 4, "支持自适应": true, "对象描述": "步骤行"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 4,
+        "最多": 7,
+        "默认": 4,
+        "支持自适应": true,
+        "对象描述": "步骤行"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "POLICY<br>PROCESS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "政策制定流程"},
-        "slot-step-rows": {
-          "类型": "重复列表", "项数": "4-7",
-          "每项字段": {
-            "slot-step-num": {"类型": "纯文本", "最大字数": 4, "示例": "01"},
-            "slot-step-title": {"类型": "纯文本", "最大字数": 16, "示例": "调研"},
-            "slot-step-desc": {"类型": "富文本", "最大字数": 80, "示例": "行业访谈 + <em>数据收集</em>"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "EXECUTION STEPS"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 17,
+          "示例": "战略落地的六个关键步骤"
+        },
+        "slot-step-num": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "01"
+        },
+        "slot-step-title": {
+          "类型": "纯文本",
+          "最大字数": 17,
+          "示例": "明确战略目标与成功标准"
+        },
+        "slot-step-desc": {
+          "类型": "纯文本",
+          "最大字数": 57,
+          "示例": "定义 2025 年的三个核心 OKR，建立可量化的成功指标体系，确保全员对齐"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "PRC-C",
       "page_role": "process",
@@ -1569,24 +3092,56 @@
         "漏斗 → 用 PRC-D"
       ],
       "_renderer": {
-        "dom_selector": ".variant-prc-c",
-        "items_dom_selector": ".cycle-node",
-        "items_count": 4
+        "dom_selector": ".variant-prc-c"
       },
-      "数量约束": {"类型": "严格固定", "数量": 4, "支持自适应": false, "对象描述": "循环节点"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 4,
+        "支持自适应": false,
+        "对象描述": "循环节点"
+      },
       "slots": {
-        "slot-cycle-center-title": {"类型": "富文本", "描述": "中心标题", "最大字数": 20, "示例": "<em>飞轮</em>"},
-        "slot-cycle-nodes": {
-          "类型": "重复列表", "项数": 4,
-          "每项字段": {
-            "label": {"类型": "纯文本", "最大字数": 16, "示例": "用户增长"},
-            "desc": {"类型": "富文本", "最大字数": 40, "示例": "<strong>+30%</strong> YoY"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 18,
+          "示例": "THE FLYWHEEL"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "增长飞轮：四个相互强化的核心驱动力"
+        },
+        "slot-cycle-center-label": {
+          "类型": "纯文本",
+          "最大字数": 12,
+          "示例": "[ CORE ]"
+        },
+        "slot-cycle-center-title": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "增长飞轮",
+          "描述": "中心标题"
+        },
+        "slot-cycle-node-num": {
+          "类型": "纯文本",
+          "最大字数": 9,
+          "示例": "[ 01 ]"
+        },
+        "slot-cycle-node-title": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "用户规模"
+        },
+        "slot-cycle-node-desc": {
+          "类型": "纯文本",
+          "最大字数": 29,
+          "示例": "1200 万月活，规模效应降低获客成本"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "PRC-D",
       "page_role": "process",
@@ -1597,27 +3152,57 @@
         "闭环 → 用 PRC-C"
       ],
       "_renderer": {
-        "dom_selector": ".variant-prc-d",
-        "items_dom_selector": ".funnel-row",
-        "items_count": 5
+        "dom_selector": ".variant-prc-d"
       },
-      "数量约束": {"类型": "范围内", "最少": 3, "最多": 6, "默认": 5, "支持自适应": true, "对象描述": "漏斗层"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 3,
+        "最多": 6,
+        "默认": 5,
+        "支持自适应": true,
+        "对象描述": "漏斗层"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "USER<br>FUNNEL"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "用户转化漏斗"},
-        "slot-funnel-rows": {
-          "类型": "重复列表", "项数": "3-6",
-          "每项字段": {
-            "slot-funnel-num-val": {"类型": "纯文本", "最大字数": 10, "示例": "100"},
-            "slot-funnel-num-unit": {"类型": "纯文本", "最大字数": 8, "示例": "万"},
-            "slot-funnel-bar-title": {"类型": "纯文本", "最大字数": 20, "示例": "曝光"},
-            "slot-funnel-desc": {"类型": "富文本", "最大字数": 60, "示例": "广告 + 试驾邀约"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "CONVERSION FUNNEL"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 29,
+          "示例": "用户转化漏斗：从曝光到复购的全链路数据"
+        },
+        "slot-funnel-num": {
+          "类型": "富文本",
+          "最大字数": 21,
+          "示例": "2400万[ REACH ]"
+        },
+        "slot-funnel-num-val": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "2400万"
+        },
+        "slot-funnel-num-unit": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "[ REACH ]"
+        },
+        "slot-funnel-bar-title": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "品牌曝光"
+        },
+        "slot-funnel-desc": {
+          "类型": "纯文本",
+          "最大字数": 41,
+          "示例": "全渠道月度触达用户数，包含线上广告、社交媒体、线下活动"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "PRC-E",
       "page_role": "process",
@@ -1629,26 +3214,62 @@
         "漏斗 → 用 PRC-D"
       ],
       "_renderer": {
-        "dom_selector": ".variant-prc-e",
-        "items_dom_selector": ".tree-branch",
-        "items_count": 4
+        "dom_selector": ".variant-prc-e"
       },
-      "数量约束": {"类型": "范围内", "最少": 2, "最多": 4, "默认": 4, "支持自适应": true, "对象描述": "分支"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 4,
+        "默认": 4,
+        "支持自适应": true,
+        "对象描述": "分支"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "DECISION<br>TREE"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "决策树"},
-        "slot-tree-branches": {
-          "类型": "重复列表", "项数": "2-4",
-          "每项字段": {
-            "slot-tree-branch-tag": {"类型": "纯文本", "最大字数": 20, "示例": "[ BRANCH A ]"},
-            "slot-tree-branch-title": {"类型": "纯文本", "最大字数": 16, "示例": "纯电"},
-            "slot-tree-branch-desc": {"类型": "富文本", "最大字数": 80, "示例": "BEV 路线"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 29,
+          "示例": "ROOT CAUSE ANALYSIS"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 18,
+          "示例": "用户流失率上升的根因分析"
+        },
+        "slot-tree-root-tag": {
+          "类型": "纯文本",
+          "最大字数": 24,
+          "示例": "[ CORE PROBLEM ]"
+        },
+        "slot-tree-root-title": {
+          "类型": "富文本",
+          "最大字数": 20,
+          "示例": "用户流失率上升至 8.4%"
+        },
+        "slot-tree-root-desc": {
+          "类型": "纯文本",
+          "最大字数": 59,
+          "示例": "Q3 月度流失率较 Q2 上升 2.1 个百分点，超出预警阈值，需要系统性分析"
+        },
+        "slot-tree-branch-tag": {
+          "类型": "纯文本",
+          "最大字数": 33,
+          "示例": "[ ROOT CAUSE 01 · 主因 ]"
+        },
+        "slot-tree-branch-title": {
+          "类型": "纯文本",
+          "最大字数": 9,
+          "示例": "产品体验下降"
+        },
+        "slot-tree-branch-desc": {
+          "类型": "纯文本",
+          "最大字数": 62,
+          "示例": "核心功能响应速度劣化 34%，用户满意度评分从 4.2 降至 3.7，直接触发流"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "FRW-A",
       "page_role": "framework",
@@ -1660,27 +3281,60 @@
         "维恩图 → 用 FRW-D"
       ],
       "_renderer": {
-        "dom_selector": ".variant-frw-a",
-        "items_dom_selector": ".quadrant",
-        "items_count": 4
+        "dom_selector": ".variant-frw-a"
       },
-      "数量约束": {"类型": "严格固定", "数量": 4, "支持自适应": false, "对象描述": "象限"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 4,
+        "支持自适应": false,
+        "对象描述": "象限"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "2×2<br>MATRIX"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "BCG 矩阵"},
-        "slot-quadrants": {
-          "类型": "重复列表", "项数": 4,
-          "每项字段": {
-            "slot-q-tag": {"类型": "纯文本", "最大字数": 30, "示例": "[ STAR ]"},
-            "slot-q-title": {"类型": "纯文本", "最大字数": 16, "示例": "明星业务"},
-            "slot-q-desc": {"类型": "富文本", "最大字数": 60, "示例": "<em>高增长 + 高份额</em>"},
-            "slot-q-items": {"类型": "同质列表", "项数": "2-4", "示例": ["比亚迪汉 EV", "理想 L9"]}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 29,
+          "示例": "STRATEGIC PORTFOLIO"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 29,
+          "示例": "产品战略矩阵：市场吸引力 × 竞争优势"
+        },
+        "slot-axis-y-label": {
+          "类型": "纯文本",
+          "最大字数": 14,
+          "示例": "市场吸引力 ↑ 高"
+        },
+        "slot-q-tag": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "[ STAR · 明星产品 ]"
+        },
+        "slot-q-title": {
+          "类型": "富文本",
+          "最大字数": 12,
+          "示例": "智能驾驶订阅服务"
+        },
+        "slot-q-desc": {
+          "类型": "纯文本",
+          "最大字数": 44,
+          "示例": "高市场吸引力 + 强竞争优势，是未来 3 年的核心增长引擎"
+        },
+        "slot-q-item": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "NOA 功能 · 月订阅 99 元"
+        },
+        "slot-axis-x-label": {
+          "类型": "纯文本",
+          "最大字数": 12,
+          "示例": "弱 ← 竞争优势"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "FRW-B",
       "page_role": "framework",
@@ -1692,25 +3346,47 @@
         "维恩图 → 用 FRW-D"
       ],
       "_renderer": {
-        "dom_selector": ".variant-frw-b",
-        "items_dom_selector": ".pyramid-block",
-        "items_count": 3
+        "dom_selector": ".variant-frw-b"
       },
-      "数量约束": {"类型": "范围内", "最少": 3, "最多": 5, "默认": 3, "支持自适应": true, "对象描述": "金字塔层"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 3,
+        "最多": 5,
+        "默认": 3,
+        "支持自适应": true,
+        "对象描述": "金字塔层"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "VALUE<br>PYRAMID"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "价值金字塔"},
-        "slot-pyramid-blocks": {
-          "类型": "重复列表", "项数": "3-5",
-          "每项字段": {
-            "slot-pyramid-title": {"类型": "纯文本", "最大字数": 20, "示例": "情感价值"},
-            "content": {"类型": "富文本", "最大字数": 60, "示例": "品牌认同 / 自我表达"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 24,
+          "示例": "COMPETITIVE MOAT"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "护城河层级：从基础能力到不可替代性"
+        },
+        "slot-pyramid-title": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "品牌与生态"
+        },
+        "slot-pyramid-desc": {
+          "类型": "纯文本",
+          "最大字数": 50,
+          "示例": "用户忠诚度、品牌溢价、生态锁定——最难复制，一旦建立几乎无法被攻破"
+        },
+        "slot-pyramid-item": {
+          "类型": "纯文本",
+          "最大字数": 9,
+          "示例": "NPS 72"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "FRW-C",
       "page_role": "framework",
@@ -1721,25 +3397,52 @@
         "金字塔 → 用 FRW-B"
       ],
       "_renderer": {
-        "dom_selector": ".variant-frw-c",
-        "items_dom_selector": ".radial-node",
-        "items_count": 6
+        "dom_selector": ".variant-frw-c"
       },
-      "数量约束": {"类型": "范围内", "最少": 3, "最多": 6, "默认": 6, "支持自适应": true, "对象描述": "圈层节点"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 3,
+        "最多": 6,
+        "默认": 6,
+        "支持自适应": true,
+        "对象描述": "圈层节点"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "CORE<br>VS PERIPHERY"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "核心 vs 外围"},
-        "slot-radial-nodes": {
-          "类型": "重复列表", "项数": "3-6",
-          "每项字段": {
-            "slot-radial-node-title": {"类型": "纯文本", "最大字数": 16, "示例": "三电技术"},
-            "slot-radial-node-desc": {"类型": "富文本", "最大字数": 40, "示例": "电池 / 电机 / 电控"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 20,
+          "示例": "ECOSYSTEM MAP"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "以智能驾驶为核心的产品生态地图"
+        },
+        "slot-radial-core-label": {
+          "类型": "纯文本",
+          "最大字数": 12,
+          "示例": "[ CORE ]"
+        },
+        "slot-radial-core-title": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "智能驾驶"
+        },
+        "slot-radial-node-title": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "感知系统"
+        },
+        "slot-radial-node-desc": {
+          "类型": "纯文本",
+          "最大字数": 21,
+          "示例": "激光雷达 + 摄像头融合感知"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "FRW-D",
       "page_role": "framework",
@@ -1751,26 +3454,67 @@
         "同心圆 → 用 FRW-C"
       ],
       "_renderer": {
-        "dom_selector": ".variant-frw-d",
-        "items_dom_selector": ".venn-circle",
-        "items_count": 2
+        "dom_selector": ".variant-frw-d"
       },
-      "数量约束": {"类型": "范围内", "最少": 2, "最多": 3, "默认": 2, "支持自适应": false, "对象描述": "维恩圆"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 2,
+        "最多": 3,
+        "默认": 2,
+        "支持自适应": false,
+        "对象描述": "维恩圆"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "OVERLAP"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "交集"},
-        "slot-venn-circles": {
-          "类型": "重复列表", "项数": "2-3",
-          "每项字段": {
-            "title": {"类型": "纯文本", "最大字数": 16, "示例": "传统车企"},
-            "content": {"类型": "富文本", "最大字数": 60, "示例": "比亚迪 / 吉利"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 21,
+          "示例": "THE SWEET SPOT"
         },
-        "overlap-content": {"类型": "富文本", "描述": "重叠区文字", "最大字数": 30, "示例": "<em>跨界</em>合作"}
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 36,
+          "示例": "我们的差异化优势：技术 × 规模 × 品牌的交集"
+        },
+        "slot-venn-label": {
+          "类型": "富文本",
+          "最大字数": 71,
+          "示例": "[ TECHNOLOGY ]\n技术领先\n\n端到端智驾算法\n自研芯片 SoC\n80"
+        },
+        "slot-venn-label-tag": {
+          "类型": "纯文本",
+          "最大字数": 21,
+          "示例": "[ TECHNOLOGY ]"
+        },
+        "slot-venn-label-title": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "技术领先"
+        },
+        "slot-venn-label-item": {
+          "类型": "纯文本",
+          "最大字数": 11,
+          "示例": "端到端智驾算法"
+        },
+        "slot-venn-int-tag": {
+          "类型": "纯文本",
+          "最大字数": 30,
+          "示例": "[ UNIQUE ADVANTAGE ]"
+        },
+        "slot-venn-int-title": {
+          "类型": "富文本",
+          "最大字数": 8,
+          "示例": "不可替代"
+        },
+        "slot-venn-int-desc": {
+          "类型": "纯文本",
+          "最大字数": 54,
+          "示例": "技术领先 + 规模优势的交集，构成竞争对手无法在 3 年内复制的核心壁垒"
+        }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLO-A",
       "page_role": "closing",
@@ -1783,27 +3527,65 @@
         "Thank You → 用 CLO-E"
       ],
       "_renderer": {
-        "dom_selector": ".variant-clo-a",
-        "items_dom_selector": ".conclusion-item",
-        "items_count": 3
+        "dom_selector": ".variant-clo-a"
       },
-      "数量约束": {"类型": "严格固定", "数量": 3, "支持自适应": false, "对象描述": "结论项"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 3,
+        "支持自适应": false,
+        "对象描述": "结论项"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "THREE<br>CONCLUSIONS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "三大结论"},
-        "slot-conclusion-list": {
-          "类型": "重复列表", "项数": 3,
-          "每项字段": {
-            "slot-conclusion-num": {"类型": "纯文本", "最大字数": 4, "示例": "01"},
-            "slot-conclusion-title": {"类型": "纯文本", "最大字数": 16, "示例": "拐点已至"},
-            "slot-conclusion-text": {"类型": "富文本", "最大字数": 100, "示例": "渗透率<em>40.9%</em>, 突破主流门槛"}
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 20,
+          "示例": "KEY TAKEAWAYS"
         },
-        "slot-insight": {"类型": "纯文本", "最大字数": 60, "示例": "三个结论指向同一个方向 — 第二曲线已经开始"}
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 17,
+          "示例": "本次研究的三个核心结论"
+        },
+        "slot-conclusion-list": {
+          "类型": "纯文本",
+          "最大字数": 368,
+          "示例": "01\n\n渗透率拐点已过，行业进入质量竞争阶段\n40% 的渗透率标志着主流市场的到"
+        },
+        "slot-conclusion-item": {
+          "类型": "纯文本",
+          "最大字数": 113,
+          "示例": "01\n\n渗透率拐点已过，行业进入质量竞争阶段\n40% 的渗透率标志着主流市场的到"
+        },
+        "slot-conclusion-num": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "01"
+        },
+        "slot-conclusion-text": {
+          "类型": "纯文本",
+          "最大字数": 107,
+          "示例": "渗透率拐点已过，行业进入质量竞争阶段\n40% 的渗透率标志着主流市场的到来。接下"
+        },
+        "slot-conclusion-title": {
+          "类型": "纯文本",
+          "最大字数": 27,
+          "示例": "渗透率拐点已过，行业进入质量竞争阶段"
+        },
+        "slot-conclusion-desc": {
+          "类型": "纯文本",
+          "最大字数": 78,
+          "示例": "40% 的渗透率标志着主流市场的到来。接下来的竞争，不再是谁卖得多，而是谁的用户"
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 54,
+          "示例": "[ BOTTOM LINE ] 中国新能源汽车行业已进入全球竞争的新阶段"
+        }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLO-B",
       "page_role": "closing",
@@ -1814,32 +3596,57 @@
         "4 支柱 → 用 CLO-C"
       ],
       "_renderer": {
-        "dom_selector": ".variant-clo-b",
-        "items_dom_selector": ".panel-item",
-        "items_count": 8
+        "dom_selector": ".variant-clo-b"
       },
-      "数量约束": {"类型": "范围内", "最少": 4, "最多": 10, "默认": 8, "支持自适应": true, "对象描述": "panel 内 item 总数(左右各半)"},
+      "数量约束": {
+        "类型": "范围内",
+        "最少": 4,
+        "最多": 10,
+        "默认": 8,
+        "支持自适应": true,
+        "对象描述": "panel 内 item 总数(左右各半)"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "CONCLUSION<br>&amp; ACTION"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "结论 & 行动"},
-        "slot-dual-panel": {
-          "类型": "组合字段",
-          "子字段": {
-            "left": {
-              "slot-panel-label": {"类型": "纯文本", "最大字数": 30, "示例": "[ CONCLUSION ]"},
-              "items": {"类型": "重复列表", "项数": "2-5", "每项字段": {"num": {"示例": "01"}, "text": {"示例": "拐点已至"}}}
-            },
-            "right": {
-              "slot-panel-label": {"类型": "纯文本", "最大字数": 30, "示例": "[ ACTION ]"},
-              "items": {"类型": "重复列表", "项数": "2-5", "每项字段": {"num": {"示例": "01"}, "text": {"示例": "加大投入"}}}
-            }
-          }
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 32,
+          "示例": "CONCLUSIONS & ACTIONS"
         },
-        "slot-insight": {"类型": "纯文本", "最大字数": 80, "示例": "结论已清晰, 行动已明确, 时间窗口正在打开"}
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 11,
+          "示例": "结论与行动建议"
+        },
+        "slot-dual-panel": {
+          "类型": "富文本",
+          "最大字数": 342,
+          "示例": "[ CONCLUSIONS ]\n01渗透率拐点已过，行业进入质量竞争\n02智能化"
+        },
+        "slot-panel-label": {
+          "类型": "纯文本",
+          "最大字数": 23,
+          "示例": "[ CONCLUSIONS ]"
+        },
+        "slot-panel-item": {
+          "类型": "富文本",
+          "最大字数": 27,
+          "示例": "01渗透率拐点已过，行业进入质量竞争"
+        },
+        "slot-item-num": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "01"
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 47,
+          "示例": "[ NEXT STEP ] 请参阅附录中的详细行动计划和时间表"
+        }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLO-C",
       "page_role": "closing",
@@ -1850,26 +3657,60 @@
         "结论 + 行动 → 用 CLO-B"
       ],
       "_renderer": {
-        "dom_selector": ".variant-clo-c",
-        "items_dom_selector": ".card",
-        "items_count": 4
+        "dom_selector": ".variant-clo-c"
       },
-      "数量约束": {"类型": "严格固定", "数量": 4, "支持自适应": false, "对象描述": "支柱卡"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 4,
+        "支持自适应": false,
+        "对象描述": "支柱卡"
+      },
       "slots": {
-        "slot-title-en": {"类型": "富文本", "最大字数": 30, "示例": "FOUR<br>PILLARS"},
-        "slot-title-zh": {"类型": "富文本", "最大字数": 30, "示例": "四大支柱"},
+        "slot-title-en": {
+          "类型": "纯文本",
+          "最大字数": 18,
+          "示例": "FOUR PILLARS"
+        },
+        "slot-title-zh": {
+          "类型": "纯文本",
+          "最大字数": 20,
+          "示例": "支撑我们判断的四个核心支柱"
+        },
         "slot-card-grid": {
-          "类型": "重复列表", "项数": 4,
-          "每项字段": {
-            "num": {"类型": "纯文本", "最大字数": 4, "示例": "01"},
-            "title": {"类型": "纯文本", "最大字数": 16, "示例": "技术领先"},
-            "desc": {"类型": "富文本", "最大字数": 80, "示例": "持续<em>研发投入</em>"}
-          }
+          "类型": "纯文本",
+          "最大字数": 405,
+          "示例": "01\n[ MARKET ]\n市场规模确定性\n2030 年全球新能源汽车市场规模将"
+        },
+        "slot-card-num": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "01"
+        },
+        "slot-card-label": {
+          "类型": "纯文本",
+          "最大字数": 15,
+          "示例": "[ MARKET ]"
+        },
+        "slot-card-title": {
+          "类型": "纯文本",
+          "最大字数": 11,
+          "示例": "市场规模确定性"
+        },
+        "slot-card-desc": {
+          "类型": "纯文本",
+          "最大字数": 68,
+          "示例": "2030 年全球新能源汽车市场规模将达 3 万亿美元，中国贡献 40% 以上，确"
+        },
+        "slot-insight": {
+          "类型": "纯文本",
+          "最大字数": 68,
+          "示例": "[ INVESTMENT THESIS ] 中国新能源汽车是未来十年最确定的结构"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLO-D",
       "page_role": "closing",
@@ -1880,25 +3721,56 @@
         "左右双栏 → 用 CLO-B"
       ],
       "_renderer": {
-        "dom_selector": ".variant-clo-d",
-        "items_dom_selector": ".action-item",
-        "items_count": 4
+        "dom_selector": ".variant-clo-d"
       },
-      "数量约束": {"类型": "严格固定", "数量": 4, "支持自适应": false, "对象描述": "行动短句"},
+      "数量约束": {
+        "类型": "严格固定",
+        "数量": 4,
+        "支持自适应": false,
+        "对象描述": "行动短句"
+      },
       "slots": {
-        "slot-conclusion-tag": {"类型": "纯文本", "最大字数": 30, "示例": "[ FINAL CALL ]"},
-        "slot-hero-conclusion": {"类型": "富文本", "描述": "全屏大字结论", "最大字数": 60, "示例": "中国新能源车<em>领先全球</em>"},
+        "slot-hero-conclusion": {
+          "类型": "富文本",
+          "最大字数": 74,
+          "示例": "[ FINAL CONCLUSION ]\n中国新能源汽车已经赢得了这场战争，现在",
+          "描述": "全屏大字结论"
+        },
+        "slot-conclusion-tag": {
+          "类型": "纯文本",
+          "最大字数": 30,
+          "示例": "[ FINAL CONCLUSION ]"
+        },
+        "slot-conclusion-text": {
+          "类型": "富文本",
+          "最大字数": 42,
+          "示例": "中国新能源汽车已经赢得了这场战争，现在是扩大战果的时候。"
+        },
         "slot-action-bar": {
-          "类型": "重复列表", "项数": 4,
-          "每项字段": {
-            "slot-action-num": {"类型": "纯文本", "最大字数": 4, "示例": "01"},
-            "slot-action-text": {"类型": "纯文本", "最大字数": 20, "示例": "技术深挖"}
-          }
+          "类型": "富文本",
+          "最大字数": 89,
+          "示例": "[ NEXT ACTIONS ]\n\n01加大智能化投入\n02启动欧洲本地化\n03"
+        },
+        "slot-action-bar-label": {
+          "类型": "纯文本",
+          "最大字数": 24,
+          "示例": "[ NEXT ACTIONS ]"
+        },
+        "slot-action-item": {
+          "类型": "富文本",
+          "最大字数": 14,
+          "示例": "01加大智能化投入"
+        },
+        "slot-action-num": {
+          "类型": "纯文本",
+          "最大字数": 8,
+          "示例": "01"
         }
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     },
-
     {
       "id": "CLO-E",
       "page_role": "closing",
@@ -1907,16 +3779,40 @@
       "什么时候不用": [
         "需要结论 → 用 CLO-A/B/C/D"
       ],
-      "_renderer": {"dom_selector": ".variant-clo-e"},
-      "数量约束": {"类型": "无重复元素", "支持自适应": false},
-      "slots": {
-        "slot-eyebrow": {"类型": "纯文本", "最大字数": 30, "示例": "[ END OF REPORT ]"},
-        "slot-hero": {"类型": "富文本", "描述": "巨大字", "最大字数": 30, "示例": "THANK<br>YOU"},
-        "slot-message": {"类型": "富文本", "最大字数": 120, "示例": "联系方式: <strong>research@archive.com</strong>"},
-        "slot-confidential": {"类型": "纯文本", "描述": "底部保密标识", "最大字数": 60, "示例": "© 2026 ARCHIVE RESEARCH · CONFIDENTIAL"}
+      "_renderer": {
+        "dom_selector": ".variant-clo-e"
       },
-      "_warnings": {"PowerPoint 导出安全": true}
+      "数量约束": {
+        "类型": "无重复元素",
+        "支持自适应": false
+      },
+      "slots": {
+        "slot-eyebrow": {
+          "类型": "纯文本",
+          "最大字数": 26,
+          "示例": "[ END OF REPORT ]"
+        },
+        "slot-hero": {
+          "类型": "富文本",
+          "最大字数": 12,
+          "示例": "THANKYOU",
+          "描述": "巨大字"
+        },
+        "slot-message": {
+          "类型": "富文本",
+          "最大字数": 30,
+          "示例": "如有问题，欢迎进一步探讨联系方式请见附录"
+        },
+        "slot-confidential": {
+          "类型": "纯文本",
+          "最大字数": 60,
+          "示例": "[ CONFIDENTIAL · FOR INTERNAL USE ONLY ]",
+          "描述": "底部保密标识"
+        }
+      },
+      "_warnings": {
+        "PowerPoint 导出安全": true
+      }
     }
-
   ]
 }
